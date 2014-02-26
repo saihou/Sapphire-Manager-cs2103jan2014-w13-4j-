@@ -8,7 +8,7 @@ class Task {
 	
 	public Task(){
 	}
-	
+
 	void setStartTime(int time){
 		startTime = time;
 	}
@@ -25,6 +25,9 @@ class Task {
 	}
 	void setTaskName(String name){
 		taskName = name;
+	}
+	String getName() {
+		return taskName;
 	}
 	int getDate(){
 	    return date;

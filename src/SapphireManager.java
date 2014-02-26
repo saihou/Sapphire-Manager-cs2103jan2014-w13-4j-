@@ -28,10 +28,21 @@ public class SapphireManager {
 		//print
 	}
 	private static void executeEditCommand(String cmd){
-		//search for the task	
+		//search for the task
+		ArrayList<Task> matchedTasks = searchByName(cmd);
+		
+		//display matched tasks
+		displayTasks(matchedTasks);
+		
 		//ask user to choose
+		int choice = readUserChoice(new Scanner(System.in));
+		
 		//display selected task to user
+		displaySelectedTasks(matchedTasks, choice);
 		//read input from user, parse input
+		
+		//String input = readUserUpdates(new Scanner(System.in));
+		
 		//edit
 	}
 	private static void executeDeleteCommand(String cmd){
@@ -51,7 +62,49 @@ public class SapphireManager {
 		
 		
 	}
-	
+	private static ArrayList<Task> searchByName(String name) {
+		ArrayList<Task> matchedTasks = new ArrayList<Task>();
+		
+		for (Task t : taskList) {
+			if (t.getName().contains(name)) {
+				matchedTasks.add(t);
+			}
+		}
+		return matchedTasks;
+	}
+	private static void displayTasks(ArrayList<Task> tasks) {
+		int i = 1;
+		System.out.println("Existing tasks found: ");
+		
+		for (Task t: tasks) {
+			//t.printTaskDetails();
+			System.out.print(i+++ ". ");
+			System.out.println(t.getName());
+			System.out.println("Date: " + t.getDate());
+		}
+		System.out.println("Enter a number: ");
+	}
+	private static int readUserChoice(Scanner scan) {
+		Integer userInput=0;
+		if (scan.hasNext()) {
+			userInput = scan.nextInt();
+		}
+		return userInput;
+	}
+	private static void displaySelectedTasks(ArrayList<Task> tasks, int choice) {
+		Task selectedTask = tasks.get(choice-1);
+		System.out.println("Currently editing: ");
+		System.out.println(selectedTask.getName());
+		System.out.println("Date: " + selectedTask.getDate());
+		//selectedTask.printTaskDetails();
+	}
+	private static String readUserUpdates(Scanner scan) {
+		String userInput=null;
+		if (scan.hasNext()) {
+			userInput = scan.nextLine();
+		}
+		return userInput;
+	}
 	private static void executeSearchCommand(String cmd) {
 		
 	}
