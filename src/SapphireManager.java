@@ -33,16 +33,16 @@ public class SapphireManager {
 	}
 	
 	private static void executeDisplayCommand(String cmd){
-		//read everything from text file
 		//sort????
-		//print
+		displayTasksGivenList(taskList);
 	}
+	
 	private static void executeEditCommand(String cmd){
 		//search for the task
 		ArrayList<Task> matchedTasks = searchByName(cmd);
 		
 		//display matched tasks
-		displayTasks(matchedTasks);
+		//displayTasks(matchedTasks);
 		
 		//ask user to choose
 		int choice = readUserChoice(new Scanner(System.in));
@@ -129,18 +129,7 @@ public class SapphireManager {
 		}
 		return matchedTasks;
 	}
-	private static void displayTasks(ArrayList<Task> tasks) {
-		int i = 1;
-		System.out.println("Existing tasks found: ");
-		
-		for (Task t: tasks) {
-			//t.printTaskDetails();
-			System.out.print(i+++ ". ");
-			System.out.println(t.getName());
-			System.out.println("Date: " + t.getDate());
-		}
-		System.out.println("Enter a number: ");
-	}
+	
 	private static int readUserChoice(Scanner scan) {
 		Integer userInput=0;
 		if (scan.hasNext()) {
@@ -271,9 +260,10 @@ public class SapphireManager {
 	
 	private static void displayTasksGivenList(ArrayList<Task> list){
 		int count = 1;
-		for(Task task:list){
+		for(Task task : list){
 			print(count++ + ". ");
 			task.printTaskDetails();
+			print(""); 	//line separator between tasks
 		}
 	}
 	
