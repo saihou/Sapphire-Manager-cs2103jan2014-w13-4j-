@@ -116,7 +116,7 @@ public class SapphireManager {
 	
 	//parser method is only for create and update
 	//parser method if only for add and edit
-	public static void parser(String cmd, Task myTask)throws Exception{
+	public static void parser(String cmd, Task myTask){
 
 		//store the task name
 		int indexOfFirstDash = cmd.indexOf("-");
@@ -173,7 +173,8 @@ public class SapphireManager {
 	}
 	
 	private static void writeLineToArrayList(String line){
-		Task taskToAdd = new Task(line);
+		Task taskToAdd = new Task();
+		parser(line,taskToAdd);
 		taskList.add(taskToAdd);
 	}
 	
@@ -211,10 +212,29 @@ public class SapphireManager {
 		return dateFormatter.format(date.getTime());
 	}
 	
-	private static void printTodaysTask(){
+	private static void displayTasksGivenList(ArrayList<Task> list){
+		int count = 1;
+		for(Task task:list){
+			print(count++ + ". ");
+			task.printTaskDetails();
+		}
+	}
+	
+	private static ArrayList<Task> searchForTasksWithSameDate(String date){
+		ArrayList<Task> matchingTasks = new ArrayList<Task>();
+		for(Task currentTaskChecked : taskList){
+			String currentTaskDate = currentTaskChecked.getDate();
+			if(date.compareTo(currentTaskDate) == 0){
+				matchingTasks.add(currentTaskChecked);
+			}
+		}
+		return matchingTasks;
+	}
+	
+	private static void printTodaysTasks(){
 		String todaysDate = getTodaysDate();
-		ArrayList <Task> todaysTasks = searchByDate(todaysDate);
-		display(todaysTasks);
+		ArrayList<Task> todaysTasks = searchForTasksWithSameDate(todaysDate);
+		displayTasksGivenList(todaysTasks);
 	}
 	
 	private static void executeCommandsUntilExit()throws Exception{
@@ -286,7 +306,7 @@ public class SapphireManager {
 		
 		initialize();
 		
-		printTodaysTask();
+		printTodaysTasks();
 		
 		executeCommandsUntilExit();
 
