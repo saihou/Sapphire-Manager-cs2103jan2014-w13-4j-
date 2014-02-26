@@ -11,6 +11,13 @@ class Task {
 	
 	public Task(){
 	}
+	
+	void setTaskName(String name){
+		taskName = name;
+	}
+	void setDate(String day){
+		date = day;
+	}
 
 	void setStartTime(String time){
 		startTime = time;
@@ -23,19 +30,15 @@ class Task {
 	void setDeadline(String time){
 		deadline = time;
 	}
-	
-	void setDate(String day){
-		date = day;
-	}
+
 	void setLocation(String loc){
 		location = loc;
 	}
-	void setTaskName(String name){
-		taskName = name;
-	}
+
 	void setType(String typeOfTask){
 		type = typeOfTask;
 	}
+	
 	String getName() {
 		return taskName;
 	}
@@ -56,6 +59,31 @@ class Task {
 	}
 	String getType(){
 		return type;
+	}
+	
+	void print(Object line){
+		System.out.println(line);
+	}
+
+	void printTaskDetails(){
+		//Print task name which all tasks will have, followed by date/time if any,
+		//followed by other optional variables
+		
+		print(taskName);
+		
+		if(type.compareTo("fullDay")==0){
+			print("Date: " + date);
+		}else if(type.compareTo("setDuration")==0){
+			print("Date: " + date);
+			print("Time: " + startTime + " to " + endTime);
+		}else if(type.compareTo("targetedTime")==0){
+			print("Date: " + date);
+			print("Time: " + deadline);
+		}
+		
+		if(location!=null){
+			print("Location: " + location);
+		}
 	}
 
 }
