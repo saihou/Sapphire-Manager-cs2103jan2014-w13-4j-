@@ -15,10 +15,15 @@ public class SapphireManager {
 	
 	private static ArrayList < Task > taskList;
 	
+	//get first word of the command
+	static String getFirstWord(String cmd){
+		return cmd.trim().split("\\s+")[0];
+	}
+	
 	//create
-	private static void executeAddCommand(String cmd){
+	private static void executeAddCommand(String cmd)throws Exception{
 		Task myTask = new Task();
-		parseText(cmd, myTask);
+		parser(cmd, myTask);
 		writeSingleTaskToFile(myTask);
 	}
 	
@@ -117,39 +122,37 @@ public class SapphireManager {
 	}
 	
 	//parser method is only for create and update
-	private static void parseText(String cmd, Task myTask){
-		
-		//store the task name 
-		int indexOfFirstDash = cmd.indexOf("/");
+	//parser method if only for add and edit
+	public static void parser(String cmd, Task myTask)throws Exception{
+
+		//store the task name
+		int indexOfFirstDash = cmd.indexOf("-");
 		myTask.setTaskName(cmd.substring(0, indexOfFirstDash));
 		
 		//new cmd string without the task name
 		String cmdWithoutTaskName = cmd.substring(indexOfFirstDash);
 		
-		int indexOfFrom = cmd.indexOf("From");
-		int indexOfTo = cmd.indexOf("To");
-		int indexOfDate = cmd.indexOf("on");
-		int indexOfLocation = cmd.indexOf("loc");
+		int indexOfFrom = cmdWithoutTaskName.indexOf("from");
+		int indexOfTo = cmdWithoutTaskName.indexOf("to");
+		int indexOfDate = cmdWithoutTaskName.indexOf("on");
+		int indexOfLocation = cmdWithoutTaskName.indexOf("loc");
 		
 		//store the starting time
 		if (indexOfFrom != -1) 
-			myTask.setStartTime(Integer.valueOf(cmdWithoutTaskName.substring(indexOfFrom + 2,
-					indexOfTo + 6)));
+			myTask.setStartTime(getFirstWord(cmdWithoutTaskName.substring(indexOfFrom+4)));
 		
 		//store the ending time
 		if (indexOfTo != -1)
-			myTask.setEndTime(Integer.valueOf(cmdWithoutTaskName.substring(indexOfTo + 2,
-					indexOfTo + 6)));
+			myTask.setEndTime(getFirstWord(cmdWithoutTaskName.substring(indexOfTo+2)));
 		
-		//store the date 
+		//store the date
 		if (indexOfDate != -1)
-			myTask.setDate(Integer.valueOf(cmdWithoutTaskName.substring(indexOfDate + 2,
-					indexOfDate + 8)));
+			myTask.setDate(getFirstWord(cmdWithoutTaskName.substring(indexOfDate+2)));
 		
 		//store the location
 		if (indexOfLocation != -1)
-			myTask.setLocation(cmdWithoutTaskName.substring(indexOfLocation + 2));
-		//
+			myTask.setLocation(getFirstWord(cmdWithoutTaskName.substring(indexOfLocation+3)));
+		
 	}
 	private static void writeSingleTaskToFile(Task taskToBeWritten) {
 		//this method writes a single task to file
@@ -209,7 +212,7 @@ public class SapphireManager {
 		display(todaysTasks);
 	}
 	
-	private static void executeCommandsUntilExit(){
+	private static void executeCommandsUntilExit()throws Exception{
 		boolean isDone = false;
 		Scanner scanUserInput = new Scanner(System.in);
 		
@@ -239,7 +242,7 @@ public class SapphireManager {
 			return false;
 		}
 	}
-	private static void doUserOperation(String userInput) {
+	private static void doUserOperation(String userInput)throws Exception {
 		String operation = userInput.split(" ")[0];
 		String userInputWithoutOperation = "";
 		
@@ -273,7 +276,7 @@ public class SapphireManager {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args)throws Exception {
 		printWelcomeMessage();
 		
 		initialize();

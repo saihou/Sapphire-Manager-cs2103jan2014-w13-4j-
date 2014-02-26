@@ -1,23 +1,23 @@
 class Task {
 	
-	private int    startTime;
-	private int    endTime;
+	private String startTime;
+	private String endTime;
 	private String location;
 	private String taskName;
-	private int date;
+	private String date;
 	
 	public Task(){
 	}
 
-	void setStartTime(int time){
+	void setStartTime(String time){
 		startTime = time;
 	}
 	
-	void setEndTime(int time){
+	void setEndTime(String time){
 		endTime = time;
 	}
 	
-	void setDate(int day){
+	void setDate(String day){
 		date = day;
 	}
 	void setLocation(String loc){
@@ -29,13 +29,13 @@ class Task {
 	String getName() {
 		return taskName;
 	}
-	int getDate(){
+	String getDate(){
 	    return date;
 	}
-	int getStartTime(){
+	String getStartTime(){
 		return startTime;
 	}
-	int getEndTime(){
+	String getEndTime(){
 		return endTime;
 	}
 	String getLocation(){
