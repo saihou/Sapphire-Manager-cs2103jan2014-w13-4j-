@@ -60,20 +60,60 @@ public class SapphireManager {
 		//ask user to choose
 		int choice = readUserChoice(new Scanner(System.in));
 		
+		//in case user entered the wrong number
+		while(choice > matchedTasks.size()) {
+			displayTasks(matchedTasks);
+			choice = readUserChoice(new Scanner(System.in));
+		}
+		
 		//display selected task to user
-		displaySelectedTasks(matchedTasks, choice);
+		displaySelectedTasksForDelete(matchedTasks, choice);
 		
 		//ask user to confirm
-		displayConfirmationMsg();
+		boolean CfmChoice = displayConfirmationMsg();
 		
 		//delete
-		
-		
+		if(CfmChoice) {
+			taskList.remove(matchedTasks.get(choice-1));
+			System.out.println("Successfully deleted "+choice+". "+matchedTasks.get(choice-1).getName());
+		} else {
+			print("Delete terminated. Please enter your next command.");
+		}
 	}
 	private static boolean displayConfirmationMsg() {
-		System.out.println("Confirm delete (y/n)");
-		
-	}
+		//return promptYesOrNo();
+		Scanner scan = new Scanner(System.in);
+		//print("Confirm delete (y/n)");
+		String choice = null;//= scan.next();
+		//System.out.println("Entered1: "+choice);
+		while(true) {
+			print("\nConfirm delete (y/n)");
+			choice = scan.next();
+			//System.out.println("Entered2: "+choice);
+			if(choice.equalsIgnoreCase("y") || choice.equalsIgnoreCase("n")) {
+				break;
+			}
+		}
+		if(choice.equalsIgnoreCase("y")) {
+			System.out.println("Chose Yes");
+			return true;
+		} else {
+			System.out.println("Chose No");
+			return false;
+		}
+	} /*
+	private static boolean promptYesOrNo() {
+		String choice = null;
+		Scanner scan = new Scanner(System.in);
+		while(!scan.next().equalsIgnoreCase("n") || !scan.next().equalsIgnoreCase("n")) {
+			choice = scan.next();
+		}
+		if(choice.equalsIgnoreCase("y")) {
+			return true;
+		} else {
+			return false;
+		}
+	}*/
 	private static ArrayList<Task> searchByName(String name) {
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 		
@@ -107,6 +147,12 @@ public class SapphireManager {
 		Task selectedTask = tasks.get(choice-1);
 		System.out.println("Currently editing: ");
 		System.out.println(selectedTask.getName());
+		System.out.println("Date: " + selectedTask.getDate());
+		//selectedTask.printTaskDetails();
+	}
+	private static void displaySelectedTasksForDelete(ArrayList<Task> tasks, int choice) {
+		Task selectedTask = tasks.get(choice-1);
+		System.out.println(choice+". "+selectedTask.getName());
 		System.out.println("Date: " + selectedTask.getDate());
 		//selectedTask.printTaskDetails();
 	}
@@ -168,8 +214,8 @@ public class SapphireManager {
 	}
 	
 	private static void writeLineToArrayList(String line){
-		Task taskToAdd = new Task(line);
-		taskList.add(taskToAdd);
+		//Task taskToAdd = new Task(line);
+		//taskList.add(taskToAdd);
 	}
 	
 	private static void processLineByLine(BufferedReader reader){
@@ -207,9 +253,9 @@ public class SapphireManager {
 	}
 	
 	private static void printTodaysTask(){
-		String todaysDate = getTodaysDate();
-		ArrayList <Task> todaysTasks = searchByDate(todaysDate);
-		display(todaysTasks);
+		//String todaysDate = getTodaysDate();
+		//ArrayList <Task> todaysTasks = searchByDate(todaysDate);
+		//display(todaysTasks);
 	}
 	
 	private static void executeCommandsUntilExit()throws Exception{
@@ -282,6 +328,17 @@ public class SapphireManager {
 		initialize();
 		
 		printTodaysTask();
+		
+		Task tt = new Task();
+		tt.setTaskName("HELLOWORLD");
+		tt.setDate("260214");
+		
+		Task tt2 = new Task();
+		tt2.setTaskName("HELLO");
+		tt2.setDate("260214");
+		
+		taskList.add(tt);
+		taskList.add(tt2);
 		
 		executeCommandsUntilExit();
 
