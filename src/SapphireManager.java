@@ -52,19 +52,26 @@ public class SapphireManager {
 	}
 	private static void executeDeleteCommand(String cmd){
 		//search for the task
+		ArrayList<Task> matchedTasks = searchByName(cmd);
 		
+		//display matched tasks
+		displayTasks(matchedTasks);
 		
 		//ask user to choose
-		
+		int choice = readUserChoice(new Scanner(System.in));
 		
 		//display selected task to user
-		
+		displaySelectedTasks(matchedTasks, choice);
 		
 		//ask user to confirm
-		
+		displayConfirmationMsg();
 		
 		//delete
 		
+		
+	}
+	private static boolean displayConfirmationMsg() {
+		System.out.println("Confirm delete (y/n)");
 		
 	}
 	private static ArrayList<Task> searchByName(String name) {
