@@ -1,14 +1,18 @@
 import java.lang.Object.*;
 import java.util.*;
+import java.io.*;
+import java.text.*;
 
 /**
  * @author 
  *
  */
 public class SapphireManager {
-	private static String WELCOME_MESSAGE = "Welcome to Sapphire Manager!\n";
-	private static String HELP_MESSAGE = "Enter '?' for a list of commands";
-	private static String textFileName = "mytextfile.txt";
+	private static final String WELCOME_MESSAGE = "Welcome to Sapphire Manager!";
+	private static final String HELP_MESSAGE = "Enter '?' for a list of commands.";
+	private static final String READY_MESSAGE = "Sapphire Manager is ready to use.";
+	private static final String textFileName = "mytextfile.txt";
+	
 	private static ArrayList < Task > taskList;
 	
 	//create
@@ -90,16 +94,59 @@ public class SapphireManager {
 	private static void writeSingleTaskToFile(Task taskToBeWritten) {
 		//this method writes a single task to file
 	}
+	
 	private static void print(String message){
 		System.out.println(message);
 	}
+	
 	private static void printWelcomeMessage(){
 		print(WELCOME_MESSAGE);
 		print(HELP_MESSAGE);
 	}
-	private static void loadAndSortTasksFromFile(){
-	}	
-	private static void printTodaysTask(){	
+	
+	private static void writeLineToArrayList(String line){
+		Task taskToAdd = new Task(line);
+		taskList.add(taskToAdd);
+	}
+	
+	private static void processLineByLine(BufferedReader reader){
+		try {
+			String line;
+			while ((line = reader.readLine()) != null) {
+		        writeLineToArrayList(line);
+			}
+		} catch (IOException e) {
+		    System.out.println("File cannot be created/opened.");
+		}
+	}
+	
+	private static void processTasksFromFile(){
+		File file = new File(textFileName);
+		try {
+		    BufferedReader reader = new BufferedReader(new FileReader(file));
+		    processLineByLine(reader);
+
+		} catch (FileNotFoundException e) {
+		    System.out.println("User's first use.");
+		} 
+	}
+	
+	private static void initialize(){
+		taskList = new ArrayList <Task> ();
+		processTasksFromFile();
+		print(READY_MESSAGE);
+	}
+	
+	private static String getTodaysDate(){
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("ddMMyy");
+		Calendar date = Calendar.getInstance();
+		return dateFormatter.format(date.getTime());
+	}
+	
+	private static void printTodaysTask(){
+		String todaysDate = getTodaysDate();
+		ArrayList <Task> todaysTasks = searchByDate(todaysDate);
+		display(todaysTasks);
 	}
 	
 	private static void executeCommandsUntilExit(){
@@ -169,7 +216,7 @@ public class SapphireManager {
 	public static void main(String[] args) {
 		printWelcomeMessage();
 		
-		loadAndSortTasksFromFile();
+		initialize();
 		
 		printTodaysTask();
 		
