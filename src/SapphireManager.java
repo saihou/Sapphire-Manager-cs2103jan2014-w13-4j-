@@ -1,0 +1,321 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Scanner;
+
+/**
+ * @author 
+ *
+ */
+public class SapphireManager {
+	private static final String WELCOME_MESSAGE = "Welcome to Sapphire Manager!";
+	private static final String HELP_MESSAGE = "Enter '?' for a list of commands.";
+	private static final String READY_MESSAGE = "Sapphire Manager is ready to use.";
+	private static final String textFileName = "mytextfile.txt";
+	
+	private static ArrayList < Task > taskList;
+	
+	//get first word of the command
+	static String getFirstWord(String cmd){
+		return cmd.trim().split("\\s+")[0];
+	}
+	
+	//create
+	private static void executeAddCommand(String cmd)throws Exception{
+		Task myTask = new Task();
+		parser(cmd, myTask);
+		writeSingleTaskToFile(myTask);
+	}
+	
+	private static void executeDisplayCommand(String cmd){
+		//read everything from text file
+		//sort????
+		//print
+	}
+	private static void executeEditCommand(String cmd){
+		//search for the task
+		ArrayList<Task> matchedTasks = searchByName(cmd);
+		
+		//display matched tasks
+		displayTasks(matchedTasks);
+		
+		//ask user to choose
+		int choice = readUserChoice(new Scanner(System.in));
+		
+		//display selected task to user
+		displaySelectedTasks(matchedTasks, choice);
+		//read input from user, parse input
+		
+		//String input = readUserUpdates(new Scanner(System.in));
+		
+		//edit
+	}
+	private static void executeDeleteCommand(String cmd){
+		//search for the task
+		
+		
+		//ask user to choose
+		
+		
+		//display selected task to user
+		
+		
+		//ask user to confirm
+		
+		
+		//delete
+		
+		
+	}
+	private static ArrayList<Task> searchByName(String name) {
+		ArrayList<Task> matchedTasks = new ArrayList<Task>();
+		
+		for (Task t : taskList) {
+			if (t.getName().contains(name)) {
+				matchedTasks.add(t);
+			}
+		}
+		return matchedTasks;
+	}
+	private static void displayTasks(ArrayList<Task> tasks) {
+		int i = 1;
+		System.out.println("Existing tasks found: ");
+		
+		for (Task t: tasks) {
+			//t.printTaskDetails();
+			System.out.print(i+++ ". ");
+			System.out.println(t.getName());
+			System.out.println("Date: " + t.getDate());
+		}
+		System.out.println("Enter a number: ");
+	}
+	private static int readUserChoice(Scanner scan) {
+		Integer userInput=0;
+		if (scan.hasNext()) {
+			userInput = scan.nextInt();
+		}
+		return userInput;
+	}
+	private static void displaySelectedTasks(ArrayList<Task> tasks, int choice) {
+		Task selectedTask = tasks.get(choice-1);
+		System.out.println("Currently editing: ");
+		System.out.println(selectedTask.getName());
+		System.out.println("Date: " + selectedTask.getDate());
+		//selectedTask.printTaskDetails();
+	}
+	private static String readUserUpdates(Scanner scan) {
+		String userInput=null;
+		if (scan.hasNext()) {
+			userInput = scan.nextLine();
+		}
+		return userInput;
+	}
+	private static void executeSearchCommand(String cmd) {
+		
+	}
+	
+	//parser method is only for create and update
+	//parser method if only for add and edit
+	public static void parser(String cmd, Task myTask){
+
+		//store the task name
+		int indexOfFirstDash = cmd.indexOf("-");
+		myTask.setTaskName(cmd.substring(0, indexOfFirstDash));
+		
+		//new cmd string without the task name
+		String cmdWithoutTaskName = cmd.substring(indexOfFirstDash);
+		
+		int indexOfFrom = cmdWithoutTaskName.indexOf("from");
+		int indexOfTo = cmdWithoutTaskName.indexOf("to");
+		int indexOfDate = cmdWithoutTaskName.indexOf("on");
+		int indexOfLocation = cmdWithoutTaskName.indexOf("loc");
+		int indexOfDeadline = cmdWithoutTaskName.indexOf("at");
+		
+		if(indexOfFrom == -1 && indexOfDeadline ==-1 && indexOfDate == -1)
+			myTask.setType("noSetTiming");
+		if(indexOfFrom == -1 && indexOfDate != -1)
+			myTask.setType("fullDay");
+		if(indexOfFrom != -1 && indexOfDate == -1)
+			myTask.setType("setDuration");
+		if(indexOfDeadline != -1)
+			myTask.setType("targetedTime");
+		//store the deadline
+		if(indexOfDeadline != -1)
+			myTask.setDeadline(getFirstWord(cmdWithoutTaskName.substring(indexOfFrom+2)));
+		//store the starting time
+		if (indexOfFrom != -1) 
+			myTask.setStartTime(getFirstWord(cmdWithoutTaskName.substring(indexOfFrom+4)));
+		
+		//store the ending time
+		if (indexOfTo != -1)
+			myTask.setEndTime(getFirstWord(cmdWithoutTaskName.substring(indexOfTo+2)));
+		
+		//store the date
+		if (indexOfDate != -1)
+			myTask.setDate(getFirstWord(cmdWithoutTaskName.substring(indexOfDate+2)));
+		
+		//store the location
+		if (indexOfLocation != -1)
+			myTask.setLocation(getFirstWord(cmdWithoutTaskName.substring(indexOfLocation+3)));
+		
+	}
+	private static void writeSingleTaskToFile(Task taskToBeWritten) {
+		//this method writes a single task to file
+	}
+	
+	private static void print(String message){
+		System.out.println(message);
+	}
+	
+	private static void printWelcomeMessage(){
+		print(WELCOME_MESSAGE);
+		print(HELP_MESSAGE);
+	}
+	
+	private static void writeLineToArrayList(String line){
+		Task taskToAdd = new Task();
+		parser(line,taskToAdd);
+		taskList.add(taskToAdd);
+	}
+	
+	private static void processLineByLine(BufferedReader reader){
+		try {
+			String line;
+			while ((line = reader.readLine()) != null) {
+		        writeLineToArrayList(line);
+			}
+		} catch (IOException e) {
+		    System.out.println("File cannot be created/opened.");
+		}
+	}
+	
+	private static void processTasksFromFile(){
+		File file = new File(textFileName);
+		try {
+		    BufferedReader reader = new BufferedReader(new FileReader(file));
+		    processLineByLine(reader);
+
+		} catch (FileNotFoundException e) {
+		    System.out.println("User's first use.");
+		} 
+	}
+	
+	private static void initialize(){
+		taskList = new ArrayList <Task> ();
+		processTasksFromFile();
+		print(READY_MESSAGE);
+	}
+	
+	private static String getTodaysDate(){
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("ddMMyy");
+		Calendar date = Calendar.getInstance();
+		return dateFormatter.format(date.getTime());
+	}
+	
+	private static void displayTasksGivenList(ArrayList<Task> list){
+		int count = 1;
+		for(Task task:list){
+			print(count++ + ". ");
+			task.printTaskDetails();
+		}
+	}
+	
+	private static ArrayList<Task> searchForTasksWithSameDate(String date){
+		ArrayList<Task> matchingTasks = new ArrayList<Task>();
+		for(Task currentTaskChecked : taskList){
+			String currentTaskDate = currentTaskChecked.getDate();
+			if(date.compareTo(currentTaskDate) == 0){
+				matchingTasks.add(currentTaskChecked);
+			}
+		}
+		return matchingTasks;
+	}
+	
+	private static void printTodaysTasks(){
+		String todaysDate = getTodaysDate();
+		ArrayList<Task> todaysTasks = searchForTasksWithSameDate(todaysDate);
+		displayTasksGivenList(todaysTasks);
+	}
+	
+	private static void executeCommandsUntilExit()throws Exception{
+		boolean isDone = false;
+		Scanner scanUserInput = new Scanner(System.in);
+		
+		while (!isDone) {
+			String userInput = captureInputFromUser(scanUserInput);
+
+			isDone = checkIfUserIsGoingToExit(userInput);
+
+			if (!isDone) {
+				doUserOperation(userInput);
+			}
+		}
+	}
+	private static String captureInputFromUser(Scanner scanUserInput) {
+		System.out.print("command: ");
+		if (scanUserInput.hasNext()) {
+			String userInput = scanUserInput.nextLine();
+			return userInput;
+		} else
+			return null;
+	}
+
+	public static boolean checkIfUserIsGoingToExit(String input) {
+		if (input == null || input.startsWith("exit")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	private static void doUserOperation(String userInput)throws Exception {
+		String operation = userInput.split(" ")[0];
+		String userInputWithoutOperation = "";
+		
+		switch (operation) {
+		case "add":
+			userInputWithoutOperation = userInput.substring(4);
+			executeAddCommand(userInputWithoutOperation);
+			break;
+		case "delete":
+			userInputWithoutOperation = userInput.substring(7);
+			executeDeleteCommand(userInputWithoutOperation);
+			break;
+		case "display":
+			userInputWithoutOperation = userInput.substring(7);
+			executeDisplayCommand(userInputWithoutOperation);
+			break;
+		case "edit":
+			userInputWithoutOperation = userInput.substring(7);
+			executeEditCommand(userInputWithoutOperation);
+			break;
+		/*case "clear":
+			break;
+		case "sort":
+			break;
+		case "search":
+			break;*/
+		default:
+			break;
+		}
+	}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args)throws Exception {
+		printWelcomeMessage();
+		
+		initialize();
+		
+		printTodaysTasks();
+		
+		executeCommandsUntilExit();
+
+	}
+
+}
+
