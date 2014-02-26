@@ -182,7 +182,19 @@ public class SapphireManager {
 		int indexOfTo = cmdWithoutTaskName.indexOf("to");
 		int indexOfDate = cmdWithoutTaskName.indexOf("on");
 		int indexOfLocation = cmdWithoutTaskName.indexOf("loc");
+		int indexOfDeadline = cmdWithoutTaskName.indexOf("at");
 		
+		if(indexOfFrom == -1 && indexOfDeadline ==-1 && indexOfDate == -1)
+			myTask.setType("noSetTiming");
+		if(indexOfFrom == -1 && indexOfDate != -1)
+			myTask.setType("fullDay");
+		if(indexOfFrom != -1 && indexOfDate == -1)
+			myTask.setType("setDuration");
+		if(indexOfDeadline != -1)
+			myTask.setType("targetedTime");
+		//store the deadline
+		if(indexOfDeadline != -1)
+			myTask.setDeadline(getFirstWord(cmdWithoutTaskName.substring(indexOfFrom+2)));
 		//store the starting time
 		if (indexOfFrom != -1) 
 			myTask.setStartTime(getFirstWord(cmdWithoutTaskName.substring(indexOfFrom+4)));
