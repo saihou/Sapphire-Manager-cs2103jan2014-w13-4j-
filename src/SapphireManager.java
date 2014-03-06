@@ -1,21 +1,38 @@
-
+/**
+ * @author Cai Di
+ */
 
 public class SapphireManager {
-	private static UserInterface myUI = new UserInterface();
-	private static Parser myParser = new Parser();
-	private static Executor myExecutor = new Executor(myParser,myUI);
 	
-	private static void processCommand(String command){
+	private static UserInterface myUI;
+	private static Parser myParser;
+	private static Executor myExecutor;
+	
+	private static void startApplication() {
+		
 		while(true){
-			doUserOperation(command);
-			if(command.compareTo("Exit") == 0)
-					break;
+			
+			String userCommand = myUI.readCommandFromUser();
+			
+			String operation = myParser.getFirstWord(userCommand);
+			
+			if(operation.equalsIgnoreCase("Exit")) {
+				break;
+			}
+			
+			doUserOperation(userCommand, operation);
+			
 		}
 	}
+	
+	private static void initialiseEnvironment() {
+		myUI = new UserInterface();
+		myParser = new Parser();
+		myExecutor = new Executor(myParser,myUI);
+	}
+	
+	private static void doUserOperation(String userInput, String operation) {
 
-	private static void doUserOperation(String userInput) {
-
-		String operation = userInput.split(" ")[0];
 		String userInputWithoutOperation = "";
 		
 		switch (operation) {
@@ -39,16 +56,17 @@ public class SapphireManager {
 			break;
 		}
 	}
+	
+	
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args)throws Exception {
-		
+	public static void main(String[] args) {
 		myUI.displayWelcomeMessage();	
 		
-		processCommand(myUI.readCommandFromUser());
+		initialiseEnvironment();
 		
-
+		startApplication();
 	}
 
 }

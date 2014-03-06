@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class UserInterface {
-	private Scanner scanner= new Scanner(System.in);
+	
+	private Scanner scanner;
 	private final String WELCOME_MESSAGE = "Welcome to Sapphire Manager!";
 	private final String HELP_MESSAGE = "Enter '?' for a list of commands.";
 	private final String READY_MESSAGE = "Sapphire Manager is ready to use.";
@@ -26,7 +27,7 @@ public class UserInterface {
 	
 	// UI Default Constructor
 	public UserInterface(){
-		
+		scanner = new Scanner(System.in);
 	}
 
 	// SECTION 1 : Functions to print messages to user
