@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class UserInterface {
+	private Scanner scanner= new Scanner(System.in);
 	private final String WELCOME_MESSAGE = "Welcome to Sapphire Manager!";
 	private final String HELP_MESSAGE = "Enter '?' for a list of commands.";
 	private final String READY_MESSAGE = "Sapphire Manager is ready to use.";
@@ -55,7 +56,7 @@ public class UserInterface {
 	
 	// SECTION 2 : Functions to read user input
 	
-	private String readUserInput(Scanner scanner){
+	private String readUserInput(){
 		String userInput = null;
 		if (scanner.hasNext()){
 			userInput = scanner.nextLine();
@@ -63,17 +64,17 @@ public class UserInterface {
 		return userInput;
 	}
 	
-	public String readCommandFromUser(Scanner scanner) {
+	public String readCommandFromUser() {
 		printInLine("command: ");
-		return readUserInput(scanner);
+		return readUserInput();
 	}
 	
-	public String readUserUpdates(Scanner scanner){
-		return readUserInput(scanner);
+	public String readUserUpdates(){
+		return readUserInput();
 	}
 	
-	public int readUserChoice(Scanner scanner){
-		String userInput = readUserInput(scanner);
+	public int readUserChoice(){
+		String userInput = readUserInput();
 		int userChoice = Integer.parseInt(userInput);
 		return userChoice;
 	}	
