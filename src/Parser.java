@@ -1,11 +1,14 @@
+/**
+ * @author Cai Di
+ */
 
 public class Parser {
 		
-	public String getFirstWord(String userInput){
+	public String getFirstWord(String userInput) {
 		return userInput.trim().split("\\s+")[0];
 	}
 	
-	public void parse(String cmd, Task myTask){
+	public void parse(String cmd, Task myTask) {
 
 		//store the task name
 		int indexOfFirstDash = cmd.indexOf("-");
