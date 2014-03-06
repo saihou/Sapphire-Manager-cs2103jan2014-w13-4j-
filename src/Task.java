@@ -8,17 +8,17 @@ class Task {
 	private String date;
 	private String type;
 	
-	public Task(String startTime, String endTime, String deadline, String location,
-			String taskName, String date, String type){
+	public Task(String type, String taskName, String date, String startTime,
+			String endTime, String deadline, String location){
+		this.type     = type;
+		this.taskName = taskName;
+		this.date     = date;
 		this.startTime = startTime;
 		this.endTime  = endTime;
 		this.deadline = deadline;
 		this.location = location;
-		this.taskName = taskName;
-		this.date     = date;
-		this.type     = type;
 	}
-	
+
 	public Task(){
 	}
 	
