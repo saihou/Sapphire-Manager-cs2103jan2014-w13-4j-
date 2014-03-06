@@ -1,8 +1,14 @@
 import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+
+/**
+ * @author Teck Sheng (Dex)
+ *	This class is the storage that that deals with the reading of file and writing to file
+ */
 
 public class Storage {
 	private ArrayList<Task> taskList = null;
@@ -47,6 +53,9 @@ public class Storage {
 	
 	public boolean writeTaskListToFile() {
 		if(taskList.size() == 0) { //clear text file
+			//BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(fileName), false));
+			//bufferedWriter.write(task.getType()+"|"+task.getName()+"|"+task.getDate()+"|"+task.getStartTime()+"|"+task.getEndTime()+"|"+task.getDeadline()+"|"+task.getLocation());
+			//bufferedWriter.close();
 			return true;
 		} else if(taskList.size() > 0) { //write text file
 			return true;
@@ -58,7 +67,9 @@ public class Storage {
 	
 	public boolean writeATaskToFile(Task task) {
 		try {
-			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName));
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(fileName), true));
+			bufferedWriter.write(task.getType()+"|"+task.getName()+"|"+task.getDate()+"|"+task.getStartTime()+"|"+task.getEndTime()+"|"+task.getDeadline()+"|"+task.getLocation());
+			bufferedWriter.close();
 			return true;
 		} catch(Exception ex) {
 			userInterface.displayMessage("Error writing to file!");
