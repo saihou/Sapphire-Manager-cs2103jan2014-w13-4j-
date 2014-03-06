@@ -4,27 +4,43 @@ import java.io.FileReader;
 
 public class Storage {
 	private ArrayList<Task> taskList;
+	private UserInterface userInterface;
+	private String fileName;
 	
-	public boolean readFromFile(String fileName) {
+	public Storage(String fileName, UserInterface userInterface) {
+		this.fileName = fileName;
+		this.userInterface = userInterface;
+	}
+	
+	public boolean readFromFile() {
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(fileName));
-			String line = br.readLine();
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
+			String line = bufferedReader.readLine();
 			String[] splitedTaskInfo;
 			while(line != null) {
 				splitedTaskInfo = line.split("|");
 				taskList.add(new Task(splitedTaskInfo[0].trim(), splitedTaskInfo[1].trim(), splitedTaskInfo[2].trim(), splitedTaskInfo[3].trim(), splitedTaskInfo[4].trim(), splitedTaskInfo[5].trim(), splitedTaskInfo[6].trim()));
-				line = br.readLine();
+				line = bufferedReader.readLine();
 			}
-			br.close();
+			bufferedReader.close();
 			return true;
 		} catch(Exception ex) {
-			System.out.println("Error reading file! Please re-start program.");
+			userInterface.displayMessage("Error reading file! Please re-start program."); 
 			return false;
 		} 
 	}
 	
 	public ArrayList<Task> getTaskList() {
 		return taskList;
+	}
+	
+	public boolean setTaskList(Task task) {
+		if(task == null) {
+			return false;
+		} else {
+			taskList.add(task);
+			return true;
+		}
 	}
 	
 	public boolean writeTaskListToFile() {
