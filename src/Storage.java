@@ -1,9 +1,11 @@
 import java.util.ArrayList;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 
 public class Storage {
-	private ArrayList<Task> taskList;
+	private ArrayList<Task> taskList = null;
 	private UserInterface userInterface;
 	private String fileName;
 	
@@ -44,17 +46,24 @@ public class Storage {
 	}
 	
 	public boolean writeTaskListToFile() {
-		if(taskList.size() == 0) {
+		if(taskList.size() == 0) { //clear text file
 			return true;
-		} else if(taskList.size() > 0) {
+		} else if(taskList.size() > 0) { //write text file
 			return true;
-		} else {
+		} else { 
+			userInterface.displayMessage("Error writing to file!");
 			return false;
 		}
 	}
 	
 	public boolean writeATaskToFile(Task task) {
-		return true;
+		try {
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName));
+			return true;
+		} catch(Exception ex) {
+			userInterface.displayMessage("Error writing to file!");
+			return false;
+		}
 	}
 	
 	public boolean clearFile(String fileName) {
