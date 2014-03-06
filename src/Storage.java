@@ -1,21 +1,11 @@
 import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 
 public class Storage {
 	private ArrayList<Task> taskList;
 	
-	public boolean addTaskToList(Task task) {
-		if(task == null) {
-			return false;
-		} else {
-			taskList.add(task);
-			return true;
-		}
-	}
-	
-	public boolean readFromTextFile(String fileName) {
+	public boolean readFromFile(String fileName) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(fileName));
 			String line = br.readLine();
@@ -37,7 +27,7 @@ public class Storage {
 		return taskList;
 	}
 	
-	public boolean writeTaskListToTextFile() {
+	public boolean writeTaskListToFile() {
 		if(taskList.size() == 0) {
 			return true;
 		} else if(taskList.size() > 0) {
@@ -47,7 +37,11 @@ public class Storage {
 		}
 	}
 	
-	public boolean writeATask(Task task) {
+	public boolean writeATaskToFile(Task task) {
 		return true;
+	}
+	
+	public boolean clearFile(String fileName) {
+		return false;
 	}
 }
