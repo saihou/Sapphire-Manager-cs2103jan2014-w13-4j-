@@ -8,64 +8,74 @@ class Task {
 	private String date;
 	private String type;
 	
+	public Task(String startTime, String endTime, String deadline, String location,
+			String taskName, String date, String type){
+		this.startTime = startTime;
+		this.endTime  = endTime;
+		this.deadline = deadline;
+		this.location = location;
+		this.taskName = taskName;
+		this.date     = date;
+		this.type     = type;
+	}
 	
 	public Task(){
 	}
 	
-	void setTaskName(String name){
+	public void setTaskName(String name){
 		taskName = name;
 	}
-	void setDate(String day){
+	public void setDate(String day){
 		date = day;
 	}
 
-	void setStartTime(String time){
+	public void setStartTime(String time){
 		startTime = time;
 	}
 	
-	void setEndTime(String time){
+	public void setEndTime(String time){
 		endTime = time;
 	}
 	
-	void setDeadline(String time){
+	public void setDeadline(String time){
 		deadline = time;
 	}
 
-	void setLocation(String loc){
+	public void setLocation(String loc){
 		location = loc;
 	}
 
-	void setType(String typeOfTask){
+	public void setType(String typeOfTask){
 		type = typeOfTask;
 	}
 	
-	String getName() {
+	public String getName() {
 		return taskName;
 	}
-	String getDate(){
+	public String getDate(){
 	    return date;
 	}
-	String getStartTime(){
+	public String getStartTime(){
 		return startTime;
 	}
-	String getEndTime(){
+	public String getEndTime(){
 		return endTime;
 	}
-	String getDeadline(){
+	public String getDeadline(){
 		return deadline;
 	}
-	String getLocation(){
+	public String getLocation(){
 		return location;
 	}
-	String getType(){
+	public String getType(){
 		return type;
 	}
 	
-	void print(Object line){
+	public void print(Object line){
 		System.out.println(line);
 	}
 
-	void printTaskDetails(){
+	public void printTaskDetails(){
 		//Print task name which all tasks will have, followed by date/time if any,
 		//followed by other optional variables
 		
