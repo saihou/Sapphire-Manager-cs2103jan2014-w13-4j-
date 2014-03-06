@@ -1,17 +1,9 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Scanner;
+
 
 public class SapphireManager {
 	private static UserInterface myUI = new UserInterface();
 	private static Parser myParser = new Parser();
-	private static Executor myExecutor = new Executor(myUI,myParser);
+	private static Executor myExecutor = new Executor(myParser,myUI);
 	
 	private static void processCommand(String command){
 		while(true){
