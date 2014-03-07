@@ -17,6 +17,7 @@ public class SapphireManager {
 			String operation = myParser.getFirstWord(userCommand);
 			
 			if(operation.equalsIgnoreCase("Exit")) {
+				myUI.displayMessage("Sapphire Manager will now exit.");
 				break;
 			}
 			
@@ -62,9 +63,9 @@ public class SapphireManager {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		myUI.displayWelcomeMessage();	
-		
 		initialiseEnvironment();
+		
+		myUI.displayWelcomeMessage();	
 		
 		startApplication();
 	}

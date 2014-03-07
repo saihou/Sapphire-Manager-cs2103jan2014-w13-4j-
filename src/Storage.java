@@ -11,13 +11,15 @@ import java.io.FileWriter;
  */
 
 public class Storage {
-	private ArrayList<Task> taskList = null;
+	private ArrayList<Task> taskList;
 	private UserInterface userInterface;
 	private String fileName;
 	
 	public Storage(String fileName, UserInterface userInterface) {
 		this.fileName = fileName;
 		this.userInterface = userInterface;
+		taskList = new ArrayList<Task>();
+		readFromFile();
 	}
 	
 	public boolean readFromFile() {
@@ -26,7 +28,7 @@ public class Storage {
 			String line = bufferedReader.readLine();
 			String[] splitedTaskInfo;
 			while(line != null) {
-				splitedTaskInfo = line.split("|");
+				splitedTaskInfo = line.split("\\|");
 				taskList.add(new Task(splitedTaskInfo[0].trim(), splitedTaskInfo[1].trim(), splitedTaskInfo[2].trim(), splitedTaskInfo[3].trim(), splitedTaskInfo[4].trim(), splitedTaskInfo[5].trim(), splitedTaskInfo[6].trim()));
 				line = bufferedReader.readLine();
 			}
@@ -69,6 +71,7 @@ public class Storage {
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(fileName), true));
 			bufferedWriter.write(task.getType()+"|"+task.getName()+"|"+task.getDate()+"|"+task.getStartTime()+"|"+task.getEndTime()+"|"+task.getDeadline()+"|"+task.getLocation());
+			bufferedWriter.newLine();
 			bufferedWriter.close();
 			return true;
 		} catch(Exception ex) {
