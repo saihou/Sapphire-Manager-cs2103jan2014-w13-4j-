@@ -1,8 +1,6 @@
 import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
- * @author Sai Hou
  *	This class is the main executor that will execute the commands
  *	ADD, DISPLAY, EDIT, DELETE
  */
@@ -13,14 +11,19 @@ public class Executor {
 	UserInterface userInterface;
 	History history;
 	
+	/**
+	 * @author Sai Hou
+	 */
 	public Executor(Parser parserFromManager, UserInterface ui) {
-		String fileName = "";
+		String fileName = "mytextfile";
 		parser = parserFromManager;
 		userInterface = ui;
 		history = new History();
 		taskStorage = new Storage(fileName, ui);
 	}
-	
+	/**
+	 * @author Cai Di
+	 */
 	public void executeAddCommand(String userCommand) {
 		ArrayList<Task> allTasks = taskStorage.getTaskList();
 		
@@ -30,11 +33,16 @@ public class Executor {
 		
 		allTasks.add(myTask);
 		
-		taskStorage.writeATaskToFile(myTask);
+		boolean isFileWritingSuccessful = taskStorage.writeATaskToFile(myTask);
 		
-		updateHistory("add", myTask, null);
+		if (isFileWritingSuccessful) {
+			userInterface.displayMessage("Successfully added : " + myTask.getName() + ".");
+			updateHistory("add", myTask, null);
+		}
 	}
-	
+	/**
+	 * @author Sai Hou
+	 */
 	public void executeDisplayCommand(String userCommand){
 		ArrayList<Task> allTasks = taskStorage.getTaskList();
 		
@@ -52,8 +60,6 @@ public class Executor {
 		userInterface.displayTasksGivenList(matchedTasks);
 		userInterface.displayMessage("Enter a number: ");
 		
-		
-		
 		//ask user to choose
 		int choice = userInterface.readUserChoice();
 		Task taskToBeEdited = matchedTasks.get(choice-1);
@@ -69,9 +75,13 @@ public class Executor {
 		
 		parser.parse(modificationsFromUser, taskToBeEdited);
 		
+		userInterface.displayMessage("Successfully made changes to " + taskToBeEdited.getName() +".");
+		
 		updateHistory("edit", taskToBeEdited, duplicatedOldTask);
 	}
-	
+	/**
+	 * @author Dex
+	 */
 	public void executeDeleteCommand(String userCommand) {
 		
 		ArrayList<Task> allTasks = taskStorage.getTaskList();
@@ -101,11 +111,13 @@ public class Executor {
 		//delete
 		allTasks.remove(taskToBeRemoved);
 		
-		userInterface.displayMessage("Successfully deleted "+choice+". "+taskToBeRemoved.getName());
 		
-		taskStorage.writeTaskListToFile();
+		boolean isFileWritingSuccessful = taskStorage.writeTaskListToFile();
 		
-		updateHistory("delete", taskToBeRemoved, null);
+		if (isFileWritingSuccessful) {
+			userInterface.displayMessage("Successfully deleted "+choice+". "+taskToBeRemoved.getName());
+			updateHistory("delete", taskToBeRemoved, null);
+		}
 	}
 	
 	private static ArrayList<Task> searchByName(String name, ArrayList<Task> taskList) {
