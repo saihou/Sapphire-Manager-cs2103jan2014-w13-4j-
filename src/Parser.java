@@ -14,7 +14,9 @@ public class Parser {
 		String cmdWithoutTaskName="";
 		int indexOfFirstSlash = cmd.indexOf("/");
 		if (indexOfFirstSlash != -1) {
-			myTask.setTaskName(cmd.substring(0, indexOfFirstSlash));
+			String taskName = cmd.substring(0, indexOfFirstSlash);
+			taskName = taskName.trim();			
+			myTask.setTaskName(taskName);
 			cmdWithoutTaskName = cmd.substring(indexOfFirstSlash);
 		}
 		else {
