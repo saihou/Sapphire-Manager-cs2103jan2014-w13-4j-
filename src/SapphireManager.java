@@ -2,6 +2,10 @@
  * @author Cai Di
  */
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+
 public class SapphireManager {
 	
 	private static UserInterface myUI;
@@ -58,6 +62,27 @@ public class SapphireManager {
 		}
 	}
 	
+	/**
+	 * @author Si Rui
+	 * This function gets the current date and returns it in DDMMYY format.
+	 */
+	private static String getTodaysDate(){
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("ddMMyy");
+		Calendar date = Calendar.getInstance();
+		return dateFormatter.format(date.getTime());
+	}
+	
+	/**
+	 * @author Si Rui
+	 * This function processes the current date and prints tasks that fall on this date.
+	 * This is part of the application start up sequence, an added function to increase 
+	 * efficiency of the user.
+	 */
+	private static void printTodaysTasks(){
+		String todaysDate = getTodaysDate();
+		ArrayList<Task> todaysTasks = myExecutor.getTodaysTasks(todaysDate);
+		myUI.displayTasksGivenList(todaysTasks);
+	}
 	
 	/**
 	 * @param args
@@ -66,6 +91,8 @@ public class SapphireManager {
 		initialiseEnvironment();
 		
 		myUI.displayWelcomeMessage();	
+		
+		printTodaysTasks();
 		
 		startApplication();
 	}

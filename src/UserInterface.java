@@ -1,6 +1,3 @@
-/**
- * 
- */
 
 /**
  * @author Si Rui
@@ -15,7 +12,7 @@ public class UserInterface {
 	private Scanner scanner;
 	private final String WELCOME_MESSAGE = "Welcome to Sapphire Manager!";
 	private final String HELP_MESSAGE = "Enter '?' for a list of commands.";
-	private final String READY_MESSAGE = "Sapphire Manager is ready to use.";
+	//private final String READY_MESSAGE = "Sapphire Manager is ready to use.";
 	
 	private void print(String message){
 		System.out.println(message);
@@ -27,14 +24,14 @@ public class UserInterface {
 	
 	// UI Default Constructor
 	public UserInterface(){
-		scanner = new Scanner(System.in);
+		this.scanner = new Scanner(System.in);
 	}
 
 	// SECTION 1 : Functions to print messages to user
 	
 	public void displayWelcomeMessage(){
 		print(WELCOME_MESSAGE);
-		print(READY_MESSAGE);
+		//print(READY_MESSAGE); //to be removed in final version, this to check file is ready
 		print(HELP_MESSAGE);
 	}
 	
@@ -49,10 +46,22 @@ public class UserInterface {
 	public void displayTasksGivenList(ArrayList<Task> list){
 		int count = 1;
 		for(Task task : list){
-			print(count++ + ". ");
+			printInLine(count++ + ". ");
 			task.printTaskDetails();
 			print(""); 	//line separator between tasks
 		}
+	}
+	
+	public void displayExistingTasksFound(ArrayList<Task> taskList){
+		print("Existing tasks found:");
+		displayTasksGivenList(taskList);
+		printInLine("Enter a number: ");
+	}
+	
+	public void displayCurrentlyEditingSequence(Task taskToEdit){
+		print("Currently Editing:");
+		displaySingleTask(taskToEdit);
+		printInLine("Enter your edits: ");
 	}
 	
 	// SECTION 2 : Functions to read user input
@@ -66,7 +75,7 @@ public class UserInterface {
 	}
 	
 	public String readCommandFromUser() {
-		printInLine("command: ");
+		printInLine("Command: ");
 		return readUserInput();
 	}
 	

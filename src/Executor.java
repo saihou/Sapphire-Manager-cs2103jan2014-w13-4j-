@@ -131,6 +131,28 @@ public class Executor {
 		return matchedTasks;
 	}
 	
+	/**
+	 * @author Si Rui (&Dex/SH?? Whoever wrote the one above)
+	 */
+	private static ArrayList<Task> searchByDate(String date, ArrayList<Task> taskList) {
+		ArrayList<Task> matchedTasks = new ArrayList<Task>();
+		
+		for (Task t : taskList) {
+			if (t.getDate().compareTo(date)==0) {
+				matchedTasks.add(t);
+			}
+		}
+		return matchedTasks;
+	}
+	
+	public ArrayList<Task> getTodaysTasks(String date){
+		ArrayList<Task> allTasks = taskStorage.getTaskList();
+		
+		ArrayList<Task> matchedTasks = searchByDate(date, allTasks);
+		
+		return matchedTasks;
+	}
+	
 	private void updateHistory(String lastAction, Task pointer, Task duplicatedTask) {
 		history.setLastAction(lastAction);
 		history.setPointerToLastTask(pointer);
