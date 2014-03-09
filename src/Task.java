@@ -92,14 +92,15 @@ class Task {
 		
 		if(getType().equals("fullDay")){
 			println("Date: " + getDate());
-		} else if(type.equals("setDuration")){
+		} else if(getType().equals("setDuration")){
 			println("Date: " + getDate());
 			println("Time: " + getStartTime() + " to " + getEndTime());
-		} else if(type.equals("targetedTime")){
+		} else if(getType().equals("targetedTime")){
 			println("Date: " + getDate());
 			println("Time: " + getDeadline());
 		} else {
-			println("Does not belong to any category, OMG!");
+			println("Date: " + getDate());
+			println("Does not belong to any category!");
 		}
 		
 		if(getLocation() != null){
