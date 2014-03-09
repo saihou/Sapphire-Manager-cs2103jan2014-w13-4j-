@@ -16,11 +16,11 @@ public class Parser {
 		if (indexOfFirstSlash != -1) {
 			String taskName = cmd.substring(0, indexOfFirstSlash);
 			taskName = taskName.trim();			
-			myTask.setTaskName(taskName);
+			myTask.setName(taskName);
 			cmdWithoutTaskName = cmd.substring(indexOfFirstSlash);
 		}
 		else {
-			myTask.setTaskName(cmd.substring(0));
+			myTask.setName(cmd.substring(0));
 		}
 		
 		//new cmd string without the task name
