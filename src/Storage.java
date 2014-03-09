@@ -65,7 +65,7 @@ public class Storage {
 			task.setType(splitedTaskInfo[0]); 
 		} 
 		if(!splitedTaskInfo[1].equals("")) { //task name
-			task.setTaskName(splitedTaskInfo[1]);
+			task.setName(splitedTaskInfo[1]);
 		} 
 		if(!splitedTaskInfo[2].equals("")) { //date
 			task.setDate(splitedTaskInfo[2]);
