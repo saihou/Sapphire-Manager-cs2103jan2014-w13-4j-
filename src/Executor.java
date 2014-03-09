@@ -120,6 +120,74 @@ public class Executor {
 		}
 	}
 	
+	/**
+	 * @author executeUndoCommand and related functions: Si Rui 
+	 * Undo the last entered event. This can only be entered after an “add”, “delete”, or “edit” command.
+	 * 		
+	 * 		Last user action | Action taken by undo function
+	 * 		Added a task 	-> Remove the task
+	 * 		Deleted a task 	-> Restore the original task
+	 * 		Edited a task	-> Revert all changes done to the original task
+	 */
+	
+	private boolean noLastAction(String lastAction, boolean undoWasCalled){
+		if(lastAction == null && !undoWasCalled){	//undo was not called
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	private boolean ableToUndo(String lastAction){
+		boolean undoWasCalled = history.getUndoWasCalled();
+		
+		if(noLastAction(lastAction, undoWasCalled)){
+			userInterface.displayMessage("There is nothing to undo.");
+			return false;
+		}else if(undoWasCalled){
+			userInterface.displayMessage("Sorry, only able to undo once.");
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
+	private String executeActionRequiredToUndo(String lastAction){
+		Task pointerToLastTask = history.getPointerToLastTask();
+		String taskName = pointerToLastTask.getName();
+		String actionTakenToUndo = "";
+		
+		switch(lastAction){
+		case "add": //execute delete(pointerToLastTask)
+			actionTakenToUndo = "deleted \"" + taskName + '"';
+			break;
+		case "delete":	//execute add(pointerToLastTask)
+			actionTakenToUndo = "re-added \"" + taskName + '"';
+			break;
+		case "edit": 	//revert original copy of task
+			Task taskToRestore = history.getCopyOfLastTask();
+			//execute delete(pointerToLastTask)
+			//execute add(taskToRestore)
+			actionTakenToUndo = "reverted \"" + taskName + '"';
+			break;
+		}
+		
+		return actionTakenToUndo;
+	}
+	
+	public void executeUndoCommand(){
+		String lastAction = history.getLastAction();
+		
+		if(ableToUndo(lastAction)){
+			String actionTakenToUndo = executeActionRequiredToUndo(lastAction);
+			userInterface.displayMessage("Successfully " + actionTakenToUndo + '.');
+		}
+		
+	}
+	
+	/**
+	 * @author SH/Dex
+	 */
 	private static ArrayList<Task> searchByName(String name, ArrayList<Task> taskList) {
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 		
@@ -132,7 +200,7 @@ public class Executor {
 	}
 	
 	/**
-	 * @author Si Rui (&Dex/SH?? Whoever wrote the one above)
+	 * @author Si Rui (&SH/Dex?? Whoever wrote the one above)
 	 */
 	private static ArrayList<Task> searchByDate(String date, ArrayList<Task> taskList) {
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
@@ -157,5 +225,6 @@ public class Executor {
 		history.setLastAction(lastAction);
 		history.setPointerToLastTask(pointer);
 		history.setCopyOfLastTask(duplicatedTask);
+		history.setUndoIsCalled(false);
 	}
 }

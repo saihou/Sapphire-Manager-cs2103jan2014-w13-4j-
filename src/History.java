@@ -15,6 +15,12 @@ public class History {
 	private String lastAction;
 	private Task pointerToLastTask;
 	private Task copyOfLastTask;
+	private boolean undoWasCalled;
+	
+	public History(){
+		this.lastAction = null;
+		this.undoWasCalled = false;
+	}
 	
 	public void setLastAction(String lastAction){
 		this.lastAction = lastAction;
@@ -28,15 +34,23 @@ public class History {
 		this.copyOfLastTask = copyOfLastTask;
 	}
 	
+	public void setUndoIsCalled(boolean undoWasCalled){
+		this.undoWasCalled = undoWasCalled;
+	}
+	
 	public String getLastAction(){
-		return lastAction;
+		return this.lastAction;
 	}
 	
 	public Task getPointerToLastTask(){
-		return pointerToLastTask;
+		return this.pointerToLastTask;
 	}
 	
 	public Task getCopyOfLastTask(){
-		return copyOfLastTask;
+		return this.copyOfLastTask;
+	}
+	
+	public boolean getUndoWasCalled(){
+		return this.undoWasCalled;
 	}
 }
