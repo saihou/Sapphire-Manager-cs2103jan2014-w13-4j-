@@ -33,7 +33,7 @@ public class Executor {
 		
 		allTasks.add(myTask);
 		
-		boolean isFileWritingSuccessful = taskStorage.writeATaskToFile(myTask);
+		boolean isFileWritingSuccessful = taskStorage.writeATaskToFile(myTask, true);
 		
 		if (isFileWritingSuccessful) {
 			userInterface.displayMessage("Successfully added : " + myTask.getName() + ".");
