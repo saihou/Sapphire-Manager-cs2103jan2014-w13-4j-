@@ -17,7 +17,7 @@ public class Parser {
 			String taskName = userInput.substring(0, indexOfFirstSlash);
 			taskName = taskName.trim();			
 			myTask.setName(taskName);
-			cmd = userInput.split("/")[1];
+			cmd = userInput.substring(indexOfFirstSlash+1);
 		}
 		else {
 			myTask.setName(userInput.substring(0));
@@ -32,12 +32,12 @@ public class Parser {
 		int indexOfLocation = cmd.indexOf("loc");
 		int indexOfDeadline = cmd.indexOf("at");
 		
-		//store the deadline
+		try{
 		if(indexOfDeadline != -1){
 			String[] temp = cmd.split("at");
 			String deadLine = getFirstWord(temp[1]);
 			myTask.setDeadline(deadLine);
-			cmd = temp[0]+cmd.split(deadLine)[1];
+	        cmd = temp[0]+cmd.split(deadLine)[1];
 			cmd = cmd.trim();
 		}
 		
@@ -71,6 +71,8 @@ public class Parser {
 			String location = cmd.split("loc")[1].trim();
 			myTask.setLocation(location);
 		}
+		}
+		catch (ArrayIndexOutOfBoundsException e){}
 		
 		parseType(myTask);
 		
