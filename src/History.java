@@ -1,8 +1,4 @@
 /**
- * 
- */
-
-/**
  * @author Si Rui
  *	This class stores the history of the last user action, a pointer to the last task 
  *	that was added, edited or deleted, and a copy of the details of that last task. 
@@ -13,7 +9,7 @@
  */
 public class History {
 	private String lastAction;
-	private Task pointerToLastTask;
+	private Task referenceToLastTask;
 	private Task copyOfLastTask;
 	private boolean undoWasCalled;
 	
@@ -26,15 +22,15 @@ public class History {
 		this.lastAction = lastAction;
 	}
 	
-	public void setPointerToLastTask(Task pointerToLastTask){
-		this.pointerToLastTask = pointerToLastTask;
+	public void setReferenceToLastTask(Task referenceToLastTask){
+		this.referenceToLastTask = referenceToLastTask;
 	}
 	
 	public void setCopyOfLastTask(Task copyOfLastTask){
 		this.copyOfLastTask = copyOfLastTask;
 	}
 	
-	public void setUndoIsCalled(boolean undoWasCalled){
+	public void setUndoWasCalled(boolean undoWasCalled){
 		this.undoWasCalled = undoWasCalled;
 	}
 	
@@ -42,8 +38,8 @@ public class History {
 		return this.lastAction;
 	}
 	
-	public Task getPointerToLastTask(){
-		return this.pointerToLastTask;
+	public Task getReferenceToLastTask(){
+		return this.referenceToLastTask;
 	}
 	
 	public Task getCopyOfLastTask(){
