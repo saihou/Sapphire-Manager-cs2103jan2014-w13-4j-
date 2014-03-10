@@ -54,8 +54,11 @@ public class SapphireManager {
 			myExecutor.executeDisplayCommand(userInputWithoutOperation);
 			break;
 		case "edit":
-			userInputWithoutOperation = userInput.substring(7);
+			userInputWithoutOperation = userInput.substring(5);
 			myExecutor.executeEditCommand(userInputWithoutOperation);
+			break;
+		case "undo":
+			myExecutor.executeUndoCommand();
 			break;
 		default:
 			break;
@@ -92,7 +95,7 @@ public class SapphireManager {
 		
 		myUI.displayWelcomeMessage();	
 		
-		printTodaysTasks();
+		//printTodaysTasks();
 		
 		startApplication();
 	}

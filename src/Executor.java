@@ -4,69 +4,66 @@ import java.util.ArrayList;
  *	This class is the main executor that will execute the commands
  *	ADD, DISPLAY, EDIT, DELETE
  */
+
 public class Executor {
 	
 	Storage taskStorage;
 	Parser parser;
 	UserInterface userInterface;
 	History history;
+	ArrayList<Task> allTasks;
 	
 	/**
 	 * @author Sai Hou
 	 */
 	public Executor(Parser parserFromManager, UserInterface ui) {
-		String fileName = "mytextfile";
 		parser = parserFromManager;
 		userInterface = ui;
 		history = new History();
-		taskStorage = new Storage(fileName, ui);
+		taskStorage = new Storage(ui);
+		allTasks = taskStorage.getTaskList();
 	}
 	/**
 	 * @author Cai Di
 	 */
 	public void executeAddCommand(String userCommand) {
-		ArrayList<Task> allTasks = taskStorage.getTaskList();
+		Task taskToBeAdded = new Task();
 		
-		Task myTask = new Task();
+		parser.parse(userCommand, taskToBeAdded);
 		
-		parser.parse(userCommand, myTask);
+		boolean isAdditionOfNewTaskSuccessful = addThisTask(taskToBeAdded);
 		
-		allTasks.add(myTask);
-		
-		boolean isFileWritingSuccessful = taskStorage.writeATaskToFile(myTask, true);
-		
-		if (isFileWritingSuccessful) {
-			userInterface.displayMessage("Successfully added : " + myTask.getName() + ".");
-			updateHistory("add", myTask, null);
+		if (isAdditionOfNewTaskSuccessful) {
+			userInterface.displayMessage("Successfully added : " + taskToBeAdded.getName() + ".");
+			updateHistory("add", taskToBeAdded, null);
 		}
+	}
+	private boolean addThisTask(Task taskToBeAdded) {
+		allTasks.add(taskToBeAdded);
+		
+		boolean isFileWritingSuccessful = taskStorage.writeATaskToFile(taskToBeAdded, true);
+		return isFileWritingSuccessful;
 	}
 	/**
 	 * @author Sai Hou
 	 */
 	public void executeDisplayCommand(String userCommand){
-		ArrayList<Task> allTasks = taskStorage.getTaskList();
-		
 		userInterface.displayTasksGivenList(allTasks);
 	}
 	
 	public void executeEditCommand(String userCommand){
-		ArrayList<Task> allTasks = taskStorage.getTaskList();
-		
 		//search for the task
-		ArrayList<Task> matchedTasks = searchByName(userCommand, allTasks);
+		ArrayList<Task> matchedTasks = searchByName(userCommand);
 		
 		//display matched tasks
-		userInterface.displayMessage("Existing tasks found:");
-		userInterface.displayTasksGivenList(matchedTasks);
-		userInterface.displayMessage("Enter a number: ");
+		userInterface.displayExistingTasksFound(matchedTasks);
 		
 		//ask user to choose
 		int choice = userInterface.readUserChoice();
 		Task taskToBeEdited = matchedTasks.get(choice-1);
 		
 		//display selected task to user
-		userInterface.displayMessage("Currently editing: ");
-		userInterface.displaySingleTask(taskToBeEdited);
+		userInterface.displayCurrentlyEditingSequence(taskToBeEdited);
 		
 		//read input from user, parse input
 		String modificationsFromUser = userInterface.readUserUpdates();
@@ -83,41 +80,45 @@ public class Executor {
 	 * @author Dex
 	 */
 	public void executeDeleteCommand(String userCommand) {
-		
-		ArrayList<Task> allTasks = taskStorage.getTaskList();
-		
 		//search for the task
-		ArrayList<Task> matchedTasks = searchByName(userCommand, allTasks);
+		ArrayList<Task> matchedTasks = searchByName(userCommand);
 		
 		//display matched tasks
-		userInterface.displayMessage("Existing tasks found:");
-		userInterface.displayTasksGivenList(matchedTasks);
-		userInterface.displayMessage("Enter a number: ");
+		userInterface.displayExistingTasksFound(matchedTasks);
 		
 		//ask user to choose
+		int choice = loopUntilUserEntersValidChoice(matchedTasks);
+		
+		//retrieve the task to be removed
+		Task taskToBeDeleted = matchedTasks.get(choice-1);
+		
+		//display it to user
+		userInterface.displaySingleTask(taskToBeDeleted);
+		
+		boolean isDeletionSuccessful = deleteThisTask(taskToBeDeleted);
+		
+		if (isDeletionSuccessful) {
+			userInterface.displayMessage("Successfully deleted "+choice+". "+taskToBeDeleted.getName());
+			updateHistory("delete", taskToBeDeleted, null);
+		}
+	}
+	
+	private boolean deleteThisTask(Task taskToBeRemoved) {
+		//delete from array list
+		allTasks.remove(taskToBeRemoved);
+		
+		//delete from text file
+		boolean isFileWritingSuccessful = taskStorage.writeTaskListToFile();
+		return isFileWritingSuccessful;
+	}
+	private int loopUntilUserEntersValidChoice(ArrayList<Task> matchedTasks) {
 		int choice = userInterface.readUserChoice();
 		
-		//in case user entered the wrong number
 		while (choice > matchedTasks.size()) {
 			userInterface.displayTasksGivenList(matchedTasks);
 			choice = userInterface.readUserChoice();
 		}
-		
-		Task taskToBeRemoved = matchedTasks.get(choice-1);
-		
-		//display selected task to user
-		userInterface.displaySingleTask(taskToBeRemoved);
-		
-		//delete
-		allTasks.remove(taskToBeRemoved);
-		
-		
-		boolean isFileWritingSuccessful = taskStorage.writeTaskListToFile();
-		
-		if (isFileWritingSuccessful) {
-			userInterface.displayMessage("Successfully deleted "+choice+". "+taskToBeRemoved.getName());
-			updateHistory("delete", taskToBeRemoved, null);
-		}
+		return choice;
 	}
 	
 	/**
@@ -158,18 +159,27 @@ public class Executor {
 		String actionTakenToUndo = "";
 		
 		switch(lastAction){
-		case "add": //execute delete(pointerToLastTask)
-			actionTakenToUndo = "deleted \"" + taskName + '"';
-			break;
-		case "delete":	//execute add(pointerToLastTask)
-			actionTakenToUndo = "re-added \"" + taskName + '"';
-			break;
-		case "edit": 	//revert original copy of task
-			Task taskToRestore = history.getCopyOfLastTask();
-			//execute delete(pointerToLastTask)
-			//execute add(taskToRestore)
-			actionTakenToUndo = "reverted \"" + taskName + '"';
-			break;
+			case "add": 
+				//execute delete(pointerToLastTask)
+				deleteThisTask(pointerToLastTask);
+				
+				actionTakenToUndo = "deleted \"" + taskName + '"';
+				break;
+			case "delete":	
+				//execute add(pointerToLastTask)
+				addThisTask(pointerToLastTask);
+				
+				actionTakenToUndo = "re-added \"" + taskName + '"';
+				break;
+			case "edit": 	//revert original copy of task
+				Task taskToRestore = history.getCopyOfLastTask();
+				//execute delete(pointerToLastTask)
+				deleteThisTask(pointerToLastTask);
+				//execute add(taskToRestore)
+				addThisTask(taskToRestore);
+				
+				actionTakenToUndo = "reverted \"" + taskName + '"';
+				break;
 		}
 		
 		return actionTakenToUndo;
@@ -188,10 +198,10 @@ public class Executor {
 	/**
 	 * @author SH/Dex
 	 */
-	private static ArrayList<Task> searchByName(String name, ArrayList<Task> taskList) {
+	private ArrayList<Task> searchByName(String name) {
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 		
-		for (Task t : taskList) {
+		for (Task t : allTasks) {
 			if (t.getName().contains(name)) {
 				matchedTasks.add(t);
 			}
@@ -202,10 +212,11 @@ public class Executor {
 	/**
 	 * @author Si Rui (&SH/Dex?? Whoever wrote the one above)
 	 */
-	private static ArrayList<Task> searchByDate(String date, ArrayList<Task> taskList) {
+	private ArrayList<Task> searchByDate(String date) {
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 		
-		for (Task t : taskList) {
+		for (Task t : allTasks) {
+			
 			if (t.getDate().compareTo(date)==0) {
 				matchedTasks.add(t);
 			}
@@ -214,9 +225,8 @@ public class Executor {
 	}
 	
 	public ArrayList<Task> getTodaysTasks(String date){
-		ArrayList<Task> allTasks = taskStorage.getTaskList();
 		
-		ArrayList<Task> matchedTasks = searchByDate(date, allTasks);
+		ArrayList<Task> matchedTasks = searchByDate(date);
 		
 		return matchedTasks;
 	}

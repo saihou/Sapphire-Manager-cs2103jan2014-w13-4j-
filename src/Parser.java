@@ -84,7 +84,7 @@ public class Parser {
 		}
 		
 	    else if(myTask.getStartTime() == null && myTask.getDeadline() == null && myTask.getDate() == null){
-			myTask.setType("noSetTimeing");
+			myTask.setType("noSetTiming");
 		}
 		
 		else if(myTask.getStartTime() == null && myTask.getDate() != null){

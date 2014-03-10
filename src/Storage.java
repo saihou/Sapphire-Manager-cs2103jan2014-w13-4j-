@@ -11,17 +11,17 @@ import java.io.FileWriter;
  */
 
 public class Storage {
-	private final static String FILENAME = "mytextfile.txt";
+	private final static String FILE_NAME = "mytextfile.txt";
 	
 	private ArrayList<Task> taskList;
 	private BufferedReader bufferedReader;
 	private BufferedWriter bufferedWriter;
 	private File file, newFile;
-	private String fileName = FILENAME;
+	private String fileName = FILE_NAME;
 	private Task task;
 	private UserInterface userInterface;
 
-	public Storage(String fileName, UserInterface userInterface) {
+	public Storage(UserInterface userInterface) {
 		this.userInterface = userInterface;
 		taskList = new ArrayList<Task>();
 		readFromFile();
