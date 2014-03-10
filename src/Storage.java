@@ -143,17 +143,11 @@ public class Storage {
 			return false;
 		}
 	}
-	
-	private void pr(String msg) {
-		System.out.println(msg);
-	}
 
 	private Task convertStringToTask(String[] splitedTaskInfo) {
 		task = new Task();	
-		pr(Integer.toString(splitedTaskInfo.length));
 		
 		if(!splitedTaskInfo[0].equals("[null]")) { //type
-			pr(splitedTaskInfo[0]);
 			task.setType(splitedTaskInfo[0]); 
 		} else {
 			task.setType(null);
