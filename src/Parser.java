@@ -8,6 +8,11 @@ public class Parser {
 		return userInput.trim().split("\\s+")[0];
 	}
 	
+	private int lastCmdIndex(int from, int to,int date,int loc,int deadline){
+		int index = Math.max(from, Math.max(to, Math.max(date, Math.max(loc, deadline))));
+		return index;
+	}
+	
 	public void parse(String userInput, Task myTask) {
 
 		//store the task name
@@ -26,19 +31,28 @@ public class Parser {
 		//new cmd string without the task name
 		//String cmd = cmd.substring(indexOfFirstSlash);
 		
+		
+		
 		int indexOfFrom = cmd.indexOf("from");
 		int indexOfTo = cmd.indexOf("to");
 		int indexOfDate = cmd.indexOf("on");
 		int indexOfLocation = cmd.indexOf("loc");
 		int indexOfDeadline = cmd.indexOf("at");
 		
+		int index = lastCmdIndex(indexOfFrom,indexOfTo,indexOfDate,indexOfLocation,indexOfDeadline);
+
+		
 		try{
 		if(indexOfDeadline != -1){
 			String[] temp = cmd.split("at");
 			String deadLine = getFirstWord(temp[1]);
 			myTask.setDeadline(deadLine);
+			if(indexOfDeadline != index){
 	        cmd = temp[0]+cmd.split(deadLine)[1];
 			cmd = cmd.trim();
+			}
+			else
+				cmd = temp[0].trim();
 		}
 		
 		//store the starting time
@@ -46,8 +60,12 @@ public class Parser {
 			String[] temp = cmd.split("from");
 			String startTime = getFirstWord(temp[1]);
 			myTask.setStartTime(startTime);
+			if(indexOfFrom != index){
 			cmd = temp[0]+cmd.split(startTime)[1];
 			cmd = cmd.trim();
+			}
+			else
+				cmd = temp[0].trim();
 		}
 		
 		//store the ending time
@@ -55,24 +73,37 @@ public class Parser {
 			String[] temp = cmd.split("to");
 			String endTime = getFirstWord(temp[1]);
 			myTask.setEndTime(endTime);
+            if(indexOfTo != index){
 			cmd = temp[0]+cmd.split(endTime)[1];
 			cmd = cmd.trim();
+            }
+			else
+				cmd = temp[0].trim();
 		}
+
 		//store the date
 		if (indexOfDate != -1){
 			String[] temp = cmd.split("on");
 			String date = getFirstWord(temp[1]);
 			myTask.setDate(date);
+			if(indexOfDate != index){
 			cmd = temp[0]+cmd.split(date)[1];
 			cmd = cmd.trim();
+			}
+			else
+				cmd = temp[0].trim();
 		}
 		//store the location
 		if (indexOfLocation != -1){
 			String location = cmd.split("loc")[1].trim();
+			if(cmd.indexOf("/") != -1)
+				location = location.split("/")[0].trim();
+			
 			myTask.setLocation(location);
 		}
 		}
-		catch (ArrayIndexOutOfBoundsException e){}
+		catch (ArrayIndexOutOfBoundsException e){
+		}
 		
 		parseType(myTask);
 		
