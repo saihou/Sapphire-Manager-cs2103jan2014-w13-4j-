@@ -11,8 +11,16 @@ import java.io.FileWriter;
  */
 
 public class Storage {
+	//default file name - cannot change
 	private final static String FILE_NAME = "mytextfile.txt";
-	
+
+	//error messages
+	private final static String FILE_CLEARING_ERROR = "Error clearing file! Please re-start program.";
+	private final static String FILE_INITIALIZING_ERROR = "Error initializing file! Please re-start program.";
+	private final static String FILE_READING_ERROR = "Error reading file! Please re-start program.";
+	private final static String FILE_SAVING_ERROR = "Error saving file! Please re-start program.";
+
+	//declaration
 	private ArrayList<Task> taskList;
 	private BufferedReader bufferedReader;
 	private BufferedWriter bufferedWriter;
@@ -20,75 +28,28 @@ public class Storage {
 	private Task task;
 	private UserInterface userInterface;
 
+	//constructor
 	public Storage(UserInterface userInterface) {
 		this.userInterface = userInterface;
 		taskList = new ArrayList<Task>();
-		readFromFile();
+		readFile();
 	}
 
+	//get-set tasklist
 	public ArrayList<Task> getTaskList() {
 		return taskList;
 	}
 
 	public boolean setTaskList(Task task) {
-		if(task == null) {
-			return false;
-		} else {
+		if(task != null) {
 			taskList.add(task);
 			return true;
 		}
-	}
-	
-	/*
-	public void printArrayList() {
-		Task task1;
-		for(int i=0; i<taskList.size(); i++) {
-			task1 = taskList.get(i);
-			System.out.println("No: "+i+
-								"\nType: "+task1.getType()+
-								"\nName: "+task1.getName()+
-								"\nDate: "+task1.getDate()+
-								"\nStart Time: "+task1.getStartTime()+
-								"\nEnd Time: "+task1.getEndTime()+
-								"\nDeadline: "+task1.getDeadline()+
-								"\nLocation: "+task1.getLocation()+"\n");
-		}
-	}
-	*/
-	
-	public boolean readFromFile() {		
-		try {
-			file = new File(FILE_NAME);
-			if(file.exists()) {
-				userInterface.displayMessage("[Test Message]: File exists."); 
-				bufferedReader = new BufferedReader(new FileReader(FILE_NAME));
-				String line = bufferedReader.readLine();
-				String[] splitedTaskInfo;
-
-				while(line != null) {
-					splitedTaskInfo = line.split("\\|");
-					taskList.add(convertStringToTask(splitedTaskInfo));
-					line = bufferedReader.readLine();
-				}
-				bufferedReader.close();
-				userInterface.displayMessage("[Test Message]: File initialized.");
-				return true;
-			} else {
-				userInterface.displayMessage("[Test Message]: File did not exist."); 
-				bufferedWriter = new BufferedWriter(new FileWriter(file, true));
-				bufferedWriter.close();
-				userInterface.displayMessage("[Test Message]: File created."); 
-				return false;
-			}
-		} catch(Exception ex) {
-			userInterface.displayMessage("Error reading file! Please re-start program."); 
-			return false;
-		}
+		return false;
 	}
 
-	//toAppend: 
-	//true - append to existing file
-	//false - rewrite the file
+	//write a task to file
+	//toAppend: true - append to existing file; false - rewrite the file
 	public boolean writeATaskToFile(Task task, boolean toAppend) {
 		try {
 			bufferedWriter = new BufferedWriter(new FileWriter(new File(FILE_NAME), toAppend));
@@ -97,55 +58,98 @@ public class Storage {
 			bufferedWriter.close();
 			return true;
 		} catch(Exception ex) {
-			userInterface.displayMessage("Error writing to file!");
+			userInterface.displayMessage(FILE_SAVING_ERROR);
 			return false;
 		}
 	}
 
+	//write multiple task to file
 	public boolean writeTaskListToFile() {
-		if(taskList.size() == 0) { 
-			if(clearFile()) {
-				return true;
+		if(taskList.size() > 0) {
+			return writeFile();
+		} else {
+			return clearFile();
+		}
+	}
+
+	//readFile
+	private boolean readFile() {		
+		try {
+			file = new File(FILE_NAME);
+			if(file.exists()) {
+				return readFileLine();
 			} else {
-				return false;
+				return initializeFile();
 			}
-		} else if(taskList.size() > 0) { //write text file
-			for(int i=0; i<taskList.size(); i++) {
-				if(i == 0) {
-					writeATaskToFile(taskList.get(i), false);
-				} else {
-					writeATaskToFile(taskList.get(i), true);
-				}
-			}
-			return true;
-		} else { 
-			userInterface.displayMessage("Error writing to file!");
+		} catch(Exception ex) {
+			userInterface.displayMessage(FILE_READING_ERROR); 
 			return false;
 		}
 	}
 
-	public boolean clearFile() {
+	//initialize file
+	private boolean initializeFile() {
+		try {
+			bufferedWriter = new BufferedWriter(new FileWriter(file, true));
+			bufferedWriter.close();
+			return true;
+		} catch (Exception ex) {
+			userInterface.displayMessage(FILE_INITIALIZING_ERROR); 
+			return false;
+		}
+	}
+
+	//read file line by line
+	private boolean readFileLine() {
+		try {
+			bufferedReader = new BufferedReader(new FileReader(FILE_NAME));
+			String oneTaskInfo = bufferedReader.readLine();
+			String[] oneTaskSplited;
+			while(oneTaskInfo != null) {
+				oneTaskSplited = oneTaskInfo.split("\\|");
+				taskList.add(convertStringToTask(oneTaskSplited));
+				oneTaskInfo = bufferedReader.readLine();
+			}
+			bufferedReader.close();
+			return true;
+		} catch (Exception ex) {
+			userInterface.displayMessage(FILE_READING_ERROR); 
+			return false;
+		}
+	}
+
+	//clear and re-initialize file
+	private boolean clearFile() {
 		try {
 			file = new File(FILE_NAME);
 			if(file.delete()) {
 				newFile = new File(FILE_NAME);
-				if(newFile.createNewFile()) {
-					return true;
-				} else {
-					return false;
-				}
+				return newFile.createNewFile();
 			} else {
 				return false;
 			}
 		} catch (Exception ex) {
-			userInterface.displayMessage("Error clearing file.");
+			userInterface.displayMessage(FILE_CLEARING_ERROR);
 			return false;
 		}
 	}
 
+	//write file line by line
+	private boolean writeFile() {
+		for(int i=0; i<taskList.size(); i++) {
+			if(i == 0) {
+				writeATaskToFile(taskList.get(i), false);
+			} else {
+				writeATaskToFile(taskList.get(i), true);
+			}
+		}
+		return true;
+	}
+
+	//converts String to Task
 	private Task convertStringToTask(String[] splitedTaskInfo) {
 		task = new Task();	
-		
+
 		if(!splitedTaskInfo[0].equals("[null]")) { //type
 			task.setType(splitedTaskInfo[0]); 
 		} else {
@@ -191,6 +195,7 @@ public class Storage {
 		return task;
 	}
 
+	//converts Task to String
 	private String convertTaskToString(Task task) {
 		String convertedTask = "";
 
@@ -247,7 +252,7 @@ public class Storage {
 		} else {
 			convertedTask += task.getLocation();
 		}
-		
+
 		return convertedTask;
 	}
 }
