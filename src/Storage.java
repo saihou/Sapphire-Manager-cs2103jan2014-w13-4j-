@@ -17,7 +17,6 @@ public class Storage {
 	private BufferedReader bufferedReader;
 	private BufferedWriter bufferedWriter;
 	private File file, newFile;
-	private String fileName = FILE_NAME;
 	private Task task;
 	private UserInterface userInterface;
 
@@ -59,10 +58,10 @@ public class Storage {
 	
 	public boolean readFromFile() {		
 		try {
-			file = new File(fileName);
+			file = new File(FILE_NAME);
 			if(file.exists()) {
 				userInterface.displayMessage("[Test Message]: File exists."); 
-				bufferedReader = new BufferedReader(new FileReader(fileName));
+				bufferedReader = new BufferedReader(new FileReader(FILE_NAME));
 				String line = bufferedReader.readLine();
 				String[] splitedTaskInfo;
 
@@ -92,7 +91,7 @@ public class Storage {
 	//false - rewrite the file
 	public boolean writeATaskToFile(Task task, boolean toAppend) {
 		try {
-			bufferedWriter = new BufferedWriter(new FileWriter(new File(fileName), toAppend));
+			bufferedWriter = new BufferedWriter(new FileWriter(new File(FILE_NAME), toAppend));
 			bufferedWriter.write(convertTaskToString(task));
 			bufferedWriter.newLine();
 			bufferedWriter.close();
@@ -127,9 +126,9 @@ public class Storage {
 
 	public boolean clearFile() {
 		try {
-			file = new File(fileName);
+			file = new File(FILE_NAME);
 			if(file.delete()) {
-				newFile = new File(fileName);
+				newFile = new File(FILE_NAME);
 				if(newFile.createNewFile()) {
 					return true;
 				} else {
@@ -139,7 +138,7 @@ public class Storage {
 				return false;
 			}
 		} catch (Exception ex) {
-			userInterface.displayMessage("Error deleting file.");
+			userInterface.displayMessage("Error clearing file.");
 			return false;
 		}
 	}
