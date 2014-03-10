@@ -95,7 +95,7 @@ public class SapphireManager {
 		
 		myUI.displayWelcomeMessage();	
 		
-		//printTodaysTasks();
+		printTodaysTasks();
 		
 		startApplication();
 	}

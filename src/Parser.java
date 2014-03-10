@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * @author Cai Di
  */
@@ -128,6 +130,11 @@ public class Parser {
 			myTask.setType("setDuration");
 		}
 
+	}
+	
+	public boolean checkIfUserChoiceIsValid(ArrayList<Task> matchedTasks) {
+		//stub
+		return true;
 	}
 
 

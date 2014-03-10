@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 /**
  *	This class is the main executor that will execute the commands
- *	ADD, DISPLAY, EDIT, DELETE
+ *	ADD, DISPLAY, EDIT, DELETE, UNDO
  */
 
 public class Executor {
@@ -23,9 +23,7 @@ public class Executor {
 		taskStorage = new Storage(ui);
 		allTasks = taskStorage.getTaskList();
 	}
-	/**
-	 * @author Cai Di
-	 */
+	
 	public void executeAddCommand(String userCommand) {
 		Task taskToBeAdded = new Task();
 		
@@ -38,15 +36,14 @@ public class Executor {
 			updateHistory("add", taskToBeAdded, null);
 		}
 	}
+	
 	private boolean addThisTask(Task taskToBeAdded) {
 		allTasks.add(taskToBeAdded);
 		
 		boolean isFileWritingSuccessful = taskStorage.writeATaskToFile(taskToBeAdded, true);
 		return isFileWritingSuccessful;
 	}
-	/**
-	 * @author Sai Hou
-	 */
+
 	public void executeDisplayCommand(String userCommand){
 		userInterface.displayTasksGivenList(allTasks);
 	}
@@ -55,34 +52,39 @@ public class Executor {
 		//search for the task
 		ArrayList<Task> matchedTasks = searchByName(userCommand);
 		
+		if (searchResultIsEmpty(userCommand, matchedTasks)) {
+			return;
+		}
 		//display matched tasks
 		userInterface.displayExistingTasksFound(matchedTasks);
 		
 		//ask user to choose
-		int choice = userInterface.readUserChoice();
+		int choice = loopUntilUserEntersValidChoice(matchedTasks);
+		
 		Task taskToBeEdited = matchedTasks.get(choice-1);
 		
 		//display selected task to user
 		userInterface.displayCurrentlyEditingSequence(taskToBeEdited);
 		
 		//read input from user, parse input
-		String modificationsFromUser = userInterface.readUserUpdates();
+		String userModifications = userInterface.readUserUpdates();
 		
 		Task duplicatedOldTask = new Task(taskToBeEdited);
 		
-		parser.parse(modificationsFromUser, taskToBeEdited);
+		parser.parse(userModifications, taskToBeEdited);
 		
 		userInterface.displayMessage("Successfully made changes to " + taskToBeEdited.getName() +".");
 		
 		updateHistory("edit", taskToBeEdited, duplicatedOldTask);
 	}
-	/**
-	 * @author Dex
-	 */
+
 	public void executeDeleteCommand(String userCommand) {
 		//search for the task
 		ArrayList<Task> matchedTasks = searchByName(userCommand);
 		
+		if (searchResultIsEmpty(userCommand, matchedTasks)) {
+			return;
+		}
 		//display matched tasks
 		userInterface.displayExistingTasksFound(matchedTasks);
 		
@@ -92,14 +94,21 @@ public class Executor {
 		//retrieve the task to be removed
 		Task taskToBeDeleted = matchedTasks.get(choice-1);
 		
-		//display it to user
-		userInterface.displaySingleTask(taskToBeDeleted);
-		
 		boolean isDeletionSuccessful = deleteThisTask(taskToBeDeleted);
 		
 		if (isDeletionSuccessful) {
 			userInterface.displayMessage("Successfully deleted "+choice+". "+taskToBeDeleted.getName());
 			updateHistory("delete", taskToBeDeleted, null);
+		}
+	}
+
+	private boolean searchResultIsEmpty(String userCommand, ArrayList<Task> matchedTasks) {
+		if (matchedTasks.size() == 0) {
+			userInterface.displayMessage("Cannot find " + userCommand + "!");
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
 	
@@ -111,14 +120,22 @@ public class Executor {
 		boolean isFileWritingSuccessful = taskStorage.writeTaskListToFile();
 		return isFileWritingSuccessful;
 	}
+	
+	//stub.. sort of.
 	private int loopUntilUserEntersValidChoice(ArrayList<Task> matchedTasks) {
 		int choice = userInterface.readUserChoice();
+		boolean isChoiceValid = parser.checkIfUserChoiceIsValid(matchedTasks);
 		
-		while (choice > matchedTasks.size()) {
+		while (!isChoiceValid) {
 			userInterface.displayTasksGivenList(matchedTasks);
 			choice = userInterface.readUserChoice();
+			isChoiceValid = parser.checkIfUserChoiceIsValid(matchedTasks);
 		}
 		return choice;
+	}
+	
+	public void executeClearCommand(String userCommand){
+		//stub
 	}
 	
 	/**
@@ -196,13 +213,16 @@ public class Executor {
 	}
 	
 	/**
-	 * @author SH/Dex
+	 * @author Sai Hou
 	 */
 	private ArrayList<Task> searchByName(String name) {
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 		
 		for (Task t : allTasks) {
-			if (t.getName().contains(name)) {
+			String taskNameInLowerCase = t.getName().toLowerCase();
+			name = name.toLowerCase();
+			
+			if (taskNameInLowerCase.contains(name)) {
 				matchedTasks.add(t);
 			}
 		}
@@ -210,15 +230,18 @@ public class Executor {
 	}
 	
 	/**
-	 * @author Si Rui (&SH/Dex?? Whoever wrote the one above)
+	 * @author Si Rui
 	 */
 	private ArrayList<Task> searchByDate(String date) {
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 		
 		for (Task t : allTasks) {
+			String taskDate = t.getDate();
 			
-			if (t.getDate().compareTo(date)==0) {
-				matchedTasks.add(t);
+			if (taskDate != null) {
+				if (taskDate.compareTo(date)==0) {
+					matchedTasks.add(t);
+				}
 			}
 		}
 		return matchedTasks;
@@ -231,6 +254,9 @@ public class Executor {
 		return matchedTasks;
 	}
 	
+	/**
+	 * @author Sai Hou
+	 */
 	private void updateHistory(String lastAction, Task pointer, Task duplicatedTask) {
 		history.setLastAction(lastAction);
 		history.setPointerToLastTask(pointer);
