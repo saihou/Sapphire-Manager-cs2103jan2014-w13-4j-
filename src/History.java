@@ -11,11 +11,11 @@ public class History {
 	private String lastAction;
 	private Task referenceToLastTask;
 	private Task copyOfLastTask;
-	private boolean undoWasCalled;
+	//private boolean undoWasCalled;
 	
 	public History(){
 		this.lastAction = null;
-		this.undoWasCalled = false;
+		//this.undoWasCalled = false;
 	}
 	
 	public void setLastAction(String lastAction){
@@ -30,9 +30,9 @@ public class History {
 		this.copyOfLastTask = copyOfLastTask;
 	}
 	
-	public void setUndoWasCalled(boolean undoWasCalled){
+	/*public void setUndoWasCalled(boolean undoWasCalled){
 		this.undoWasCalled = undoWasCalled;
-	}
+	}*/
 	
 	public String getLastAction(){
 		return this.lastAction;
@@ -46,7 +46,7 @@ public class History {
 		return this.copyOfLastTask;
 	}
 	
-	public boolean getUndoWasCalled(){
+	/*public boolean getUndoWasCalled(){
 		return this.undoWasCalled;
-	}
+	}*/
 }
