@@ -54,10 +54,11 @@ public class Parser {
 				String deadLine = getFirstWord(temp[1]);
 				myTask.setDeadline(deadLine);
 				if (indexOfDeadline != index) {
-					cmd = temp[0] + cmd.split(deadLine)[1];
+					cmd = temp[0] + temp[1].trim().substring(4);
 					cmd = cmd.trim();
-				} else
+				} else{
 					cmd = temp[0].trim();
+				}
 			}
 
 			// store the starting time
@@ -66,7 +67,7 @@ public class Parser {
 				String startTime = getFirstWord(temp[1]);
 				myTask.setStartTime(startTime);
 				if (indexOfFrom != index) {
-					cmd = temp[0] + cmd.split(startTime)[1];
+					cmd = temp[0] + temp[1].trim().substring(4);
 					cmd = cmd.trim();
 				} else
 					cmd = temp[0].trim();
@@ -78,7 +79,7 @@ public class Parser {
 				String endTime = getFirstWord(temp[1]);
 				myTask.setEndTime(endTime);
 				if (indexOfTo != index) {
-					cmd = temp[0] + cmd.split(endTime)[1];
+					cmd = temp[0] + temp[1].trim().substring(4);
 					cmd = cmd.trim();
 				} else
 					cmd = temp[0].trim();
@@ -90,14 +91,13 @@ public class Parser {
 				String date = getFirstWord(temp[1]);
 				myTask.setDate(date);
 				if (indexOfDate != index) {
-					cmd = temp[0] + cmd.split(date)[1];
+					cmd = temp[0] + temp[1].trim().substring(6);
 					cmd = cmd.trim();
 				} else
 					cmd = temp[0].trim();
 			}
 			// store the location
 			if (indexOfLocation != -1) {
-				System.out.println(cmd);
 				String location = cmd.split("/loc")[1].trim();
 				if (cmd.indexOf("/") != -1)
 					location = location.split("/")[0].trim();
