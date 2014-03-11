@@ -12,6 +12,13 @@ public class UserInterface {
 	private Scanner scanner;
 	private final String WELCOME_MESSAGE = "Welcome to Sapphire Manager!";
 	private final String HELP_MESSAGE = "Enter '?' for a list of commands.";
+	private final String TASKS_FOUND_MESSAGE = "Existing tasks found: ";
+	
+	private final String PROMPT_FOR_COMMAND = "Command: ";
+	private final String PROMPT_FOR_NUMBER = "Enter a number: ";
+	private final String PROMPT_FOR_EDITS = "Enter your edits: ";
+	private final String CURRENTLY_EDITING_MESSAGE = "Currently Editing:";
+	
 	//private final String READY_MESSAGE = "Sapphire Manager is ready to use.";
 	
 	private void print(String message){
@@ -20,6 +27,10 @@ public class UserInterface {
 	
 	private void printInLine(String message){
 		System.out.print(message);
+	}
+	
+	private void printLineSeparator(){
+		print("");
 	}
 	
 	// UI Default Constructor
@@ -43,25 +54,25 @@ public class UserInterface {
 		taskToDisplay.printTaskDetails();
 	}
 	
-	public void displayTasksGivenList(ArrayList<Task> list){
+	public void displayTasksGivenList(ArrayList<Task> taskList){
 		int count = 1;
-		for(Task task : list){
+		for(Task task : taskList){
 			printInLine(count++ + ". ");
 			task.printTaskDetails();
-			print(""); 	//line separator between tasks
+			printLineSeparator(); 	
 		}
 	}
 	
 	public void displayExistingTasksFound(ArrayList<Task> taskList){
-		print("Existing tasks found:");
+		print(TASKS_FOUND_MESSAGE);
 		displayTasksGivenList(taskList);
-		printInLine("Enter a number: ");
+		printInLine(PROMPT_FOR_NUMBER);
 	}
 	
-	public void displayCurrentlyEditingSequence(Task taskToEdit){
-		print("Currently Editing:");
-		displaySingleTask(taskToEdit);
-		printInLine("Enter your edits: ");
+	public void displayCurrentlyEditingSequence(Task taskBeingEdited){
+		print(CURRENTLY_EDITING_MESSAGE);
+		displaySingleTask(taskBeingEdited);
+		printInLine(PROMPT_FOR_EDITS);
 	}
 	
 	// SECTION 2 : Functions to read user input
@@ -75,11 +86,11 @@ public class UserInterface {
 	}
 	
 	public String readCommandFromUser() {
-		printInLine("Command: ");
+		printInLine(PROMPT_FOR_COMMAND);
 		return readUserInput();
 	}
 	
-	public String readUserUpdates(){
+	public String readUserEdits(){
 		return readUserInput();
 	}
 	

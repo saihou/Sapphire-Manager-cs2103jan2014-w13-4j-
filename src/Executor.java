@@ -67,7 +67,7 @@ public class Executor {
 		userInterface.displayCurrentlyEditingSequence(taskToBeEdited);
 		
 		//read input from user, parse input
-		String userModifications = userInterface.readUserUpdates();
+		String userModifications = userInterface.readUserEdits();
 		
 		Task duplicatedOldTask = new Task(taskToBeEdited);
 		
@@ -171,7 +171,7 @@ public class Executor {
 	}
 	
 	private String executeActionRequiredToUndo(String lastAction){
-		Task pointerToLastTask = history.getPointerToLastTask();
+		Task pointerToLastTask = history.getReferenceToLastTask();
 		String taskName = pointerToLastTask.getName();
 		String actionTakenToUndo = "";
 		
@@ -257,10 +257,10 @@ public class Executor {
 	/**
 	 * @author Sai Hou
 	 */
-	private void updateHistory(String lastAction, Task pointer, Task duplicatedTask) {
+	private void updateHistory(String lastAction, Task reference, Task duplicatedTask) {
 		history.setLastAction(lastAction);
-		history.setPointerToLastTask(pointer);
+		history.setReferenceToLastTask(reference);
 		history.setCopyOfLastTask(duplicatedTask);
-		history.setUndoIsCalled(false);
+		history.setUndoWasCalled(false);
 	}
 }
