@@ -52,6 +52,7 @@ public class UserInterface {
 	
 	public void displaySingleTask(Task taskToDisplay) {
 		taskToDisplay.printTaskDetails();
+		printLineSeparator();
 	}
 	
 	public void displayTasksGivenList(ArrayList<Task> taskList){

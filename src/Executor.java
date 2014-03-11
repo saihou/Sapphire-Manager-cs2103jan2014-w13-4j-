@@ -148,21 +148,11 @@ public class Executor {
 	 * 		Edited a task	-> Revert all changes done to the original task
 	 */
 	
-	private boolean noLastAction(String lastAction, boolean undoWasCalled){
-		if(lastAction == null && !undoWasCalled){	//undo was not called
-			return true;
-		}else{
-			return false;
-		}
-	}
-	
 	private boolean ableToUndo(String lastAction){
-		boolean undoWasCalled = history.getUndoWasCalled();
-		
-		if(noLastAction(lastAction, undoWasCalled)){
+		if(lastAction==null){
 			userInterface.displayMessage("There is nothing to undo.");
 			return false;
-		}else if(undoWasCalled){
+		}else if(lastAction.compareTo("undo")==0){
 			userInterface.displayMessage("Sorry, only able to undo once.");
 			return false;
 		}else{
@@ -179,13 +169,11 @@ public class Executor {
 			case "add": 
 				//execute delete(pointerToLastTask)
 				deleteThisTask(pointerToLastTask);
-				
 				actionTakenToUndo = "deleted \"" + taskName + '"';
 				break;
 			case "delete":	
 				//execute add(pointerToLastTask)
 				addThisTask(pointerToLastTask);
-				
 				actionTakenToUndo = "re-added \"" + taskName + '"';
 				break;
 			case "edit": 	//revert original copy of task
@@ -194,7 +182,6 @@ public class Executor {
 				deleteThisTask(pointerToLastTask);
 				//execute add(taskToRestore)
 				addThisTask(taskToRestore);
-				
 				actionTakenToUndo = "reverted \"" + taskName + '"';
 				break;
 		}
@@ -208,6 +195,7 @@ public class Executor {
 		if(ableToUndo(lastAction)){
 			String actionTakenToUndo = executeActionRequiredToUndo(lastAction);
 			userInterface.displayMessage("Successfully " + actionTakenToUndo + '.');
+			updateHistory("undo", null, null);
 		}
 		
 	}
@@ -261,6 +249,5 @@ public class Executor {
 		history.setLastAction(lastAction);
 		history.setReferenceToLastTask(reference);
 		history.setCopyOfLastTask(duplicatedTask);
-		history.setUndoWasCalled(false);
 	}
 }
