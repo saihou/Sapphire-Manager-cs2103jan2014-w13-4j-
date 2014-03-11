@@ -29,24 +29,24 @@ public class Parser {
 			taskName = taskName.trim();
 			myTask.setName(taskName);
 
-			cmd = userInput.substring(indexOfFirstSlash + 1);
+			cmd = userInput.substring(indexOfFirstSlash);
 		}
 
 		// new cmd string without the task name
 		// String cmd = cmd.substring(indexOfFirstSlash);
 
-		int indexOfFrom = cmd.indexOf("from");
+		int indexOfFrom = cmd.indexOf("/from");
 		int indexOfTo = cmd.indexOf("to");
-		int indexOfDate = cmd.indexOf("on");
-		int indexOfLocation = cmd.indexOf("loc");
-		int indexOfDeadline = cmd.indexOf("at");
+		int indexOfDate = cmd.indexOf("/on");
+		int indexOfLocation = cmd.indexOf("/loc");
+		int indexOfDeadline = cmd.indexOf("/at");
 
 		int index = lastCmdIndex(indexOfFrom, indexOfTo, indexOfDate,
 				indexOfLocation, indexOfDeadline);
 
 		try {
 			if (indexOfDeadline != -1) {
-				String[] temp = cmd.split("at");
+				String[] temp = cmd.split("/at");
 				String deadLine = getFirstWord(temp[1]);
 				myTask.setDeadline(deadLine);
 				if (indexOfDeadline != index) {
@@ -58,7 +58,7 @@ public class Parser {
 
 			// store the starting time
 			if (indexOfFrom != -1) {
-				String[] temp = cmd.split("from");
+				String[] temp = cmd.split("/from");
 				String startTime = getFirstWord(temp[1]);
 				myTask.setStartTime(startTime);
 				if (indexOfFrom != index) {
@@ -82,7 +82,7 @@ public class Parser {
 
 			// store the date
 			if (indexOfDate != -1) {
-				String[] temp = cmd.split("on");
+				String[] temp = cmd.split("/on");
 				String date = getFirstWord(temp[1]);
 				myTask.setDate(date);
 				if (indexOfDate != index) {
@@ -93,7 +93,8 @@ public class Parser {
 			}
 			// store the location
 			if (indexOfLocation != -1) {
-				String location = cmd.split("loc")[1].trim();
+				System.out.println(cmd);
+				String location = cmd.split("/loc")[1].trim();
 				if (cmd.indexOf("/") != -1)
 					location = location.split("/")[0].trim();
 
