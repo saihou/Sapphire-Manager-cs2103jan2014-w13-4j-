@@ -31,7 +31,11 @@ public class Parser {
 
 			cmd = userInput.substring(indexOfFirstSlash);
 		}
-
+		else {
+			String taskName = userInput.trim();
+			myTask.setName(taskName);
+		}
+		
 		// new cmd string without the task name
 		// String cmd = cmd.substring(indexOfFirstSlash);
 
