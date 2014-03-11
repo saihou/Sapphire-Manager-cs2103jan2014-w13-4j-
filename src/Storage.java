@@ -25,8 +25,8 @@ public class Storage {
 	private BufferedReader bufferedReader;
 	private BufferedWriter bufferedWriter;
 	private File file, newFile;
-	private Task task;
-	private UserInterface userInterface;
+	protected Task task;
+	protected UserInterface userInterface;
 
 	//constructor
 	public Storage(UserInterface userInterface) {
