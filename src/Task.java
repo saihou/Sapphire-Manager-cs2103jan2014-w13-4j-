@@ -99,8 +99,7 @@ class Task {
 			println("Date: " + getDate());
 			println("Time: " + getDeadline());
 		} else {
-			println("Date: " + getDate());
-			println("Does not belong to any category!");
+			println("To be completed during free-time.");
 		}
 		
 		if(getLocation() != null){
