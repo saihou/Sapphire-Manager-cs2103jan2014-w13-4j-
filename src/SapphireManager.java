@@ -84,7 +84,13 @@ public class SapphireManager {
 	private static void printTodaysTasks(){
 		String todaysDate = getTodaysDate();
 		ArrayList<Task> todaysTasks = myExecutor.getTodaysTasks(todaysDate);
-		myUI.displayTasksGivenList(todaysTasks);
+		
+		if(todaysTasks.isEmpty()){
+			myUI.displayMessage("You have no tasks today.");
+		}else{
+			myUI.displayMessage("Today's tasks: ");
+			myUI.displayTasksGivenList(todaysTasks);
+		}
 	}
 	
 	/**
