@@ -7,11 +7,11 @@ import java.util.ArrayList;
 
 public class Executor {
 	
-	Storage taskStorage;
-	Parser parser;
-	UserInterface userInterface;
-	History history;
-	ArrayList<Task> allTasks;
+	protected Storage taskStorage;
+	protected Parser parser;
+	protected UserInterface userInterface;
+	protected History history;
+	protected ArrayList<Task> allTasks;
 	
 	/**
 	 * @author Sai Hou
@@ -48,11 +48,11 @@ public class Executor {
 		userInterface.displayTasksGivenList(allTasks);
 	}
 	
-	public void executeEditCommand(String userCommand){
+	public void executeEditCommand(String taskName){
 		//search for the task
-		ArrayList<Task> matchedTasks = searchByName(userCommand);
+		ArrayList<Task> matchedTasks = searchByName(taskName);
 		
-		if (searchResultIsEmpty(userCommand, matchedTasks)) {
+		if (searchResultIsEmpty(taskName, matchedTasks)) {
 			return;
 		}
 		//display matched tasks
@@ -66,23 +66,33 @@ public class Executor {
 		//display selected task to user
 		userInterface.displayCurrentlyEditingSequence(taskToBeEdited);
 		
-		//read input from user, parse input
+		//read changes from user
 		String userModifications = userInterface.readUserEdits();
 		
 		Task duplicatedOldTask = new Task(taskToBeEdited);
 		
+		boolean isEditSuccessful = editThisTask(taskToBeEdited, userModifications);
+		
+		if (isEditSuccessful) {
+			userInterface.displayMessage("Successfully made changes to " + taskToBeEdited.getName() +".");
+			updateHistory("edit", taskToBeEdited, duplicatedOldTask);
+		}
+		
+	}
+	private boolean editThisTask(Task taskToBeEdited, String userModifications) {
+		//modify array list
 		parser.parse(userModifications, taskToBeEdited);
 		
-		userInterface.displayMessage("Successfully made changes to " + taskToBeEdited.getName() +".");
-		
-		updateHistory("edit", taskToBeEdited, duplicatedOldTask);
+		//write changes to file
+		boolean isFileWritingSuccessful = taskStorage.writeTaskListToFile();
+		return isFileWritingSuccessful;
 	}
-
-	public void executeDeleteCommand(String userCommand) {
+	
+	public void executeDeleteCommand(String taskName) {
 		//search for the task
-		ArrayList<Task> matchedTasks = searchByName(userCommand);
+		ArrayList<Task> matchedTasks = searchByName(taskName);
 		
-		if (searchResultIsEmpty(userCommand, matchedTasks)) {
+		if (searchResultIsEmpty(taskName, matchedTasks)) {
 			return;
 		}
 		//display matched tasks
@@ -121,7 +131,8 @@ public class Executor {
 		return isFileWritingSuccessful;
 	}
 	
-	//stub.. sort of.
+	//stub
+	//always true for now
 	private int loopUntilUserEntersValidChoice(ArrayList<Task> matchedTasks) {
 		int choice = userInterface.readUserChoice();
 		boolean isChoiceValid = parser.checkIfUserChoiceIsValid(matchedTasks);
@@ -134,7 +145,7 @@ public class Executor {
 		return choice;
 	}
 	
-	public void executeClearCommand(String userCommand){
+	public void executeClearCommand(String userCommand) {
 		//stub
 	}
 	
@@ -148,14 +159,14 @@ public class Executor {
 	 * 		Edited a task	-> Revert all changes done to the original task
 	 */
 	
-	private boolean ableToUndo(String lastAction){
-		if(lastAction==null){
+	private boolean ableToUndo(String lastAction) {
+		if(lastAction == null){
 			userInterface.displayMessage("There is nothing to undo.");
 			return false;
-		}else if(lastAction.compareTo("undo")==0){
+		} else if(lastAction.compareTo("undo") == 0) {
 			userInterface.displayMessage("Sorry, only able to undo once.");
 			return false;
-		}else{
+		} else{
 			return true;
 		}
 	}
@@ -165,7 +176,7 @@ public class Executor {
 		String taskName = pointerToLastTask.getName();
 		String actionTakenToUndo = "";
 		
-		switch(lastAction){
+		switch(lastAction) {
 			case "add": 
 				//execute delete(pointerToLastTask)
 				deleteThisTask(pointerToLastTask);
@@ -189,7 +200,7 @@ public class Executor {
 		return actionTakenToUndo;
 	}
 	
-	public void executeUndoCommand(){
+	public void executeUndoCommand() {
 		String lastAction = history.getLastAction();
 		
 		if(ableToUndo(lastAction)){
@@ -205,7 +216,7 @@ public class Executor {
 	 */
 	private ArrayList<Task> searchByName(String name) {
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
-		
+
 		for (Task t : allTasks) {
 			String taskNameInLowerCase = t.getName().toLowerCase();
 			name = name.toLowerCase();
@@ -227,7 +238,7 @@ public class Executor {
 			String taskDate = t.getDate();
 			
 			if (taskDate != null) {
-				if (taskDate.compareTo(date)==0) {
+				if (taskDate.compareTo(date) == 0) {
 					matchedTasks.add(t);
 				}
 			}
