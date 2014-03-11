@@ -43,7 +43,7 @@ public class UserInterface {
 	public void displayWelcomeMessage(){
 		print(WELCOME_MESSAGE);
 		//print(READY_MESSAGE); //to be removed in final version, this to check file is ready
-		print(HELP_MESSAGE);
+		//print(HELP_MESSAGE); //not implemented yet
 	}
 	
 	public void displayMessage(String message){
