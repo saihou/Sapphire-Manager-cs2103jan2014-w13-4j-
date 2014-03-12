@@ -10,9 +10,8 @@ public class Parser {
 		return userInput.trim().split("\\s+")[0];
 	}
 
-	private int lastCmdIndex(int from, int to, int date, int loc, int deadline) {
-		int index = Math.max(from,
-				Math.max(to, Math.max(date, Math.max(loc, deadline))));
+	private int lastCmdIndex(int from, int date, int loc, int deadline) {
+		int index = Math.max(from, Math.max(date, Math.max(loc, deadline)));
 		return index;
 	}
 
@@ -40,72 +39,49 @@ public class Parser {
 		// String cmd = cmd.substring(indexOfFirstSlash);
 
 		int indexOfFrom = cmd.indexOf("/from");
-		int indexOfTo = cmd.indexOf("to");
 		int indexOfDate = cmd.indexOf("/on");
 		int indexOfLocation = cmd.indexOf("/loc");
 		int indexOfDeadline = cmd.indexOf("/at");
 
-		int index = lastCmdIndex(indexOfFrom, indexOfTo, indexOfDate,
+		int index = lastCmdIndex(indexOfFrom, indexOfDate,
 				indexOfLocation, indexOfDeadline);
-
-		try {
-			if (indexOfDeadline != -1) {
-				String[] temp = cmd.split("/at");
-				String deadLine = getFirstWord(temp[1]);
-				myTask.setDeadline(deadLine);
-				if (indexOfDeadline != index) {
-					cmd = temp[0] + temp[1].trim().substring(4);
-					cmd = cmd.trim();
-				} else{
-					cmd = temp[0].trim();
-				}
-			}
-
-			// store the starting time
-			if (indexOfFrom != -1) {
-				String[] temp = cmd.split("/from");
-				String startTime = getFirstWord(temp[1]);
-				myTask.setStartTime(startTime);
-				if (indexOfFrom != index) {
-					cmd = temp[0] + temp[1].trim().substring(4);
-					cmd = cmd.trim();
-				} else
-					cmd = temp[0].trim();
-			}
-
-			// store the ending time
-			if (indexOfTo != -1) {
-				String[] temp = cmd.split("to");
-				String endTime = getFirstWord(temp[1]);
-				myTask.setEndTime(endTime);
-				if (indexOfTo != index) {
-					cmd = temp[0] + temp[1].trim().substring(4);
-					cmd = cmd.trim();
-				} else
-					cmd = temp[0].trim();
-			}
-
-			// store the date
-			if (indexOfDate != -1) {
-				String[] temp = cmd.split("/on");
-				String date = getFirstWord(temp[1]);
-				myTask.setDate(date);
-				if (indexOfDate != index) {
-					cmd = temp[0] + temp[1].trim().substring(6);
-					cmd = cmd.trim();
-				} else
-					cmd = temp[0].trim();
-			}
-			// store the location
-			if (indexOfLocation != -1) {
-				String location = cmd.split("/loc")[1].trim();
-				if (cmd.indexOf("/") != -1)
-					location = location.split("/")[0].trim();
-
-				myTask.setLocation(location);
-			}
-		} catch (ArrayIndexOutOfBoundsException e) {
+        try{
+		if(indexOfFrom != -1){
+			String[] temp = cmd.split("/from");
+			String startTime = temp[1].trim().substring(0,4);
+			myTask.setStartTime(startTime);
+			temp[1] = temp[1].trim().substring(4).trim();
+			temp[1] = temp[1].substring(2).trim();
+			String endTime = temp[1].substring(0,4);
+			myTask.setEndTime(endTime);
+			cmd = temp[0] + temp[1].substring(4).trim();
 		}
+		
+		if(indexOfDate != -1){
+			String[] temp = cmd.split("/on");
+			String date = temp[1].trim().substring(0,6);
+			myTask.setDate(date);
+			temp[1] = temp[1].trim().substring(6).trim();
+			cmd = temp[0]+temp[1];
+			
+			
+		}
+		if(indexOfDeadline != -1){
+			String[] temp = cmd.split("/at");
+			String deadline = temp[1].trim().substring(0,4);
+			myTask.setDeadline(deadline);
+			temp[1] = temp[1].trim().substring(4).trim();
+			cmd = temp[0]+temp[1];
+			
+		}
+		if(indexOfLocation != -1){
+			String location = cmd.split("/loc")[1].trim();
+			myTask.setLocation(location);
+			
+		}
+        }catch(StringIndexOutOfBoundsException | ArrayIndexOutOfBoundsException e){
+        	System.out.println("invalid input");
+        }
 
 		parseType(myTask);
 
