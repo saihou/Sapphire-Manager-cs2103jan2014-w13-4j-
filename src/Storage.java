@@ -119,7 +119,7 @@ public class Storage {
 	}
 
 	//clear and re-initialize file
-	private boolean clearFile() {
+	public boolean clearFile() {
 		try {
 			file = new File(FILE_NAME);
 			if(file.delete()) {
@@ -132,6 +132,12 @@ public class Storage {
 			userInterface.displayMessage(FILE_CLEARING_ERROR);
 			return false;
 		}
+	}
+	
+	//clear and initialize ArrayList
+	public boolean clearTaskList() {
+		taskList.clear();
+		return true;
 	}
 
 	//write file line by line
