@@ -261,4 +261,38 @@ public class Executor {
 		history.setReferenceToLastTask(reference);
 		history.setCopyOfLastTask(duplicatedTask);
 	}
+	
+	//only used for JUnitTesting!
+	public String jUnitTestAdd(String userCommand, String junit) {
+		//basically combining all the println from various objects (UI, Task)
+		//and appending them to a StringBuilder. At the end, the StringBuilder is
+		//converted to a String and returned so that JUnit can assertEquals();
+		StringBuilder sb = new StringBuilder();
+		int count = 1;
+		for(Task task : allTasks){
+			sb.append(count+ ". ");
+			
+			sb.append(task.getName()+"\n");
+			
+			if(task.getType().equals("fullDay")){
+				sb.append("Date: " + task.getDate()+"\n");
+			} else if(task.getType().equals("setDuration")){
+				sb.append("Date: " + task.getDate()+"\n");
+				sb.append("Time: " + task.getStartTime() + " to " + task.getEndTime()+"\n");
+			} else if(task.getType().equals("targetedTime")){
+				sb.append("Date: " + task.getDate()+"\n");
+				sb.append("Time: " + task.getDeadline()+"\n");
+			} else {
+				sb.append("To be completed during free-time.\n");
+			}
+			
+			if(task.getLocation() != null){
+				sb.append("Location: " + task.getLocation()+"\n");
+			}
+			
+			task.printTaskDetails();
+		}
+		return sb.toString();
+	}
+	
 }
