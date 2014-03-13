@@ -118,8 +118,16 @@ public class Storage {
 		}
 	}
 
+	public boolean clear() {
+		if(clearFile() && clearTaskList()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	//clear and re-initialize file
-	public boolean clearFile() {
+	private boolean clearFile() {
 		try {
 			file = new File(FILE_NAME);
 			if(file.delete()) {
@@ -135,7 +143,7 @@ public class Storage {
 	}
 	
 	//clear and initialize ArrayList
-	public boolean clearTaskList() {
+	private boolean clearTaskList() {
 		taskList.clear();
 		return true;
 	}
