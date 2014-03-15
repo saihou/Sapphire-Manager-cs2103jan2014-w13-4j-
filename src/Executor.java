@@ -147,8 +147,7 @@ public class Executor {
 	
 	public void executeClearCommand(String userCommand) {
 		//stub
-		taskStorage.clearFile();
-		taskStorage.clearTaskList();
+		taskStorage.clear();
 	}
 	
 	/**
