@@ -9,7 +9,14 @@ public class SapphireManagerTest {
 	public void test() {
 		Executor exec = new Executor(new Parser(), new UserInterface());
 		
+		assertClearAll(exec);
+		
 		assertAddingAllTypesOfTasks(exec);
+	}
+	
+	private void assertClearAll(Executor exec) {
+		exec.executeClearCommand();
+		assertEquals("Desc: Clear everything", "", exec.jUnitAutomatedTest());
 	}
 	
 	private void assertAddingAllTypesOfTasks(Executor exec) {
@@ -22,44 +29,49 @@ public class SapphireManagerTest {
 	
 	private void assertAddATaskWithNoSetTiming(Executor exec) {
 		exec.executeAddCommand("nosettiming");
-		assertEquals("test", "1. nosettiming\n" + 
-						"To be completed during free-time.\n", 
-						exec.jUnitTestAdd("no use string", "junit"));
+		assertEquals("Desc: Adding a task with no set timing", 
+				"1. nosettiming\n" + 
+				"To be completed during free-time.\n", 
+				exec.jUnitAutomatedTest());
 		
-		exec.executeClearCommand("no use");
+		exec.executeClearCommand();
 	}
 	private void assertAddATaskWithDuration(Executor exec) {
 		exec.executeAddCommand("setduration /on 123456 /from 0000 to 0001");
-		assertEquals("test", "1. setduration\n" + 
+		assertEquals("Desc: Adding a task with set duration", 
+				"1. setduration\n" + 
 				"Date: 123456\n" +
 				"Time: 0000 to 0001\n", 
-				exec.jUnitTestAdd("no use string", "junit"));
+				exec.jUnitAutomatedTest());
 
-		exec.executeClearCommand("no use");
+		exec.executeClearCommand();
 	}
 	private void assertAddATaskWithDeadline(Executor exec) {
 		exec.executeAddCommand("deadline /on 123456 /at 0000");
-		assertEquals("test", "1. deadline\n" + 
+		assertEquals("Desc: Adding a task with deadline",
+				"1. deadline\n" + 
 				"Date: 123456\n" +
 				"Time: 0000\n",  
-				exec.jUnitTestAdd("no use string", "junit"));
+				exec.jUnitAutomatedTest());
 
-		exec.executeClearCommand("no use");
+		exec.executeClearCommand();
 	}
 	private void assertAddAFullDayTask(Executor exec) {
 		exec.executeAddCommand("fullday /on 123456");
-		assertEquals("test", "1. fullday\n" + 
-						"Date: 123456\n", 
-						exec.jUnitTestAdd("no use string", "junit"));
+		assertEquals("Desc: Adding a full day task", 
+				"1. fullday\n" + 
+				"Date: 123456\n", 
+				exec.jUnitAutomatedTest());
 		
-		exec.executeClearCommand("no use");
+		exec.executeClearCommand();
 	}
 	private void assertAddATaskWithKeywordsInItsTaskName(Executor exec) {
 		exec.executeAddCommand("from to loc on at /on 123456");
-		assertEquals("test", "1. from to loc on at\n" + 
-						"Date: 123456\n", 
-						exec.jUnitTestAdd("no use string", "junit"));
+		assertEquals("Desc: Adding a task with keywords in task name", 
+				"1. from to loc on at\n" + 
+				"Date: 123456\n", 
+				exec.jUnitAutomatedTest());
 		
-		exec.executeClearCommand("no use");
+		exec.executeClearCommand();
 	}
 }
