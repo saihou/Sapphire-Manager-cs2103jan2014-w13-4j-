@@ -145,8 +145,7 @@ public class Executor {
 		return choice;
 	}
 	
-	public void executeClearCommand(String userCommand) {
-		//stub
+	public void executeClearCommand() {
 		taskStorage.clear();
 	}
 	
@@ -264,10 +263,11 @@ public class Executor {
 	}
 	
 	//only used for JUnitTesting!
-	public String jUnitTestAdd(String userCommand, String junit) {
+	public String jUnitAutomatedTest() {
 		//basically combining all the println from various objects (UI, Task)
 		//and appending them to a StringBuilder. At the end, the StringBuilder is
 		//converted to a String and returned so that JUnit can assertEquals();
+		
 		StringBuilder sb = new StringBuilder();
 		int count = 1;
 		for(Task task : allTasks){

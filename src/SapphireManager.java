@@ -14,10 +14,8 @@ public class SapphireManager {
 	
 	private static void startApplication() {
 		
-		while(true){
-			
+		while(true) {
 			String userCommand = myUI.readCommandFromUser();
-			
 			String operation = myParser.getFirstWord(userCommand);
 			
 			if(operation.equalsIgnoreCase("Exit")) {
@@ -26,7 +24,6 @@ public class SapphireManager {
 			}
 			
 			doUserOperation(userCommand, operation);
-			
 		}
 	}
 	
