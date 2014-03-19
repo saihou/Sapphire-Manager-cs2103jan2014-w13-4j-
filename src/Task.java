@@ -84,27 +84,28 @@ class Task {
 		System.out.println(line);
 	}
 
-	public void printTaskDetails(){
+	public void printTaskDetails(int num, SapphireMgrGUI gui){
 		//Print task name which all tasks will have, followed by date/time if any,
 		//followed by other optional variables
-		
-		println(getName());
+		gui.printToDisplay("\t"+num+". "+getName());
 		
 		if(getType().equals("fullDay")){
-			println("Date: " + getDate());
+			gui.printToDisplay("\tDate: " + getDate());
 		} else if(getType().equals("setDuration")){
-			println("Date: " + getDate());
-			println("Time: " + getStartTime() + " to " + getEndTime());
+			gui.printToDisplay("\tDate: " + getDate());
+			gui.printToDisplay("\tTime: " + getStartTime() + " to " + getEndTime());
 		} else if(getType().equals("targetedTime")){
-			println("Date: " + getDate());
-			println("Time: " + getDeadline());
+			gui.printToDisplay("\tDate: " + getDate());
+			gui.printToDisplay("\tTime: " + getDeadline());
 		} else {
-			println("To be completed during free-time.");
+			gui.printToDisplay("\tTo be completed during free-time.");
 		}
 		
 		if(getLocation() != null){
-			println("Location: " + getLocation());
+			gui.printToDisplay("\tLocation: " + getLocation());
 		}
+		
+		gui.printToDisplay("");
 	}
 
 }
