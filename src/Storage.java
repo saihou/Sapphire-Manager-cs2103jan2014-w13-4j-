@@ -25,18 +25,18 @@ public class Storage {
 	private BufferedReader bufferedReader;
 	private BufferedWriter bufferedWriter;
 	private File file, newFile;
-	protected Task task;
-	protected UserInterface userInterface;
+	private SapphireMgrGUI gui = SapphireMgrGUI.getInstance();
+	private Task task;
 
 	//constructor
-	public Storage(UserInterface userInterface) {
-		this.userInterface = userInterface;
+	public Storage() {
 		taskList = new ArrayList<Task>();
 		readFile();
 	}
 
 	//get-set tasklist
 	public ArrayList<Task> getTaskList() {
+		System.out.println("taskList size: "+taskList.size());
 		return taskList;
 	}
 
@@ -58,7 +58,7 @@ public class Storage {
 			bufferedWriter.close();
 			return true;
 		} catch(Exception ex) {
-			userInterface.displayMessage(FILE_SAVING_ERROR);
+			gui.printToDisplay(FILE_SAVING_ERROR);
 			return false;
 		}
 	}
@@ -71,6 +71,15 @@ public class Storage {
 			return clearFile();
 		}
 	}
+	
+	//clear all file
+	public boolean clear() {
+		if(clearFile() && clearTaskList()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	//readFile
 	private boolean readFile() {		
@@ -81,8 +90,8 @@ public class Storage {
 			} else {
 				return initializeFile();
 			}
-		} catch(Exception ex) {
-			userInterface.displayMessage(FILE_READING_ERROR); 
+		} catch(Exception ex) { 
+			gui.printToDisplay(FILE_READING_ERROR);
 			return false;
 		}
 	}
@@ -94,7 +103,7 @@ public class Storage {
 			bufferedWriter.close();
 			return true;
 		} catch (Exception ex) {
-			userInterface.displayMessage(FILE_INITIALIZING_ERROR); 
+			gui.printToDisplay(FILE_INITIALIZING_ERROR);
 			return false;
 		}
 	}
@@ -113,15 +122,7 @@ public class Storage {
 			bufferedReader.close();
 			return true;
 		} catch (Exception ex) {
-			userInterface.displayMessage(FILE_READING_ERROR); 
-			return false;
-		}
-	}
-
-	public boolean clear() {
-		if(clearFile() && clearTaskList()) {
-			return true;
-		} else {
+			gui.printToDisplay(FILE_READING_ERROR);
 			return false;
 		}
 	}
@@ -137,11 +138,11 @@ public class Storage {
 				return false;
 			}
 		} catch (Exception ex) {
-			userInterface.displayMessage(FILE_CLEARING_ERROR);
+			gui.printToDisplay(FILE_CLEARING_ERROR);
 			return false;
 		}
 	}
-	
+
 	//clear and initialize ArrayList
 	private boolean clearTaskList() {
 		taskList.clear();
@@ -205,7 +206,10 @@ public class Storage {
 		} else {
 			task.setLocation(null);
 		}
-
+		
+		assert task != null;
+		//assert false;
+		
 		return task;
 	}
 
