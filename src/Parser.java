@@ -7,6 +7,9 @@
 import java.util.ArrayList;
 
 public class Parser {
+	// get instance of gui @Dex
+	private SapphireMgrGUI gui = SapphireMgrGUI.getInstance();
+
 	// constructor
 	public Parser(){
 	}
