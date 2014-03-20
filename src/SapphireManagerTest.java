@@ -1,25 +1,25 @@
 import static org.junit.Assert.*;
 
-import org.junit.Test;
+//import org.junit.Test;
 
 
 public class SapphireManagerTest {
 
 	//@Test
 	public void test() {
-		Executor exec = new Executor(new Parser(), new UserInterface());
+		CommandExecutor exec = new CommandExecutor(new CommandParser());
 		
 		assertClearAll(exec);
 		
 		assertAddingAllTypesOfTasks(exec);
 	}
 	
-	private void assertClearAll(Executor exec) {
+	private void assertClearAll(CommandExecutor exec) {
 		exec.executeClearCommand();
 		assertEquals("Desc: Clear everything", "", exec.jUnitAutomatedTest());
 	}
 	
-	private void assertAddingAllTypesOfTasks(Executor exec) {
+	private void assertAddingAllTypesOfTasks(CommandExecutor exec) {
 		assertAddATaskWithNoSetTiming(exec);
 		assertAddATaskWithDuration(exec);
 		assertAddATaskWithDeadline(exec);
@@ -27,7 +27,7 @@ public class SapphireManagerTest {
 		assertAddATaskWithKeywordsInItsTaskName(exec);
 	}
 	
-	private void assertAddATaskWithNoSetTiming(Executor exec) {
+	private void assertAddATaskWithNoSetTiming(CommandExecutor exec) {
 		exec.executeAddCommand("nosettiming");
 		assertEquals("Desc: Adding a task with no set timing", 
 				"1. nosettiming\n" + 
@@ -36,7 +36,7 @@ public class SapphireManagerTest {
 		
 		exec.executeClearCommand();
 	}
-	private void assertAddATaskWithDuration(Executor exec) {
+	private void assertAddATaskWithDuration(CommandExecutor exec) {
 		exec.executeAddCommand("setduration /on 123456 /from 0000 to 0001");
 		assertEquals("Desc: Adding a task with set duration", 
 				"1. setduration\n" + 
@@ -46,7 +46,7 @@ public class SapphireManagerTest {
 
 		exec.executeClearCommand();
 	}
-	private void assertAddATaskWithDeadline(Executor exec) {
+	private void assertAddATaskWithDeadline(CommandExecutor exec) {
 		exec.executeAddCommand("deadline /on 123456 /at 0000");
 		assertEquals("Desc: Adding a task with deadline",
 				"1. deadline\n" + 
@@ -56,7 +56,7 @@ public class SapphireManagerTest {
 
 		exec.executeClearCommand();
 	}
-	private void assertAddAFullDayTask(Executor exec) {
+	private void assertAddAFullDayTask(CommandExecutor exec) {
 		exec.executeAddCommand("fullday /on 123456");
 		assertEquals("Desc: Adding a full day task", 
 				"1. fullday\n" + 
@@ -65,7 +65,7 @@ public class SapphireManagerTest {
 		
 		exec.executeClearCommand();
 	}
-	private void assertAddATaskWithKeywordsInItsTaskName(Executor exec) {
+	private void assertAddATaskWithKeywordsInItsTaskName(CommandExecutor exec) {
 		exec.executeAddCommand("from to loc on at /on 123456");
 		assertEquals("Desc: Adding a task with keywords in task name", 
 				"1. from to loc on at\n" + 
