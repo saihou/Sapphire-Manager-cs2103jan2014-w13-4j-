@@ -25,7 +25,7 @@ public class Storage {
 	private BufferedReader bufferedReader;
 	private BufferedWriter bufferedWriter;
 	private File file, newFile;
-	private SapphireMgrGUI gui = SapphireMgrGUI.getInstance();
+	private SapphireManagerGUI gui = SapphireManagerGUI.getInstance();
 	private Task task;
 
 	//constructor
