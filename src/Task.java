@@ -84,7 +84,7 @@ class Task {
 		System.out.println(line);
 	}
 
-	public void printTaskDetails(int num, SapphireMgrGUI gui){
+	public void printTaskDetails(int num, SapphireManagerGUI gui){
 		//Print task name which all tasks will have, followed by date/time if any,
 		//followed by other optional variables
 		gui.printToDisplay("\t"+num+". "+getName());
