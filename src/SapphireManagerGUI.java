@@ -29,25 +29,26 @@ import javax.swing.JTextField;
 import javax.swing.text.DefaultCaret;
 
 public class SapphireManagerGUI {
-	private final static String CURRENTLY_EDITING_MESSAGE = "Currently Editing:";
-	private final static String HELP_MESSAGE = "Enter F1 for a list of commands.";
-	private final static String NO_TASK_TO_DISPLAY_TODAY = "You have no tasks due today.\n";
+	private final static String MESSAGE_CURRENTLY_EDITING = "Currently Editing:";
+	private final static String MESSAGE_HELP = "Enter F1 for a list of commands.";
+	private final static String MESSAGE_NO_TASK_TO_DISPLAY_TODAY = "You have no tasks due today.\n";
+	private final static String MESSAGE_WELCOME = "Welcome to Sapphire Manager!";
+	private final static String MESSAGE_TASKS_FOUND = "Existing tasks found: ";
+	private final static String MESSAGE_TODAY_TASK_TITLE = "Today's task:";
+	
 	private final static String PROMPT_FOR_NUMBER = "Enter a number: ";
 	private final static String PROMPT_FOR_EDITS = "Enter your edits: ";
-	private final static String TASKS_FOUND_MESSAGE = "Existing tasks found: ";
-	private final static String TODAY_TASK_TITLE = "Today's task:";
-	private final static String WELCOME_MESSAGE = "Welcome to Sapphire Manager!";
+	
 	private final static String WRONG_COMMAND_ENTERED = "Wrong command entered! Enter F1 for a list of commands.";
 
-	private static ArrayList<Task> todaysTasks;
+	private static ArrayList<Task> todaysTasks, matchedTasks;
 	private static CommandExecutor myExecutor;
-	private static CommandParser myParser;
-	private static JTextArea displayBox;
 	private static SapphireManagerGUI window;
 	private static String todaysDate = "", currentTask = "";
 	private static Task taskToBeEdited;
+	
 	//private static JOptionPane exitPane;
-
+	private static JTextArea displayBox;
 	private JFrame frmSapphireManager;
 	private JScrollPane scrollPane;
 	private JTextField textField;
@@ -59,19 +60,19 @@ public class SapphireManagerGUI {
 				try {
 					todaysTasks = new ArrayList<Task>();
 					window = new SapphireManagerGUI();
-					myParser = new CommandParser();
 					todaysDate = getTodaysDate();
 
-					myExecutor = new CommandExecutor(myParser);
+					myExecutor = new CommandExecutor();
+					
 					todaysTasks = myExecutor.getTodaysTasks(todaysDate);
 					if(todaysTasks.isEmpty()) {
-						displayBox.append(NO_TASK_TO_DISPLAY_TODAY);
+						displayBox.append(MESSAGE_NO_TASK_TO_DISPLAY_TODAY);
 					} else {
 						if(todaysTasks.size() == 1) {
-							displayBox.append(TODAY_TASK_TITLE);
+							displayBox.append(MESSAGE_TODAY_TASK_TITLE);
 							todaysTasks.get(0).printTaskDetails(1, window);
 						} else {
-							displayBox.append(TODAY_TASK_TITLE);
+							displayBox.append(MESSAGE_TODAY_TASK_TITLE);
 							for(int i=0; i<todaysTasks.size(); i++) {
 								todaysTasks.get(i).printTaskDetails((i+1), window);
 							}
@@ -99,7 +100,7 @@ public class SapphireManagerGUI {
 	}
 
 	private void initialize() {		
-		initializeSapphireMgr();
+		initializeSapphireManager();
 		initializeDisplayBoxInScrollPane();
 		initializeTextField();
 		contentPaneDisplay();		
@@ -113,7 +114,7 @@ public class SapphireManagerGUI {
 
 	}
 
-	private void initializeSapphireMgr() {
+	private void initializeSapphireManager() {
 		frmSapphireManager = new JFrame();
 		frmSapphireManager.setTitle("Sapphire Manager");
 		frmSapphireManager.setBounds(100, 100, 450, 450);
@@ -162,7 +163,8 @@ public class SapphireManagerGUI {
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 					if(!textField.getText().trim().equals("")) {
 						String userCommand = readCommandFromUser();
-						String operation = myParser.getFirstWord(userCommand);
+						
+						String operation = getFirstWord(userCommand);
 
 						if(operation.equalsIgnoreCase("exit") || operation.equalsIgnoreCase("quit")) {
 							printToDisplay("Sapphire Manager will now exit.");
@@ -178,19 +180,23 @@ public class SapphireManagerGUI {
 							myExecutor.executeClearCommand();
 						} else if(operation.equalsIgnoreCase("delete") && currentTask == "") {
 							currentTask = "delete";
-							myExecutor.executeDeleteCommand1(userCommand.substring(7));
+							matchedTasks = myExecutor.searchByName(userCommand.substring(7));
+							displayExistingTasksFound(matchedTasks);
 						} else if(currentTask.equalsIgnoreCase("delete")) {
-							myExecutor.executeDeleteCommand2();
+							myExecutor.executeDeleteCommand2(matchedTasks);
 							currentTask = "";
 						} else if(operation.equalsIgnoreCase("edit") && currentTask == "") {
 							currentTask = "edit1";
-							myExecutor.executeEditCommand1(userCommand.substring(5));
+							matchedTasks = myExecutor.searchByName(userCommand.substring(5));
+							displayExistingTasksFound(matchedTasks);
 						} else if(currentTask.equalsIgnoreCase("edit1")) {
 							currentTask = "edit2";
-							taskToBeEdited = myExecutor.executeEditCommand2();
+							taskToBeEdited = myExecutor.executeEditCommand2(matchedTasks);
+							displayCurrentlyEditingSequence(taskToBeEdited);
 						} else if(currentTask.equalsIgnoreCase("edit2")) {
 							printToDisplay("Entered: '"+textField.getText()+"'.");
-							myExecutor.executeEditCommand3(taskToBeEdited);
+							String userModifications = readUserEdits();
+							myExecutor.executeEditCommand3(taskToBeEdited, userModifications);
 							currentTask = "";
 						} else {
 							printToDisplay(WRONG_COMMAND_ENTERED);
@@ -298,10 +304,10 @@ public class SapphireManagerGUI {
 	}
 
 	public void displayWelcomeMessage() {
-		printToDisplay(WELCOME_MESSAGE);
+		printToDisplay(MESSAGE_WELCOME);
 		printToDisplay("Today's date: "+getTodayDate());
 		printToDisplay("------------------------------------------");
-		printToDisplay(HELP_MESSAGE);
+		printToDisplay(MESSAGE_HELP);
 		printToDisplay("------------------------------------------");
 	}
 
@@ -337,13 +343,18 @@ public class SapphireManagerGUI {
 	}
 
 	public void displayExistingTasksFound(ArrayList<Task> taskList) {
-		printToDisplay(TASKS_FOUND_MESSAGE);
-		displayTasksGivenList(taskList);
-		printToDisplay(PROMPT_FOR_NUMBER);
+		if (taskList != null) {
+			printToDisplay(MESSAGE_TASKS_FOUND);
+			displayTasksGivenList(taskList);
+			printToDisplay(PROMPT_FOR_NUMBER);
+		}
+		else {
+			//printToDisplay(MESSAGE_NO_SEARCH_RESULTS);
+		}
 	}
 
 	public void displayCurrentlyEditingSequence(Task taskBeingEdited) {
-		printToDisplay(CURRENTLY_EDITING_MESSAGE);
+		printToDisplay(MESSAGE_CURRENTLY_EDITING);
 		displaySingleTask(taskBeingEdited);
 		printToDisplay(PROMPT_FOR_EDITS);
 	}
@@ -383,4 +394,8 @@ public class SapphireManagerGUI {
 		int userChoice = Integer.parseInt(userInput);
 		return userChoice;
 	}
+	private String getFirstWord(String str) {
+		return str.trim().split("\\s+")[0];
+	}
+	
 }

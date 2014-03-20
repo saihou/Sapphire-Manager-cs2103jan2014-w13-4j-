@@ -7,7 +7,7 @@ public class SapphireManagerTest {
 
 	//@Test
 	public void test() {
-		CommandExecutor exec = new CommandExecutor(new CommandParser());
+		CommandExecutor exec = new CommandExecutor();
 		
 		assertClearAll(exec);
 		
