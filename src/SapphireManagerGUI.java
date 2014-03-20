@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -41,13 +40,13 @@ public class SapphireManagerGUI {
 	private final static String WRONG_COMMAND_ENTERED = "Wrong command entered! Enter F1 for a list of commands.";
 
 	private static ArrayList<Task> todaysTasks;
-	private static Executor myExecutor;
+	private static CommandExecutor myExecutor;
+	private static CommandParser myParser;
 	private static JTextArea displayBox;
-	private static Parser myParser;
 	private static SapphireManagerGUI window;
 	private static String todaysDate = "", currentTask = "";
 	private static Task taskToBeEdited;
-	private static JOptionPane exitPane;
+	//private static JOptionPane exitPane;
 
 	private JFrame frmSapphireManager;
 	private JScrollPane scrollPane;
@@ -60,10 +59,10 @@ public class SapphireManagerGUI {
 				try {
 					todaysTasks = new ArrayList<Task>();
 					window = new SapphireManagerGUI();
-					myParser = new Parser();
+					myParser = new CommandParser();
 					todaysDate = getTodaysDate();
 
-					myExecutor = new Executor(myParser, window);
+					myExecutor = new CommandExecutor(myParser);
 					todaysTasks = myExecutor.getTodaysTasks(todaysDate);
 					if(todaysTasks.isEmpty()) {
 						displayBox.append(NO_TASK_TO_DISPLAY_TODAY);
