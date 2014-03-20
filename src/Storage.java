@@ -63,6 +63,19 @@ public class Storage {
 		}
 	}
 
+	/*public boolean writeLogToFile(String logRecord, boolean toAppend) {
+		try {
+			bufferedWriter = new BufferedWriter(new FileWriter(new File("Log Record.txt"), toAppend));
+			bufferedWriter.write(logRecord);
+			bufferedWriter.newLine();
+			bufferedWriter.close();
+			return true;
+		} catch(Exception ex) {
+			//userInterface.displayMessage(FILE_SAVING_ERROR);
+			return false;
+		}
+	}*/
+	
 	//write multiple task to file
 	public boolean writeTaskListToFile() {
 		if(taskList.size() > 0) {
