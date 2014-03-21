@@ -10,7 +10,6 @@ public class CommandExecutor {
 
 	protected Storage taskStorage;
 	protected CommandParser parser;
-	protected SapphireManagerGUI gui = SapphireManagerGUI.getInstance();
 	protected ActionHistory history;
 	protected ArrayList<Task> allTasks;
 	
