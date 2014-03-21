@@ -12,7 +12,12 @@ public class CommandExecutor {
 	protected SapphireManagerGUI gui = SapphireManagerGUI.getInstance();
 	protected ActionHistory history;
 	protected ArrayList<Task> allTasks;
-
+	
+	protected String phase;
+	
+	protected Task currentTask;
+	protected ArrayList<Task> currentTaskList;
+	
 	/**
 	 * @author Sai Hou
 	 */
@@ -21,9 +26,13 @@ public class CommandExecutor {
 		history = new ActionHistory();
 		taskStorage = new Storage();
 		allTasks = taskStorage.getTaskList();
+		phase = "normal";
+		currentTask = null;
+		currentTaskList = null;
 	}
 
-	public void executeAddCommand(String userCommand) {
+	public String executeAddCommand(String userCommand) {
+		String systemFeedback = "";
 		Task taskToBeAdded = new Task();
 
 		parser.parse(userCommand, taskToBeAdded);
@@ -31,9 +40,10 @@ public class CommandExecutor {
 		boolean isAdditionOfNewTaskSuccessful = addThisTask(taskToBeAdded);
 
 		if (isAdditionOfNewTaskSuccessful) {
-			gui.printToDisplay("Successfully added : " + taskToBeAdded.getName() + ".");
+			systemFeedback = "Successfully added : " + taskToBeAdded.getName() + ".";
 			updateHistory("add", taskToBeAdded, null);
 		}
+		return systemFeedback;
 	}
 
 	private boolean addThisTask(Task taskToBeAdded) {
@@ -47,28 +57,18 @@ public class CommandExecutor {
 		gui.displayTasksGivenList(allTasks);
 	}
 
-	public Task executeEditCommand2(ArrayList<Task> matchedTasks){
-		System.out.println("In edit command 2");
-		
-		//ask user to choose
-		int choice = loopUntilUserEntersValidChoice(matchedTasks);
+	public String executeEditCommand(String userModifications){
+		String systemFeedback = "";
 
-		Task taskToBeEdited = matchedTasks.get(choice-1);
+		Task duplicatedOldTask = new Task(currentTask);
 
-		return taskToBeEdited; 
-	}
-
-	public void executeEditCommand3(Task taskToBeEdited, String userModifications){
-		System.out.println("In edit command 3");
-
-		Task duplicatedOldTask = new Task(taskToBeEdited);
-
-		boolean isEditSuccessful = editThisTask(taskToBeEdited, userModifications);
+		boolean isEditSuccessful = editThisTask(currentTask, userModifications);
 
 		if (isEditSuccessful) {
-			gui.printToDisplay("Successfully made changes to " + taskToBeEdited.getName() +".");
-			updateHistory("edit", taskToBeEdited, duplicatedOldTask);
+			systemFeedback = "Successfully made changes to " + currentTask.getName() +".";
+			updateHistory("edit", currentTask, duplicatedOldTask);
 		}
+		return systemFeedback;
 	}
 	private boolean editThisTask(Task taskToBeEdited, String userModifications) {
 		//modify array list
@@ -79,19 +79,18 @@ public class CommandExecutor {
 		return isFileWritingSuccessful;
 	}
 
-	public void executeDeleteCommand2(ArrayList<Task> matchedTasks) {	
-		//ask user to choose
-		int choice = loopUntilUserEntersValidChoice(matchedTasks);
-		
+	public String executeDeleteCommand(int choice) {	
+		String systemFeedback = "";
 		//retrieve the task to be removed
-		Task taskToBeDeleted = matchedTasks.get(choice-1);
+		currentTask = currentTaskList.get(choice-1);
 		
-		boolean isDeletionSuccessful = deleteThisTask(taskToBeDeleted);
+		boolean isDeletionSuccessful = deleteThisTask(currentTask);
 		
 		if (isDeletionSuccessful) {
-			gui.printToDisplay("Successfully deleted "+choice+". "+taskToBeDeleted.getName());
-			updateHistory("delete", taskToBeDeleted, null);
+			systemFeedback = "Successfully deleted "+choice+". "+currentTask.getName() + ".";
+			updateHistory("delete", currentTask, null);
 		}
+		return systemFeedback;
 	}
 	
 	private boolean deleteThisTask(Task taskToBeRemoved) {
@@ -103,22 +102,11 @@ public class CommandExecutor {
 		return isFileWritingSuccessful;
 	}
 
-	//stub
-	//always true for now
-	private int loopUntilUserEntersValidChoice(ArrayList<Task> matchedTasks) {
-		int choice = gui.readUserChoice();
-		boolean isChoiceValid = parser.checkIfUserChoiceIsValid(matchedTasks);
-
-		while (!isChoiceValid) {
-			gui.displayTasksGivenList(matchedTasks);
-			choice = gui.readUserChoice();
-			isChoiceValid = parser.checkIfUserChoiceIsValid(matchedTasks);
-		}
-		return choice;
-	}
-
-	public void executeClearCommand() {
+	public String executeClearCommand() {
+		String systemFeedback = "";
 		taskStorage.clear();
+		systemFeedback = "Successfully cleared all tasks.";
+		return systemFeedback;
 	}
 
 	/**
@@ -233,8 +221,119 @@ public class CommandExecutor {
 		history.setReferenceToLastTask(reference);
 		history.setCopyOfLastTask(duplicatedTask);
 	}
-
+	
+	public String getOperation(String userCommand) {
+		return getFirstWord(userCommand);
+	}
+	
+	public String getPhase() {
+		return phase;
+	}
+	public ArrayList<Task> getCurrentTaskList() {
+		return currentTaskList;
+	}
+	public Task getCurrentTask() {
+		return currentTask;
+	}
+	public String doUserOperation(String userCommand) {
+		String systemFeedback = "";
+		
+		String operation = getOperation(userCommand);
+		
+		if(operation.equalsIgnoreCase("exit") || operation.equalsIgnoreCase("quit")) {
+			System.out.println("exit");
+			System.exit(0);
+		}
+		
+		switch (phase) {
+			case "normal" :
+				systemFeedback = executeOperation(operation, userCommand);
+				break;
+			case "editPhase1" :
+				int choice = convertToInteger(userCommand);
+				currentTask = currentTaskList.get(choice-1);
+				phase = "editPhase2";
+				break;
+			case "editPhase2" :
+				systemFeedback = executeEditCommand(userCommand);
+				phase = "normal";
+				break;
+			case "deletePhase1" :
+				choice = convertToInteger(userCommand);
+				systemFeedback = executeDeleteCommand(choice);
+				phase = "normal";
+				break;
+			default :
+				break;
+		}
+		
+		if (phase.equals("normal")) {
+			currentTask = null;
+			currentTaskList = null;
+		}
+		
+		return systemFeedback;
+	}
+	
+	private boolean checkIfOperationIsValid(String operation) {
+		boolean isValidOperation = false;
+		
+		if (operation.equalsIgnoreCase("add") || 
+			operation.equalsIgnoreCase("delete") ||
+			operation.equalsIgnoreCase("display") ||
+			operation.equalsIgnoreCase("edit") ||
+			operation.equalsIgnoreCase("undo") ||
+			operation.equalsIgnoreCase("clear")) {
+			isValidOperation = true;
+		}
+		return isValidOperation;
+	}
+	
+	private int convertToInteger(String userCommand) {
+		return Integer.parseInt(userCommand);
+	}
+	
+	private String executeOperation(String operation, String userCommand) {
+		String systemFeedback = "";
+		
+		boolean isValidOperation = checkIfOperationIsValid(operation);
+		
+		if (!isValidOperation) {
+			return "Wrong command entered! Enter F1 for a list of commands.";
+		}
+		
+		switch (operation) {
+			case "add" :
+				systemFeedback = executeAddCommand(userCommand.substring(4));
+				break;
+			case "display" :
+				executeDisplayCommand(userCommand.substring(7));
+				break;
+			case "edit" :
+				currentTaskList = searchByName(userCommand.substring(5));
+				phase = "editPhase1";
+				break;
+			case "delete" :
+				currentTaskList = searchByName(userCommand.substring(7));
+				phase = "deletePhase1";
+				break;
+			case "clear" :
+				systemFeedback = executeClearCommand();
+				break;
+			case "undo" :
+				executeUndoCommand();
+				break;
+			default : 
+				break;
+		}
+		return systemFeedback;
+	}
+	
+	private String getFirstWord(String str) {
+		return str.trim().split("\\s+")[0];
+	}
 	//only used for JUnitTesting!
+	
 	public String jUnitAutomatedTest() {
 		//basically combining all the println from various objects (UI, Task)
 		//and appending them to a StringBuilder. At the end, the StringBuilder is
@@ -254,7 +353,7 @@ public class CommandExecutor {
 				sb.append("Time: " + task.getStartTime() + " to " + task.getEndTime()+"\n");
 			} else if(task.getType().equals("targetedTime")){
 				sb.append("Date: " + task.getDate()+"\n");
-				sb.append("Time: " + task.getDeadline()+"\n");
+				//sb.append("Time: " + task.getDeadline()+"\n");
 			} else {
 				sb.append("To be completed during free-time.\n");
 			}
@@ -263,7 +362,7 @@ public class CommandExecutor {
 				sb.append("Location: " + task.getLocation()+"\n");
 			}
 
-			task.printTaskDetails(count, gui);
+			//task.printTaskDetails(count, gui);
 		}
 		return sb.toString();
 	}
