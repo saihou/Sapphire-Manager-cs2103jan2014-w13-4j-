@@ -351,7 +351,7 @@ public class SapphireManagerGUI {
 		printToDisplay("Clear");
 
 	}
-
+	
 	public void displaySingleTask(Task taskToDisplay) {	
 		//taskToDisplay.printTaskDetails(1, window);
 	}
