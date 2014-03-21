@@ -130,39 +130,43 @@ class Task implements Comparable<Task> {
 	/* 
 	 * @author Si Rui
 	 * This function allows Collections objects that store Task to sort it according to these rules:
-	 * 
-	 * 1. Top level of order: tasks with date/timing before tasks with no set timing
-	 * 		1.1 Tasks with no set timing appear at the bottom of entire displayed list 
-	 * 2. Next level of order: by date
-	 * 		Under each date:
+	 *  
+	 * 1. Tasks with timing sorted by date. Under each date:
 	 * 		2.1 Full day tasks should appear at the top under each date
 	 * 		2.2 Tasks with timings should follow chronologically 
+	 * 2. Tasks with no set timing appear at the bottom of entire displayed list alphabetically
 	 *
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
 	public int compareTo(Task t) {	//NOTE : HAVE NOT REFACTORED YET.
-		String tType = t.getType();
 		
-		// Compare tasks with date/timing vs tasks with no set timing first
-		if (this.type.compareTo(tType) != 0) {
-			if (this.type.compareTo("noSetTiming") == 0){
+		String tType = t.getType();
+		// Compare tasks with date/timing vs tasks with no set timing
+		if (this.type.equals("noSetTiming") && tType.equals("noSetTiming")) {
+			// If both are noSetTiming Tasks, list alphabetically by name
+			String tName = t.getName();
+			return this.name.compareTo(tName);
+			// else if either is noSetTiming task, return that task is larger
+		} else if (this.type.equals("noSetTiming")){
 				return 1;
-			} else if (tType.compareTo("noSetTiming") == 0) {
-				return -1;
-			} 
+		} else if (tType.equals("noSetTiming")) {
+			return -1;
 		} else {
-			if (this.type.equals("noSetTiming")) {
-				String tName = t.getName();
-				return this.name.compareTo(tName);
-			}
 			// Compare by date and within each, compare by type again
 			String thisDate = reverseDate(this.date);
 			String tDate = reverseDate(t.getDate());
 			
-			if (thisDate.compareTo(tDate) != 0) {
-				return thisDate.compareTo(tDate);
-			} else {
+			// If both tasks have timing, compare date
+			/*if(thisDate != null && tDate != null){
+				thisDate = reverseDate(thisDate);
+				tDate = reverseDate(tDate);
+				if (thisDate.compareTo(tDate) != 0) {
+					return thisDate.compareTo(tDate);
+				}
+			}*/
+			
+			if (thisDate.equals(tDate)){
 				// They have the same date, so compare type
 				if (this.type.compareTo("fullDay") == 0) {
 					return -1;
@@ -170,14 +174,14 @@ class Task implements Comparable<Task> {
 					return 1;
 				} else {
 					// Compare Time
-					int thisTime = Integer.parseInt(this.startTime);
-					int tTime = Integer.parseInt(t.getStartTime());
-					return thisTime - tTime;
+					String thisTime = this.startTime;
+					String tTime = t.getStartTime();
+					return thisTime.compareTo(tTime);
 				}
+			} else {
+				return thisDate.compareTo(tDate);
 			}
 		}
-		
-		return 0;
 	}
 	
 	/* 
@@ -189,13 +193,13 @@ class Task implements Comparable<Task> {
 		String reversedDate = "";
 		for (int i = 6; i > 0; i -= 2){
 			String toAppend = originalDate.substring(i-2, i);
-			reversedDate.concat(toAppend);
+			reversedDate += toAppend;
 		}
 		return reversedDate;
 	}
 
-	/*private void println(String line){
+	private void println(String line){
 		System.out.println(line);
-	}*/
+	}
 
 }
