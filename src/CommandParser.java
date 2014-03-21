@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class CommandParser {
 	// get instance of gui @Dex
-	//private SapphireManagerGUI gui = SapphireManagerGUI.getInstance();
+	private SapphireManagerGUI gui = SapphireManagerGUI.getInstance();
 
 	// constructor
 	public CommandParser(){
@@ -68,6 +68,7 @@ public class CommandParser {
 		int indexOfDate     = command.indexOf("/on");
 		int indexOfLocation = command.indexOf("/loc");
 		int indexOfDeadline = command.indexOf("/at");
+		int indexOfIsDone   = command.indexOf("/mark");
 
 		try {
 			// set start & end time
@@ -78,6 +79,9 @@ public class CommandParser {
 
 			// set task deadline
 			command = setDeadline(myTask, command, indexOfDeadline);
+			
+			// mark task as done/undone
+			command = setIsDone(myTask, command, indexOfIsDone);
 
 			// set task location
 			setLocation(myTask, command, indexOfLocation);
@@ -88,27 +92,48 @@ public class CommandParser {
 		}
 	}
     
-	//set task location
+	// set task location
 	private void setLocation(Task myTask, String command, int indexOfLocation) {
 		if (indexOfLocation != -1) {
 			String location = command.split("/loc")[1].trim();
 			myTask.setLocation(location);
 		}
 	}
-    
+	
+	// mark task as done/undone
+	private String setIsDone(Task myTask, String command, int indexOfIsDone){
+		if(indexOfIsDone != -1){
+			String[] temp = command.split("/mark");
+			
+			String isDone = getFirstWord(temp[1].trim());
+			if(isDone.compareTo("done")==0){
+				myTask.setIsDone(true);
+				temp[1] = temp[1].trim().substring(4).trim();
+				command = temp[0] + temp[1];
+			}
+			else{
+				myTask.setIsDone(false);
+				temp[1] = temp[1].trim().substring(6);
+				command = temp[0] + temp[1];
+			}
+		}
+		return command;
+	}
+   
 	// set task deadline
 	private String setDeadline(Task myTask, String command, int indexOfDeadline) {
 		if (indexOfDeadline != -1) {
 			String[] temp = command.split("/at");
 
 			String deadline = temp[1].trim().substring(0, 4);
-			myTask.setDeadline(deadline);
+			myTask.setStartTime(deadline);
 
 			temp[1] = temp[1].trim().substring(4).trim();
 			command = temp[0] + temp[1];
 		}
 		return command;
 	}
+	
     
 	// set task date
 	private String setDate(Task myTask, String command, int indexOfDate) {
@@ -152,11 +177,11 @@ public class CommandParser {
 	// set task type
 	private void setType(Task myTask) {
 
-		if (myTask.getDeadline() != null) {
+		if (myTask.getStartTime() != null  && myTask.getEndTime() == null) {
 			myTask.setType("targetedTime");
 		}
 
-		else if (myTask.getStartTime() == null && myTask.getDeadline() == null
+	    else if (myTask.getStartTime() == null && myTask.getEndTime() == null
 				&& myTask.getDate() == null) {
 			myTask.setType("noSetTiming");
 		}
