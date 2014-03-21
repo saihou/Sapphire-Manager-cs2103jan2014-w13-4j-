@@ -1,18 +1,18 @@
 class Task implements Comparable<Task> {
-	
-	private String type, name, date, startTime, endTime, deadline, location;
+	private String type, name, date, startTime, endTime, location;
+	boolean isDone;
 	
 	public Task() {
 	}
 	
-	public Task(Task newTask){
+	public Task(Task newTask) {
 		setType(newTask.getType());
 		setName(newTask.getName());
 		setDate(newTask.getDate());
 		setStartTime(newTask.getStartTime());
 		setEndTime(newTask.getEndTime());
-		setDeadline(newTask.getDeadline());
-		setLocation(newTask.getLocation());		
+		setLocation(newTask.getLocation());	
+		setIsDone(newTask.getIsDone());
 	}
 	
 	public Task(String type, String name, String date, String startTime, String endTime, String deadline, String location){
@@ -21,8 +21,12 @@ class Task implements Comparable<Task> {
 		setDate(date);
 		setStartTime(startTime);
 		setEndTime(endTime);
-		setDeadline(deadline);
 		setLocation(location);
+		setIsDone(false);
+	}
+	
+	public void setType(String type){
+		this.type = type;
 	}
 	
 	public void setName(String name){
@@ -39,17 +43,17 @@ class Task implements Comparable<Task> {
 	public void setEndTime(String endTime){
 		this.endTime = endTime;
 	}
-	
-	public void setDeadline(String deadline){
-		this.deadline = deadline;
-	}
 
 	public void setLocation(String location){
 		this.location = location;
 	}
-
-	public void setType(String type){
-		this.type = type;
+	
+	public void setIsDone(boolean isDone) {
+		this.isDone = isDone;
+	}
+	
+	public String getType(){
+		return type;
 	}
 	
 	public String getName() {
@@ -60,30 +64,26 @@ class Task implements Comparable<Task> {
 	    return date;
 	}
 	
-	public String getStartTime(){
+	public String getStartTime() {
 		return startTime;
 	}
 	
-	public String getEndTime(){
+	public String getEndTime() {
 		return endTime;
 	}
 	
-	public String getDeadline(){
-		return deadline;
-	}
-	
-	public String getLocation(){
+	public String getLocation() {
 		return location;
 	}
 	
-	public String getType(){
-		return type;
+	public boolean getIsDone() {
+		return isDone;
 	}
 	
 	public void println(String line){
 		System.out.println(line);
 	}
-
+/*
 	public void printTaskDetails(int num, SapphireManagerGUI gui){
 		//Print task name which all tasks will have, followed by date/time if any,
 		//followed by other optional variables
@@ -170,5 +170,5 @@ class Task implements Comparable<Task> {
 		}
 		return reversedDate;
 	}
-
+*/
 }
