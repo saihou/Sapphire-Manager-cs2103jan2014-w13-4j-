@@ -111,7 +111,7 @@ public class CommandExecutor {
 
 	/**
 	 * @author executeUndoCommand and related functions: Si Rui 
-	 * Undo the last entered event. This can only be entered after an “add”, “delete”, or “edit” command.
+	 * Undo the last entered event. This can only be entered after an edit and delete
 	 * 		
 	 * 		Last user action | Action taken by undo function
 	 * 		Added a task 	-> Remove the task
@@ -366,5 +366,39 @@ public class CommandExecutor {
 		}
 		return sb.toString();
 	}
+	
+	private void search(String taskName){
+		boolean searchDate = false;
+		taskName = taskName.trim();
+		
+		try{
+			int date = Integer.parseInt(taskName);
+			if(taskName.length()==6){
+				searchDate = true;
+			}
+			else{
+				searchDate = false;
+			}
+		}catch(NumberFormatException e){
+			searchDate = false;
+		}
+		
+		if(searchDate){
+			ArrayList<Task> matchedTasks = searchByDate(taskName);
+			//pls display matched task
+		}
+		else{
+			//search for the task
+			ArrayList<Task> matchedTasks = searchByName(taskName);
+			//pls display matched task
+			
+
+
+		}
+	}
+
+
+
+
 
 }
