@@ -57,48 +57,46 @@ public class CommandExecutor {
 	 * @author Si Rui
 	 */
 	public String executeDisplayCommand(String userCommand){
-		Collections.sort(allTasks);
+		String systemFeedback;
 		
-		//********************NEED TO DO: CHECK IF LIST IS EMPTY*************
-		
-		String displayType = parseDisplayType();
-		ArrayList<Task> taskList = new ArrayList<Task>(allTasks);;
-		
-		/*if (displayType.equals("all")) {
-			taskList = allTasks; //INCOMPLETE!!!!
-		}*/
-		String systemFeedback = formDisplayText(taskList);
-		
+		if (allTasks.isEmpty()) {
+			 systemFeedback = "You have no tasks.\n";
+		} else {
+			Collections.sort(allTasks);
+			
+			//String displayType = parseDisplayType();
+			ArrayList<Task> taskList = new ArrayList<Task>(allTasks);
+			
+			/*if (displayType.equals("all")) {
+				taskList = allTasks; //INCOMPLETE!!!!
+			}*/
+			systemFeedback = formDisplayText(taskList);
+			System.out.print(systemFeedback);
+		}
 		return systemFeedback;
 	}
 	
-	//STUB
-	private String parseDisplayType() {
-		// need parser to return me the type String
-		return "all";
-	}//END-STUB
-	
 	private String formDisplayTextOfOneTask(int count, Task t) {
-		return '\t' + count++ + ". " + t.getTaskDetails() + '\n';
+		return "\t" + count + ". " + t.getTaskDetails() + '\n';
 	}
 	
 	private String formDisplayText(ArrayList<Task> taskList) {
-		Task currentTask = taskList.get(0);
-		String currentDate = currentTask.getDate();
-		String displayText = currentDate;
+		Task firstTask = taskList.get(0);
+		String currentDate = firstTask.getDate();
+		String displayText = currentDate + '\n';
+		boolean printingMemos = false;
 		int count = 1;
 		
 		for (Task t : taskList) {
 			String taskDate = t.getDate();
-			System.out.println(taskDate);
-			if (taskDate != null && taskDate.equals(currentDate)) {
+			if ((taskDate != null && taskDate.equals(currentDate)) || printingMemos) {
 				displayText += formDisplayTextOfOneTask(count, t);
 			} else {
 				String taskType = t.getType();
 				if (taskType.equals("noSetTiming")) {
 					count = 1;
-					currentDate = null;
-					displayText += "Memos: ";
+					printingMemos = true;
+					displayText += "Memos: " + '\n';
 					displayText += formDisplayTextOfOneTask(count, t);
 				} else {
 					count = 1;
@@ -107,6 +105,7 @@ public class CommandExecutor {
 					displayText += formDisplayTextOfOneTask(count, t);
 				}
 			}
+			count++;
 		}
 		return displayText;
 	}
@@ -376,7 +375,7 @@ public class CommandExecutor {
 				systemFeedback = executeAddCommand(userCommand.substring(4));
 				break;
 			case "display" :
-				executeDisplayCommand(userCommand.substring(7));
+				systemFeedback = executeDisplayCommand(userCommand.substring(7));
 				break;
 			case "edit" :
 				currentTaskList = searchByName(userCommand.substring(5));
