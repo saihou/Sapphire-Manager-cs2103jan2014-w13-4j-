@@ -81,8 +81,26 @@ class Task implements Comparable<Task> {
 		return isDone;
 	}
 	
-	public void println(String line){
-		System.out.println(line);
+	/**
+	 * @author Si Rui
+	 * Returns a String that contains all task details in order for display Command :
+	 * Task name which all tasks must have, followed by time and then optional details.
+	 */
+	public String getTaskDetails() {
+		String taskDetails = this.name + '\n';
+		assert taskDetails != null;
+		
+		if(this.type.equals("setDuration")){
+			taskDetails += "\tTime: " + this.startTime + " to " + this.endTime + '\n';
+		} else if(this.type.equals("targetedTime")){
+			taskDetails += "\tTime: " + this.startTime + '\n';
+		}
+		
+		if(getLocation() != null){
+			taskDetails += "\tLocation: " + this.location + '\n';
+		}
+		
+		return taskDetails;
 	}
 /*
 	public void printTaskDetails(int num, SapphireManagerGUI gui){
@@ -134,6 +152,10 @@ class Task implements Comparable<Task> {
 				return -1;
 			} 
 		} else {
+			if (this.type.equals("noSetTiming")) {
+				String tName = t.getName();
+				return this.name.compareTo(tName);
+			}
 			// Compare by date and within each, compare by type again
 			String thisDate = reverseDate(this.date);
 			String tDate = reverseDate(t.getDate());
@@ -171,5 +193,9 @@ class Task implements Comparable<Task> {
 		}
 		return reversedDate;
 	}
+
+	/*private void println(String line){
+		System.out.println(line);
+	}*/
 
 }
