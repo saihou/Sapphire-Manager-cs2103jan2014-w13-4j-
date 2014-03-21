@@ -8,7 +8,6 @@ import java.util.ArrayList;
 
 public class CommandParser {
 	// get instance of gui @Dex
-	private SapphireManagerGUI gui = SapphireManagerGUI.getInstance();
 
 	// constructor
 	public CommandParser(){
