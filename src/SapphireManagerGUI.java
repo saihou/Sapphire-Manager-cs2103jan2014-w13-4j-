@@ -44,22 +44,19 @@ public class SapphireManagerGUI {
 	
 	private final static String PROMPT_FOR_NUMBER = "Enter a number: ";
 	private final static String PROMPT_FOR_EDITS = "Enter your edits: ";
-	private final static String TASKS_FOUND_MESSAGE = "Existing tasks found: ";
-	private final static String TODAY_TASK_TITLE = "Today's task:\n";
+	
+	private final static String TODAY_TASK_TITLE = "Today's task:";
 	private final static String WELCOME_MESSAGE = "Welcome to Sapphire Manager!";
-	private final static String WRONG_COMMAND_ENTERED = "Wrong command entered!\nEnter F1 for a list of commands.";
 	private final static String SPLIT_LINE = "------------------------------------------";
 	
 	private final static String WRONG_COMMAND_ENTERED = "Wrong command entered! Enter F1 for a list of commands.";
 
 	private static ArrayList<Task> todaysTasks, matchedTasks;
 	private static CommandExecutor myExecutor;
-	private static SapphireManagerGUI window;
+	private static SapphireManagerGUI sapphireManagerFrame;
 	private static String todaysDate = "", currentTask = "";
 	private static Task taskToBeEdited;
 	
-	private static JTextArea displayBox;
-	private JFrame sapphireMgrFrame;
 	private JLabel helpTip;
 	private JScrollPane scrollPane;
 	private JTextField inputBox;
@@ -70,7 +67,7 @@ public class SapphireManagerGUI {
 			public void run() {
 				try {
 					todaysTasks = new ArrayList<Task>();
-					window = new SapphireManagerGUI();
+					sapphireManagerFrame = new SapphireManagerGUI();
 					todaysDate = getTodaysDate();
 
 					myExecutor = new CommandExecutor();
@@ -126,7 +123,7 @@ public class SapphireManagerGUI {
 
 	}
 
-	private void initializeSapphireMgr() {
+	private void initializeSapphireManager() {
 		sapphireMgrFrame = new JFrame();
 		sapphireMgrFrame.getContentPane().setBackground(Color.WHITE);
 		sapphireMgrFrame.setTitle("Sapphire Manager");
@@ -335,7 +332,7 @@ public class SapphireManagerGUI {
 		printToDisplay(MESSAGE_WELCOME);
 		printToDisplay("Today's date: "+getTodayDate());
 		printToDisplay(SPLIT_LINE);
-		printToDisplay(HELP_MESSAGE);
+		printToDisplay(MESSAGE_HELP);
 		printToDisplay(SPLIT_LINE);
 	}
 
