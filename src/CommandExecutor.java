@@ -11,13 +11,13 @@ public class CommandExecutor {
 	protected CommandParser parser;
 	protected SapphireManagerGUI gui = SapphireManagerGUI.getInstance();
 	protected ActionHistory history;
-	protected ArrayList<Task> allTasks, matchedTasks;
+	protected ArrayList<Task> allTasks;
 
 	/**
 	 * @author Sai Hou
 	 */
-	public CommandExecutor(CommandParser parserFromManager) {
-		parser = parserFromManager;
+	public CommandExecutor() {
+		parser = new CommandParser();
 		history = new ActionHistory();
 		taskStorage = new Storage();
 		allTasks = taskStorage.getTaskList();
@@ -32,7 +32,6 @@ public class CommandExecutor {
 
 		if (isAdditionOfNewTaskSuccessful) {
 			gui.printToDisplay("Successfully added : " + taskToBeAdded.getName() + ".");
-			//userInterface.displayMessage("Successfully added : " + taskToBeAdded.getName() + ".");
 			updateHistory("add", taskToBeAdded, null);
 		}
 	}
@@ -46,38 +45,21 @@ public class CommandExecutor {
 
 	public void executeDisplayCommand(String userCommand){
 		gui.displayTasksGivenList(allTasks);
-		//userInterface.displayTasksGivenList(allTasks);
 	}
 
-	public void executeEditCommand1(String userCommand){
-		System.out.println("In edit command 1: "+userCommand);
-		//search for the task
-		matchedTasks = searchByName(userCommand);
-
-		if (searchResultIsEmpty(userCommand, matchedTasks)) {
-			return;
-		}
-		//display matched tasks
-		gui.displayExistingTasksFound(matchedTasks);
-	}
-
-	public Task executeEditCommand2(){
+	public Task executeEditCommand2(ArrayList<Task> matchedTasks){
 		System.out.println("In edit command 2");
+		
 		//ask user to choose
 		int choice = loopUntilUserEntersValidChoice(matchedTasks);
 
 		Task taskToBeEdited = matchedTasks.get(choice-1);
 
-		//display selected task to user
-		gui.displayCurrentlyEditingSequence(taskToBeEdited);
-
 		return taskToBeEdited; 
 	}
 
-	public void executeEditCommand3(Task taskToBeEdited){
+	public void executeEditCommand3(Task taskToBeEdited, String userModifications){
 		System.out.println("In edit command 3");
-		//read input from user, parse input
-		String userModifications = gui.readUserEdits();
 
 		Task duplicatedOldTask = new Task(taskToBeEdited);
 
@@ -97,19 +79,7 @@ public class CommandExecutor {
 		return isFileWritingSuccessful;
 	}
 
-	public void executeDeleteCommand1(String userCommand) {
-		System.out.println("In delete command 1: "+userCommand);
-		//search for the task
-		matchedTasks = searchByName(userCommand);
-		
-		if (searchResultIsEmpty(userCommand, matchedTasks)) {
-			return;
-		}
-		//display matched tasks
-		gui.displayExistingTasksFound(matchedTasks);
-	}
-
-	public void executeDeleteCommand2() {	
+	public void executeDeleteCommand2(ArrayList<Task> matchedTasks) {	
 		//ask user to choose
 		int choice = loopUntilUserEntersValidChoice(matchedTasks);
 		
@@ -124,16 +94,6 @@ public class CommandExecutor {
 		}
 	}
 	
-	private boolean searchResultIsEmpty(String userCommand, ArrayList<Task> matchedTasks) {
-		if (matchedTasks.size() == 0) {
-			gui.printToDisplay("Cannot find " + userCommand + "!");
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
 	private boolean deleteThisTask(Task taskToBeRemoved) {
 		//delete from array list
 		allTasks.remove(taskToBeRemoved);
@@ -226,7 +186,7 @@ public class CommandExecutor {
 	/**
 	 * @author Sai Hou
 	 */
-	private ArrayList<Task> searchByName(String name) {
+	public ArrayList<Task> searchByName(String name) {
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 
 		for (Task t : allTasks) {
@@ -239,7 +199,7 @@ public class CommandExecutor {
 		}
 		return matchedTasks;
 	}
-
+	
 	/**
 	 * @author Si Rui
 	 */
