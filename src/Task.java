@@ -15,14 +15,14 @@ class Task implements Comparable<Task> {
 		setIsDone(newTask.getIsDone());
 	}
 	
-	public Task(String type, String name, String date, String startTime, String endTime, String deadline, String location){
+	public Task(String type, String name, String date, String startTime, String endTime, String location, boolean isDone){
 		setType(type);
 		setName(name);
 		setDate(date);
 		setStartTime(startTime);
 		setEndTime(endTime);
 		setLocation(location);
-		setIsDone(false);
+		setIsDone(isDone);
 	}
 	
 	public void setType(String type){
@@ -32,6 +32,7 @@ class Task implements Comparable<Task> {
 	public void setName(String name){
 		this.name = name;
 	}
+	
 	public void setDate(String date){
 		this.date = date;
 	}
@@ -107,7 +108,7 @@ class Task implements Comparable<Task> {
 		
 		gui.printToDisplay("");
 	}
-
+*/
 	/* 
 	 * @author Si Rui
 	 * This function allows Collections objects that store Task to sort it according to these rules:
@@ -170,5 +171,5 @@ class Task implements Comparable<Task> {
 		}
 		return reversedDate;
 	}
-*/
+
 }
