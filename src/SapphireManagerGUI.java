@@ -1,5 +1,5 @@
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -22,11 +22,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.DefaultCaret;
+
 
 public class SapphireManagerGUI {
 	private final static String MESSAGE_CURRENTLY_EDITING = "Currently Editing:";
@@ -38,19 +41,23 @@ public class SapphireManagerGUI {
 	
 	private final static String PROMPT_FOR_NUMBER = "Enter a number: ";
 	private final static String PROMPT_FOR_EDITS = "Enter your edits: ";
+
+	private final static String SPLIT_LINE = "------------------------------------------";
 	
 	private final static String WRONG_COMMAND_ENTERED = "Wrong command entered! Enter F1 for a list of commands.";
-
+	
 	private static ArrayList<Task> todaysTasks;
 	private static CommandExecutor myExecutor;
-	private static SapphireManagerGUI window;
+	private static SapphireManagerGUI guiWindow;
 	private static String todaysDate = "";
 	
 	//private static JOptionPane exitPane;
 	private static JTextArea displayBox;
-	private JFrame frmSapphireManager;
+	
+	private JFrame guiFrame;
+	private JLabel helpTip;
 	private JScrollPane scrollPane;
-	private JTextField textField;
+	private JTextField inputBox;
 	private Toolkit toolkit;
 
 	public static void main(String[] args) {
@@ -58,7 +65,7 @@ public class SapphireManagerGUI {
 			public void run() {
 				try {
 					todaysTasks = new ArrayList<Task>();
-					window = new SapphireManagerGUI();
+					guiWindow = new SapphireManagerGUI();
 					todaysDate = getTodaysDate();
 
 					myExecutor = new CommandExecutor();
@@ -78,7 +85,7 @@ public class SapphireManagerGUI {
 						}
 					}
 
-					window.frmSapphireManager.setVisible(true);
+					guiWindow.guiFrame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -91,76 +98,84 @@ public class SapphireManagerGUI {
 		start();
 	}
 
-	public static SapphireManagerGUI getInstance() {
-		if(window == null) {
-			window = new SapphireManagerGUI();
-		} 
-		return window;
-	}
-
 	private void initialize() {		
 		initializeSapphireManager();
 		initializeDisplayBoxInScrollPane();
-		initializeTextField();
-		contentPaneDisplay();		
+		initializeInputBox();
+		initializeHelpTip();
+		contentPaneDisplay();	
 	}
 
 	private void start() {
 		displayWelcomeMessage();
-		sapphireManagerListener();
+		guiFrameListener();
 		textFieldListener();
 		displayBoxListener();
-
 	}
 
 	private void initializeSapphireManager() {
-		frmSapphireManager = new JFrame();
-		frmSapphireManager.setTitle("Sapphire Manager");
-		frmSapphireManager.setBounds(100, 100, 450, 450);
-		frmSapphireManager.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		guiFrame = new JFrame();
+		guiFrame.getContentPane().setBackground(Color.WHITE);
+		guiFrame.setTitle("Sapphire Manager");
+		guiFrame.setBounds(100, 100, 300, 450);
+		guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		guiFrame.setResizable(false);
 		toolkit = Toolkit.getDefaultToolkit();
-		int x = toolkit.getScreenSize().width-frmSapphireManager.getWidth();
-		int y = toolkit.getScreenSize().height-frmSapphireManager.getHeight()-40;
-		frmSapphireManager.setLocation(x, y);
+		int x = toolkit.getScreenSize().width-guiFrame.getWidth();
+		int y = toolkit.getScreenSize().height-guiFrame.getHeight()-40;
+		guiFrame.setLocation(x, y);
 	}
 
 	private void initializeDisplayBoxInScrollPane() {
 		displayBox = new JTextArea(5, 30);
-		displayBox.setTabSize(2);
 		scrollPane = new JScrollPane(displayBox);
 
-		scrollPane.setPreferredSize(new Dimension(380,100));
-
+		scrollPane.setBorder(null);
+		scrollPane.setPreferredSize(new Dimension(380, 380));
 		displayBox.setBackground(Color.WHITE);
+		displayBox.setBorder(null);
 		displayBox.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		displayBox.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		displayBox.setEditable(false);
 		displayBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		displayBox.setLineWrap(true);
 		displayBox.setMargin(new Insets(5, 5, 5, 5));
+		displayBox.setTabSize(2);
 		displayBox.setWrapStyleWord(true);
 
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 	}
 
-	private void initializeTextField() {
-		textField = new JTextField();
-		textField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		textField.requestFocus();
+	private void initializeInputBox() {
+		inputBox = new JTextField();
+		
+		inputBox.requestFocus();
+		inputBox.setPreferredSize(new Dimension(380, 50));
+		inputBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+	}
+	
+	private void initializeHelpTip() {
+		helpTip = new JLabel();
+		
+		helpTip.setBackground(Color.WHITE);
+		helpTip.setLabelFor(inputBox);
+		helpTip.setText("helpo");
 	}
 
 	private void contentPaneDisplay() {
-		frmSapphireManager.getContentPane().add(textField, BorderLayout.SOUTH); 		
-		frmSapphireManager.getContentPane().add(scrollPane, BorderLayout.CENTER);
+		guiFrame.getContentPane().setLayout(new BoxLayout(guiFrame.getContentPane(), BoxLayout.Y_AXIS));
+		guiFrame.getContentPane().add(scrollPane, Component.CENTER_ALIGNMENT);
+		guiFrame.getContentPane().add(helpTip, Component.LEFT_ALIGNMENT);
+		guiFrame.getContentPane().add(inputBox, Component.CENTER_ALIGNMENT);
 	}
 
 	private void textFieldListener() {
-		textField.addKeyListener(new KeyAdapter() {			
+		inputBox.addKeyListener(new KeyAdapter() {			
 			@Override
 			public void keyReleased(KeyEvent e) {
 				updateScrollBar();
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-					if(!textField.getText().trim().equals("")) {
+					if(!inputBox.getText().trim().equals("")) {
 						String userCommand = readCommandFromUser();
 						
 						String systemFeedback = "";
@@ -228,7 +243,7 @@ public class SapphireManagerGUI {
 							printToDisplay(WRONG_COMMAND_ENTERED);
 						}
 						*/
-						textField.setText("");
+						inputBox.setText("");
 					}
 				} else if(e.getKeyCode() == KeyEvent.VK_F1) {
 					printToDisplay("Help");
@@ -236,9 +251,9 @@ public class SapphireManagerGUI {
 				} else if(e.getKeyCode() == KeyEvent.VK_F5) {
 					displayBox.setText("");
 				} else if(e.getKeyCode() == KeyEvent.VK_F2) {
-					frmSapphireManager.setState(Frame.ICONIFIED);
+					guiFrame.setState(Frame.ICONIFIED);
 				} else if(e.getKeyCode() == KeyEvent.VK_F3) {
-					frmSapphireManager.setState(Frame.NORMAL);
+					guiFrame.setState(Frame.NORMAL);
 				} else if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 					printToDisplay("Sapphire Manager will now exit.");
 					System.exit(0);
@@ -274,26 +289,18 @@ public class SapphireManagerGUI {
 		});
 	}
 
-	private void sapphireManagerListener() {
-		frmSapphireManager.addFocusListener(new FocusAdapter() {
+	private void guiFrameListener() {
+		guiFrame.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent arg0) {
-				textField.requestFocusInWindow();
+				inputBox.requestFocusInWindow();
 			}
 		});
 
-		frmSapphireManager.addWindowFocusListener(new WindowAdapter() {
+		guiFrame.addWindowFocusListener(new WindowAdapter() {
 			@Override
 			public void windowGainedFocus(WindowEvent e) {
-				textField.requestFocusInWindow();
-			}
-		});
-		frmSapphireManager.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_F3) {
-					frmSapphireManager.setState(Frame.NORMAL);
-				}
+				inputBox.requestFocusInWindow();
 			}
 		});
 	}
@@ -309,12 +316,12 @@ public class SapphireManagerGUI {
 		displayBox.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				textField.requestFocusInWindow();
+				inputBox.requestFocusInWindow();
 				updateScrollBar();
 			}
 			@Override
 			public void mousePressed(MouseEvent arg0) {
-				textField.requestFocusInWindow();
+				inputBox.requestFocusInWindow();
 				updateScrollBar();
 			}
 		});
@@ -339,16 +346,24 @@ public class SapphireManagerGUI {
 	}
 
 	public void displayHelp() {
-		printToDisplay("Add <Task Name> <options 1>");
-		printToDisplay("- options 1:");
-		printToDisplay("\tDate: '/on'");
-		printToDisplay("\t*Time: '/from <time> to <time>' or '/at <deadline>'");
-		printToDisplay("\t*Location: '/loc <location name>");
-		printToDisplay("\t(* indicates optional)");
-		printToDisplay("Edit <Task Name>");
-		printToDisplay("Display <'all' | 'today' | 'past' | 'future'>");
-		printToDisplay("Delete <Task Name>");
-		printToDisplay("Clear");
+		printToDisplay(SPLIT_LINE);
+		printToDisplay("Available Commands");
+		printToDisplay(SPLIT_LINE);
+		printToDisplay("1. add [task name] [options]");
+		printToDisplay("2. delete [task name (in part or in full)]");
+		printToDisplay("3. edit [task name (in part or in full)]");
+		printToDisplay("4. display [all | today | past | future]");
+		printToDisplay("5. undo");
+		printToDisplay("6. search [task name | category | date]");
+		printToDisplay("7. clear");
+		printToDisplay("8. exit | quit");
+		printToDisplay(SPLIT_LINE);
+		printToDisplay("- Options:");
+		printToDisplay("\tDate: '/on [date]'");
+		printToDisplay("\tTime: '/from [time] to [time]' or \n\t\t   '/at [time]'");
+		printToDisplay("\tLocation: '/loc [location name]'");
+		printToDisplay("\tCategory: '/c [one-word-name]'");
+		printToDisplay("\tReminder: '/r [time]'");
 
 	}
 	
@@ -400,8 +415,8 @@ public class SapphireManagerGUI {
 
 	private String readUserInput() {
 		String userInput = null;
-		if(!textField.equals(null)) {
-			userInput = textField.getText();
+		if(!inputBox.equals(null)) {
+			userInput = inputBox.getText();
 		}
 		return userInput;
 	}
