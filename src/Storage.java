@@ -25,7 +25,6 @@ public class Storage {
 	private BufferedReader bufferedReader;
 	private BufferedWriter bufferedWriter;
 	private File file, newFile;
-	private SapphireManagerGUI gui = SapphireManagerGUI.getInstance();
 	private Task task;
 
 	//constructor
@@ -58,7 +57,8 @@ public class Storage {
 			bufferedWriter.close();
 			return true;
 		} catch(Exception ex) {
-			gui.printToDisplay(FILE_SAVING_ERROR);
+			System.out.println(FILE_SAVING_ERROR);
+			//gui.printToDisplay(FILE_SAVING_ERROR);
 			return false;
 		}
 	}
@@ -94,7 +94,7 @@ public class Storage {
 		}
 	}
 
-	//readFile
+	//read file
 	private boolean readFile() {		
 		try {
 			file = new File(FILE_NAME);
@@ -104,7 +104,8 @@ public class Storage {
 				return initializeFile();
 			}
 		} catch(Exception ex) { 
-			gui.printToDisplay(FILE_READING_ERROR);
+			System.out.println(FILE_READING_ERROR);
+			//gui.printToDisplay(FILE_READING_ERROR);
 			return false;
 		}
 	}
@@ -116,7 +117,8 @@ public class Storage {
 			bufferedWriter.close();
 			return true;
 		} catch (Exception ex) {
-			gui.printToDisplay(FILE_INITIALIZING_ERROR);
+			System.out.println(FILE_INITIALIZING_ERROR);
+			//gui.printToDisplay(FILE_INITIALIZING_ERROR);
 			return false;
 		}
 	}
@@ -135,7 +137,8 @@ public class Storage {
 			bufferedReader.close();
 			return true;
 		} catch (Exception ex) {
-			gui.printToDisplay(FILE_READING_ERROR);
+			System.out.println(FILE_READING_ERROR);
+			//gui.printToDisplay(FILE_READING_ERROR);
 			return false;
 		}
 	}
@@ -151,7 +154,8 @@ public class Storage {
 				return false;
 			}
 		} catch (Exception ex) {
-			gui.printToDisplay(FILE_CLEARING_ERROR);
+			System.out.println(FILE_CLEARING_ERROR);
+			//gui.printToDisplay(FILE_CLEARING_ERROR);
 			return false;
 		}
 	}
@@ -208,16 +212,16 @@ public class Storage {
 			task.setEndTime(null);
 		}
 
-		if(!splitedTaskInfo[5].equals("[null]")) { //deadline
-			task.setDeadline(splitedTaskInfo[5]);
-		} else {
-			task.setDeadline(null);
-		}
-
-		if(!splitedTaskInfo[6].equals("[null]")) { //location
+		if(!splitedTaskInfo[5].equals("[null]")) { //location
 			task.setLocation(splitedTaskInfo[6]);
 		} else {
 			task.setLocation(null);
+		}
+		
+		if(!splitedTaskInfo[6].equals("false")) { //isDone
+			task.setIsDone(false);
+		} else {
+			task.setIsDone(true);
 		}
 		
 		assert task != null;
@@ -270,18 +274,18 @@ public class Storage {
 
 		convertedTask += "|";
 
-		if(task.getDeadline() == null) { //deadline
-			convertedTask += "[null]";
-		} else {
-			convertedTask += task.getDeadline();
-		}
-
-		convertedTask += "|";
-
 		if(task.getLocation() == null) { //location
 			convertedTask += "[null]";
 		} else {
 			convertedTask += task.getLocation();
+		}
+		
+		convertedTask += "|";
+		
+		if(task.getIsDone() == false) { //isDone
+			convertedTask += "false";
+		} else {
+			convertedTask += "true";
 		}
 
 		return convertedTask;
