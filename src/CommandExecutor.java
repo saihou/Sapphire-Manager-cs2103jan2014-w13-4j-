@@ -1,4 +1,6 @@
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 
 /**
@@ -17,6 +19,8 @@ public class CommandExecutor {
 	
 	protected Task currentTask;
 	protected ArrayList<Task> currentTaskList;
+	
+	private final static String MESSAGE_INVALID_COMMAND = "Invalid command entered. Please try again.";
 	
 	/**
 	 * @author Sai Hou
@@ -56,34 +60,86 @@ public class CommandExecutor {
 	/**
 	 * @author Si Rui
 	 */
-	public String executeDisplayCommand(String userCommand){
-		String systemFeedback;
+	public String executeDisplayCommand(String userCommand) {
+		String systemFeedback = null;
+		ArrayList<Task> taskList = null;
 		
 		if (allTasks.isEmpty()) {
 			 systemFeedback = "You have no tasks.\n";
 		} else {
-			Collections.sort(allTasks);
+			String displayType = parser.parseDisplayType(userCommand);
+			assert(displayType != null);
 			
-			//String displayType = parseDisplayType();
-			ArrayList<Task> taskList = new ArrayList<Task>(allTasks);
+			try {
+				taskList = prepareTaskList(displayType, taskList);
+			} catch (Exception ex) {
+				System.out.println(ex.getMessage());
+			}
 			
-			/*if (displayType.equals("all")) {
-				taskList = allTasks; //INCOMPLETE!!!!
-			}*/
-			systemFeedback = formDisplayText(taskList);
-			System.out.print(systemFeedback);
+			if (taskList.isEmpty()) {
+				systemFeedback = getFeedbackIfHaveNoTasks(displayType);
+			}
+			
+			if (systemFeedback == null){
+				systemFeedback = formDisplayText(taskList);
+			}
 		}
 		return systemFeedback;
 	}
 	
-	private String formDisplayTextOfOneTask(int count, Task t) {
-		return "\t" + count + ". " + t.getTaskDetails() + '\n';
+	private ArrayList<Task> prepareTaskList(String displayType, ArrayList<Task> taskList) throws IllegalArgumentException {
+		Collections.sort(allTasks);
+		
+		boolean isDone;
+		
+		switch (displayType) {
+			case "all" : 
+				taskList = new ArrayList<Task>(allTasks);
+				break;
+			case "past" :
+				isDone = true;
+				taskList = getTasksBasedOnCompletion(allTasks, isDone);
+				break;
+			case "today" :
+				taskList = getTodaysTasks();
+				break;
+			case "future" :
+				isDone = false;
+				taskList = getTasksBasedOnCompletion(allTasks, isDone);
+				break;
+			default :
+				throw new IllegalArgumentException(MESSAGE_INVALID_COMMAND);
+		}
+		return taskList;
+	}
+	
+	private ArrayList<Task> getTasksBasedOnCompletion(ArrayList<Task> taskList, boolean statusRequested) {
+		ArrayList<Task> matchedTasks = new ArrayList<Task>();
+
+		for (Task t : taskList) {
+			if (t.getIsDone() == statusRequested) {
+				matchedTasks.add(t);
+			}
+		}
+		return matchedTasks;
+	}
+	
+	private String getFeedbackIfHaveNoTasks(String displayType) {
+		String feedback = null;
+		if (displayType.equals("past")) {
+			feedback = "You have no completed tasks.";
+		} else if (displayType.equals("today")) {
+			feedback = "You have no tasks for today.";
+		} else if (displayType.equals("future")) {
+			feedback = "You have no uncompleted tasks.";
+		}
+		return feedback;
 	}
 	
 	private String formDisplayText(ArrayList<Task> taskList) {
 		Task firstTask = taskList.get(0);
 		String currentDate = firstTask.getDate();
-		String displayText = currentDate + '\n';
+		String displayText = formatDate(currentDate) + '\n';
 		boolean printingMemos = false;
 		int count = 1;
 		
@@ -97,7 +153,7 @@ public class CommandExecutor {
 					count = 1;
 					printingMemos = true;
 					displayText += "Memos: " + '\n';
-					displayText += formDisplayTextOfOneTask(count, t);
+					displayText += formDisplayTextOfOneMemo(count, t);
 				} else {
 					count = 1;
 					currentDate = taskDate;
@@ -108,6 +164,18 @@ public class CommandExecutor {
 			count++;
 		}
 		return displayText;
+	}
+	
+	private String formDisplayTextOfOneTask(int count, Task t) {
+		return "\t" + count + ". " + t.getTaskDetails() + '\n' + t.getIsDone();
+	}
+	
+	private String formDisplayTextOfOneMemo(int count, Task t) {
+		return "\t" + count + ". " + t.getTaskDetails();
+	}
+	private String formatDate(String date){
+		//STUB
+		return date;
 	}
 
 	/**
@@ -229,13 +297,18 @@ public class CommandExecutor {
 		String systemFeedback = "";
 		String lastAction = history.getLastAction();
 
-		if(isAbleToUndo(lastAction)){
-			String actionTakenToUndo = executeActionRequiredToUndo(lastAction);
-			updateHistory("undo", null, null);
-			systemFeedback = "Successfully " + actionTakenToUndo + '.';
-		} else {
-			systemFeedback = getReasonForFailedUndo(lastAction);
+		try {
+			if(isAbleToUndo(lastAction)){
+				String actionTakenToUndo = executeActionRequiredToUndo(lastAction);
+				updateHistory("undo", null, null);
+				systemFeedback = "Successfully " + actionTakenToUndo + '.';
+			} else {
+				systemFeedback = getReasonForFailedUndo(lastAction);
+			}
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
 		}
+		
 		return systemFeedback;
 	}
 
@@ -274,11 +347,19 @@ public class CommandExecutor {
 		return matchedTasks;
 	}
 
-	public ArrayList<Task> getTodaysTasks(String date){
-
-		ArrayList<Task> matchedTasks = searchByDate(date);
-
+	public ArrayList<Task> getTodaysTasks(){
+		String todaysDate = getTodaysDate();
+		
+		ArrayList<Task> matchedTasks = searchByDate(todaysDate);
+		matchedTasks = getTasksBasedOnCompletion(matchedTasks, false);
+		
 		return matchedTasks;
+	}
+	
+	private String getTodaysDate(){
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("ddMMyy");
+		Calendar date = Calendar.getInstance();
+		return dateFormatter.format(date.getTime());
 	}
 
 	/**
@@ -464,8 +545,6 @@ public class CommandExecutor {
 
 		}
 	}
-
-
 
 
 
