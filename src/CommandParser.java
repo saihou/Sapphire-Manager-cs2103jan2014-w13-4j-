@@ -7,8 +7,6 @@
 import java.util.ArrayList;
 
 public class CommandParser {
-	// get instance of gui @Dex
-
 	// constructor
 	public CommandParser(){
 	}

@@ -434,39 +434,5 @@ public class CommandExecutor {
 		}
 		return sb.toString();
 	}
-	
-	private void search(String taskName){
-		boolean searchDate = false;
-		taskName = taskName.trim();
-		
-		try{
-			int date = Integer.parseInt(taskName);
-			if(taskName.length()==6){
-				searchDate = true;
-			}
-			else{
-				searchDate = false;
-			}
-		}catch(NumberFormatException e){
-			searchDate = false;
-		}
-		
-		if(searchDate){
-			ArrayList<Task> matchedTasks = searchByDate(taskName);
-			//pls display matched task
-		}
-		else{
-			//search for the task
-			ArrayList<Task> matchedTasks = searchByName(taskName);
-			//pls display matched task
-			
-
-
-		}
-	}
-
-
-
-
 
 }
