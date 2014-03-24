@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  *	This class is the main executor that will execute the commands
@@ -9,7 +10,6 @@ public class CommandExecutor {
 
 	protected Storage taskStorage;
 	protected CommandParser parser;
-	//protected SapphireManagerGUI gui = SapphireManagerGUI.getInstance();
 	protected ActionHistory history;
 	protected ArrayList<Task> allTasks;
 	
@@ -53,10 +53,66 @@ public class CommandExecutor {
 		return isFileWritingSuccessful;
 	}
 
-	public void executeDisplayCommand(String userCommand){
-		gui.displayTasksGivenList(allTasks);
+	/**
+	 * @author Si Rui
+	 */
+	public String executeDisplayCommand(String userCommand){
+		String systemFeedback;
+		
+		if (allTasks.isEmpty()) {
+			 systemFeedback = "You have no tasks.\n";
+		} else {
+			Collections.sort(allTasks);
+			
+			//String displayType = parseDisplayType();
+			ArrayList<Task> taskList = new ArrayList<Task>(allTasks);
+			
+			/*if (displayType.equals("all")) {
+				taskList = allTasks; //INCOMPLETE!!!!
+			}*/
+			systemFeedback = formDisplayText(taskList);
+			System.out.print(systemFeedback);
+		}
+		return systemFeedback;
+	}
+	
+	private String formDisplayTextOfOneTask(int count, Task t) {
+		return "\t" + count + ". " + t.getTaskDetails() + '\n';
+	}
+	
+	private String formDisplayText(ArrayList<Task> taskList) {
+		Task firstTask = taskList.get(0);
+		String currentDate = firstTask.getDate();
+		String displayText = currentDate + '\n';
+		boolean printingMemos = false;
+		int count = 1;
+		
+		for (Task t : taskList) {
+			String taskDate = t.getDate();
+			if ((taskDate != null && taskDate.equals(currentDate)) || printingMemos) {
+				displayText += formDisplayTextOfOneTask(count, t);
+			} else {
+				String taskType = t.getType();
+				if (taskType.equals("noSetTiming")) {
+					count = 1;
+					printingMemos = true;
+					displayText += "Memos: " + '\n';
+					displayText += formDisplayTextOfOneTask(count, t);
+				} else {
+					count = 1;
+					currentDate = taskDate;
+					displayText += currentDate + '\n';
+					displayText += formDisplayTextOfOneTask(count, t);
+				}
+			}
+			count++;
+		}
+		return displayText;
 	}
 
+	/**
+	 * @author Sai Hou
+	 */
 	public String executeEditCommand(String userModifications){
 		String systemFeedback = "";
 
@@ -110,65 +166,77 @@ public class CommandExecutor {
 	}
 
 	/**
-	 * @author executeUndoCommand and related functions: Si Rui 
-	 * Undo the last entered event. This can only be entered after an “add”, “delete”, or “edit” command.
-	 * 		
+	 * @author Si Rui
+	 * This class extends Command class and is used to undo the last entered event. 
+	 * Undo can only be used after an “add”, “delete”, or “edit” command by user.
+	 * Expected Behavior:
 	 * 		Last user action | Action taken by undo function
+	 * ---------------------->-----------------------------------------------
 	 * 		Added a task 	-> Remove the task
 	 * 		Deleted a task 	-> Restore the original task
 	 * 		Edited a task	-> Revert all changes done to the original task
 	 */
 
-	private boolean ableToUndo(String lastAction) {
-		if(lastAction == null){
-			gui.printToDisplay("There is nothing to undo.");
-			return false;
-		} else if(lastAction.compareTo("undo") == 0) {
-			gui.printToDisplay("Sorry, only able to undo once.");
-			return false;
-		} else{
+	private boolean isAbleToUndo(String lastAction) {
+		if (lastAction.equals("add") || lastAction.equals("delete") ||
+				lastAction.equals("edit")) {
 			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	private String getReasonForFailedUndo(String lastAction) throws IllegalStateException {
+		if (lastAction == null) {
+			return "There is nothing to undo.";
+		} else if (lastAction.equals("undo")) {
+			return "Sorry, only able to undo once.";
+		} else {
+			throw new IllegalStateException("Error: Undo process has failed.");
 		}
 	}
 
-	private String executeActionRequiredToUndo(String lastAction){
+	private String executeActionRequiredToUndo(String lastAction) throws IllegalStateException {
 		Task pointerToLastTask = history.getReferenceToLastTask();
+		assert pointerToLastTask != null;
+		
 		String taskName = pointerToLastTask.getName();
 		String actionTakenToUndo = "";
 
 		switch(lastAction) {
-		case "add": 
-			//execute delete(pointerToLastTask)
-			deleteThisTask(pointerToLastTask);
-			actionTakenToUndo = "deleted \"" + taskName + '"';
-			break;
-		case "delete":	
-			//execute add(pointerToLastTask)
-			addThisTask(pointerToLastTask);
-			actionTakenToUndo = "re-added \"" + taskName + '"';
-			break;
-		case "edit": 	//revert original copy of task
-			Task taskToRestore = history.getCopyOfLastTask();
-			//execute delete(pointerToLastTask)
-			deleteThisTask(pointerToLastTask);
-			//execute add(taskToRestore)
-			addThisTask(taskToRestore);
-			actionTakenToUndo = "reverted \"" + taskName + '"';
-			break;
+			case "add": 
+				deleteThisTask(pointerToLastTask);
+				actionTakenToUndo = "deleted \"" + taskName + '"';
+				break;
+			case "delete":	
+				addThisTask(pointerToLastTask);
+				actionTakenToUndo = "re-added \"" + taskName + '"';
+				break;
+			case "edit": 	//revert original copy of task
+				Task taskToRestore = history.getCopyOfLastTask();
+				deleteThisTask(pointerToLastTask);
+				addThisTask(taskToRestore);
+				actionTakenToUndo = "reverted \"" + taskName + '"';
+				break;
+			default :
+				throw new IllegalStateException("Error: Undo process has failed.");
 		}
 
 		return actionTakenToUndo;
 	}
 
-	public void executeUndoCommand() {
+	public String executeUndoCommand() {
+		String systemFeedback = "";
 		String lastAction = history.getLastAction();
 
-		if(ableToUndo(lastAction)){
+		if(isAbleToUndo(lastAction)){
 			String actionTakenToUndo = executeActionRequiredToUndo(lastAction);
-			gui.printToDisplay("Successfully " + actionTakenToUndo + '.');
 			updateHistory("undo", null, null);
+			systemFeedback = "Successfully " + actionTakenToUndo + '.';
+		} else {
+			systemFeedback = getReasonForFailedUndo(lastAction);
 		}
-
+		return systemFeedback;
 	}
 
 	/**
@@ -198,7 +266,7 @@ public class CommandExecutor {
 			String taskDate = t.getDate();
 
 			if (taskDate != null) {
-				if (taskDate.compareTo(date) == 0) {
+				if (taskDate.equals(date)) {
 					matchedTasks.add(t);
 				}
 			}
@@ -307,7 +375,7 @@ public class CommandExecutor {
 				systemFeedback = executeAddCommand(userCommand.substring(4));
 				break;
 			case "display" :
-				executeDisplayCommand(userCommand.substring(7));
+				systemFeedback = executeDisplayCommand(userCommand.substring(7));
 				break;
 			case "edit" :
 				currentTaskList = searchByName(userCommand.substring(5));
