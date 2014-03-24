@@ -17,7 +17,82 @@ public class CommandParser {
 	public String getFirstWord(String userInput) {
 		return userInput.trim().split("\\s+")[0];
 	}
-    
+	/**
+	 * @param userCommand
+	 * @return displayType, "all", "future", "past" or "today"
+	 * 
+	 * @author Sai Hou
+	 */
+	public String parseDisplayType(String userCommand) {
+		String displayType = "";
+		
+		userCommand = prepareUserCommandForParsing(userCommand);
+		
+		boolean isAllKeywordPresent = userCommand.contains("/all");
+		boolean isFutureKeywordPresent = userCommand.contains("/future");
+		boolean isPastKeywordPresent = userCommand.contains("/past");
+		boolean isTodayKeywordPresent = userCommand.contains("/today");
+		
+		displayType = determineDisplayType(isFutureKeywordPresent,
+				isPastKeywordPresent, isTodayKeywordPresent, isAllKeywordPresent); 
+		
+		return displayType;
+	}
+
+	/**
+	 * 
+	 * @param isFutureKeywordPresent
+	 * @param isPastKeywordPresent
+	 * @param isTodayKeywordPresent
+	 * @param isAllKeywordPresent
+	 * @return error message if number of keywords > 1,
+	 * 		"all" if number of keywords == 0,
+	 * 		the respective display type otherwise.
+	 */
+	private String determineDisplayType(boolean isFutureKeywordPresent,
+			boolean isPastKeywordPresent, boolean isTodayKeywordPresent,
+			boolean isAllKeywordPresent) {
+		String displayType;
+		
+		int numberOfKeywordsPresent = getNumberOfKeywordsPresent(isAllKeywordPresent, isFutureKeywordPresent,
+				isPastKeywordPresent, isTodayKeywordPresent);
+		
+		assert numberOfKeywordsPresent >=0;
+		
+		if (numberOfKeywordsPresent > 1 ) {
+			displayType = "Invalid number of keywords!!";
+			return displayType;
+		}
+		
+		if (isFutureKeywordPresent) {
+			displayType = "future";
+		} else if (isPastKeywordPresent) {
+			displayType = "past";
+		} else if (isTodayKeywordPresent) {
+			displayType = "today";
+		} else {
+			displayType = "all";
+		}
+		return displayType;
+	}
+
+	private int getNumberOfKeywordsPresent(boolean isAllKeywordPresent,
+			boolean isFutureKeywordPresent, boolean isPastKeywordPresent,
+			boolean isTodayKeywordPresent) {
+		return (isAllKeywordPresent ? 1:0) + 
+				(isFutureKeywordPresent ? 1:0) +
+				(isPastKeywordPresent ? 1:0) + 
+				(isTodayKeywordPresent ? 1:0);
+	}
+
+	private String prepareUserCommandForParsing(String userCommand) {
+		return userCommand.trim().toLowerCase();
+	}
+	
+	/**
+	 * @author Cai Di
+	 */
+	
 	// Analyze userInput and assign task details to myTask object
 	public void parse(String userInput, Task myTask) {
 		// String command is the update version of userInput string after each extraction
@@ -87,7 +162,7 @@ public class CommandParser {
 			
 		} catch (StringIndexOutOfBoundsException
 				| ArrayIndexOutOfBoundsException e) {
-			System.out.println("Uer input is not valid!"); 
+			System.out.println("User input is not valid!"); 
 		}
 	}
     
