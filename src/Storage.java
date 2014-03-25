@@ -58,23 +58,9 @@ public class Storage {
 			return true;
 		} catch(Exception ex) {
 			System.out.println(FILE_SAVING_ERROR);
-			//gui.printToDisplay(FILE_SAVING_ERROR);
 			return false;
 		}
 	}
-
-	/*public boolean writeLogToFile(String logRecord, boolean toAppend) {
-		try {
-			bufferedWriter = new BufferedWriter(new FileWriter(new File("Log Record.txt"), toAppend));
-			bufferedWriter.write(logRecord);
-			bufferedWriter.newLine();
-			bufferedWriter.close();
-			return true;
-		} catch(Exception ex) {
-			//userInterface.displayMessage(FILE_SAVING_ERROR);
-			return false;
-		}
-	}*/
 	
 	//write multiple task to file
 	public boolean writeTaskListToFile() {
@@ -105,7 +91,6 @@ public class Storage {
 			}
 		} catch(Exception ex) { 
 			System.out.println(FILE_READING_ERROR);
-			//gui.printToDisplay(FILE_READING_ERROR);
 			return false;
 		}
 	}
@@ -118,7 +103,6 @@ public class Storage {
 			return true;
 		} catch (Exception ex) {
 			System.out.println(FILE_INITIALIZING_ERROR);
-			//gui.printToDisplay(FILE_INITIALIZING_ERROR);
 			return false;
 		}
 	}
@@ -138,7 +122,6 @@ public class Storage {
 			return true;
 		} catch (Exception ex) {
 			System.out.println(FILE_READING_ERROR);
-			//gui.printToDisplay(FILE_READING_ERROR);
 			return false;
 		}
 	}
@@ -155,7 +138,6 @@ public class Storage {
 			}
 		} catch (Exception ex) {
 			System.out.println(FILE_CLEARING_ERROR);
-			//gui.printToDisplay(FILE_CLEARING_ERROR);
 			return false;
 		}
 	}
@@ -179,7 +161,7 @@ public class Storage {
 	}
 
 	//converts String to Task
-	private Task convertStringToTask(String[] splitedTaskInfo) {
+	public Task convertStringToTask(String[] splitedTaskInfo) {
 		task = new Task();	
 
 		if(!splitedTaskInfo[0].equals("[null]")) { //type
@@ -213,7 +195,7 @@ public class Storage {
 		}
 
 		if(!splitedTaskInfo[5].equals("[null]")) { //location
-			task.setLocation(splitedTaskInfo[6]);
+			task.setLocation(splitedTaskInfo[5]);
 		} else {
 			task.setLocation(null);
 		}
@@ -224,14 +206,14 @@ public class Storage {
 			task.setIsDone(true);
 		}
 		
-		assert task != null;
+		//assert task != null;
 		//assert false;
 		
 		return task;
 	}
 
 	//converts Task to String
-	private String convertTaskToString(Task task) {
+	public String convertTaskToString(Task task) {
 		String convertedTask = "";
 
 		if(task.getType() == null) { //type

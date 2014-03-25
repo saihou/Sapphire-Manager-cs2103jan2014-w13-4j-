@@ -202,4 +202,29 @@ class Task implements Comparable<Task> {
 		System.out.println(line);
 	}
 
+	public boolean comparedTo(Task newTask) {
+		if(!getType().equals(newTask.getType())) {
+			return false;
+		}
+		if(!getName().equals(newTask.getName())) {
+			return false;
+		}
+		if(!getDate().equals(newTask.getDate())) {
+			return false;
+		}
+		if(!getStartTime().equals(newTask.getStartTime())) {
+			return false;
+		}
+		if(!getEndTime().equals(newTask.getEndTime())) {
+			return false;
+		}
+		if(!getLocation().equals(newTask.getLocation())) {
+			return false;
+		}
+		if(getIsDone() != newTask.getIsDone()) {
+			return false;
+		}
+		return true;
+		
+	}
 }
