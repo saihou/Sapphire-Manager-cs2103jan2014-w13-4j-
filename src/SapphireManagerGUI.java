@@ -1,3 +1,8 @@
+/**
+ * @author Teck Sheng (Dex)
+ * This GUI class handles the display of of system to user
+ */
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
@@ -44,12 +49,12 @@ public class SapphireManagerGUI {
 
 	private final static String SPLIT_LINE = "------------------------------------------";
 	
-	private final static String WRONG_COMMAND_ENTERED = "Wrong command entered! Enter F1 for a list of commands.";
+	//private final static String WRONG_COMMAND_ENTERED = "Wrong command entered! Enter F1 for a list of commands.";
 	
 	private static ArrayList<Task> todaysTasks;
 	private static CommandExecutor myExecutor;
 	private static SapphireManagerGUI guiWindow;
-	private static String todaysDate = "";
+	//private static String todaysDate = "";
 	
 	//private static JOptionPane exitPane;
 	private static JTextArea displayBox;
@@ -66,7 +71,6 @@ public class SapphireManagerGUI {
 				try {
 					todaysTasks = new ArrayList<Task>();
 					guiWindow = new SapphireManagerGUI();
-					todaysDate = getTodaysDate();
 
 					myExecutor = new CommandExecutor();
 					
@@ -204,48 +208,6 @@ public class SapphireManagerGUI {
 								}
 								break;
 						}
-						
-						//printToDisplay(WRONG_COMMAND_ENTERED);
-						/*
-						 * String operation = getFirstWord(userCommand);
-						 */
-						/*
-						if(operation.equalsIgnoreCase("exit") || operation.equalsIgnoreCase("quit")) {
-							printToDisplay("Sapphire Manager will now exit.");
-							System.exit(0);
-						} else if(operation.equalsIgnoreCase("add")) {
-							myExecutor.executeAddCommand(userCommand.substring(4));
-						} else if(operation.equalsIgnoreCase("display")) {
-							myExecutor.executeDisplayCommand(userCommand.substring(7));
-						} else if(operation.equalsIgnoreCase("undo")) {
-							myExecutor.executeUndoCommand();
-						} else if(operation.equalsIgnoreCase("clear")) {
-							printToDisplay("All tasks cleared.");
-							myExecutor.executeClearCommand();
-						} else if(operation.equalsIgnoreCase("delete") && currentTask == "") {
-							currentTask = "delete";
-							matchedTasks = myExecutor.searchByName(userCommand.substring(7));
-							displayExistingTasksFound(matchedTasks);
-						} else if(currentTask.equalsIgnoreCase("delete")) {
-							myExecutor.executeDeleteCommand2(matchedTasks);
-							currentTask = "";
-						} else if(operation.equalsIgnoreCase("edit") && currentTask == "") {
-							currentTask = "edit1";
-							matchedTasks = myExecutor.searchByName(userCommand.substring(5));
-							displayExistingTasksFound(matchedTasks);
-						} else if(currentTask.equalsIgnoreCase("edit1")) {
-							currentTask = "edit2";
-							taskToBeEdited = myExecutor.executeEditCommand2(matchedTasks);
-							displayCurrentlyEditingSequence(taskToBeEdited);
-						} else if(currentTask.equalsIgnoreCase("edit2")) {
-							printToDisplay("Entered: '"+textField.getText()+"'.");
-							String userModifications = readUserEdits();
-							myExecutor.executeEditCommand3(taskToBeEdited, userModifications);
-							currentTask = "";
-						} else {
-							printToDisplay(WRONG_COMMAND_ENTERED);
-						}
-						*/
 						inputBox.setText("");
 					}
 				} else if(e.getKeyCode() == KeyEvent.VK_F1) {
@@ -412,13 +374,13 @@ public class SapphireManagerGUI {
 		Calendar date = Calendar.getInstance();
 		return dateFormatter.format(date.getTime());
 	}
-
+	/*
 	private static String getTodaysDate(){
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("ddMMyy");
 		Calendar date = Calendar.getInstance();
 		return dateFormatter.format(date.getTime());
 	}
-
+	*/
 	private String readUserInput() {
 		String userInput = null;
 		if(!inputBox.equals(null)) {
