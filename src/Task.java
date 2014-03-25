@@ -201,7 +201,7 @@ class Task implements Comparable<Task> {
 	private void println(String line){
 		System.out.println(line);
 	}
-	
+
 	public boolean comparedTo(Task newTask) {
 		if(!getType().equals(newTask.getType())) {
 			return false;

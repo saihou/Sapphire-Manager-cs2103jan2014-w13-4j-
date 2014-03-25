@@ -21,6 +21,7 @@ public class CommandExecutor {
 	protected ArrayList<Task> currentTaskList;
 	
 	private final static String MESSAGE_INVALID_COMMAND = "Invalid command entered. Please try again.";
+	private final static String MESSAGE_NO_SEARCH_RESULTS = "No records found!";
 	
 	/**
 	 * @author Sai Hou
@@ -44,7 +45,7 @@ public class CommandExecutor {
 		boolean isAdditionOfNewTaskSuccessful = addThisTask(taskToBeAdded);
 
 		if (isAdditionOfNewTaskSuccessful) {
-			systemFeedback = "Successfully added : " + taskToBeAdded.getName() + ".";
+			systemFeedback = "Successfully added \"" + taskToBeAdded.getName() + "\".";
 			updateHistory("add", taskToBeAdded, null);
 		}
 		return systemFeedback;
@@ -189,7 +190,7 @@ public class CommandExecutor {
 		boolean isEditSuccessful = editThisTask(currentTask, userModifications);
 
 		if (isEditSuccessful) {
-			systemFeedback = "Successfully made changes to " + currentTask.getName() +".";
+			systemFeedback = "Successfully made changes to \"" + currentTask.getName() +"\".";
 			updateHistory("edit", currentTask, duplicatedOldTask);
 		}
 		return systemFeedback;
@@ -374,7 +375,6 @@ public class CommandExecutor {
 	public String getOperation(String userCommand) {
 		return getFirstWord(userCommand);
 	}
-	
 	public String getPhase() {
 		return phase;
 	}
@@ -384,6 +384,7 @@ public class CommandExecutor {
 	public Task getCurrentTask() {
 		return currentTask;
 	}
+	
 	public String doUserOperation(String userCommand) {
 		String systemFeedback = "";
 		
@@ -394,23 +395,30 @@ public class CommandExecutor {
 			System.exit(0);
 		}
 		
+		boolean isValidChoice = false;
 		switch (phase) {
 			case "normal" :
 				systemFeedback = executeOperation(operation, userCommand);
 				break;
 			case "editPhase1" :
-				int choice = convertToInteger(userCommand);
-				currentTask = currentTaskList.get(choice-1);
-				phase = "editPhase2";
+				isValidChoice = ValidationCheck.isValidChoice(userCommand, currentTaskList.size());
+				if (isValidChoice) {
+					int choice = convertToInteger(userCommand);
+					currentTask = currentTaskList.get(choice-1);
+					phase = "editPhase2";
+				}
 				break;
 			case "editPhase2" :
 				systemFeedback = executeEditCommand(userCommand);
 				phase = "normal";
 				break;
 			case "deletePhase1" :
-				choice = convertToInteger(userCommand);
-				systemFeedback = executeDeleteCommand(choice);
-				phase = "normal";
+				isValidChoice = ValidationCheck.isValidChoice(userCommand, currentTaskList.size());
+				if (isValidChoice) {
+					int choice = convertToInteger(userCommand);
+					systemFeedback = executeDeleteCommand(choice);
+					phase = "normal";
+				}
 				break;
 			default :
 				break;
@@ -424,20 +432,6 @@ public class CommandExecutor {
 		return systemFeedback;
 	}
 	
-	private boolean checkIfOperationIsValid(String operation) {
-		boolean isValidOperation = false;
-		
-		if (operation.equalsIgnoreCase("add") || 
-			operation.equalsIgnoreCase("delete") ||
-			operation.equalsIgnoreCase("display") ||
-			operation.equalsIgnoreCase("edit") ||
-			operation.equalsIgnoreCase("undo") ||
-			operation.equalsIgnoreCase("clear")) {
-			isValidOperation = true;
-		}
-		return isValidOperation;
-	}
-	
 	private int convertToInteger(String userCommand) {
 		return Integer.parseInt(userCommand);
 	}
@@ -445,7 +439,7 @@ public class CommandExecutor {
 	private String executeOperation(String operation, String userCommand) {
 		String systemFeedback = "";
 		
-		boolean isValidOperation = checkIfOperationIsValid(operation);
+		boolean isValidOperation = ValidationCheck.isValidOperation(operation);
 		
 		if (!isValidOperation) {
 			return "Wrong command entered! Enter F1 for a list of commands.";
@@ -458,20 +452,34 @@ public class CommandExecutor {
 			case "display" :
 				systemFeedback = executeDisplayCommand(userCommand.substring(7));
 				break;
+			case "update" :
+				//fallthrough
 			case "edit" :
 				currentTaskList = searchByName(userCommand.substring(5));
-				phase = "editPhase1";
+				if (currentTaskList.size() > 0) {
+					phase = "editPhase1";
+				}
+				else {
+					systemFeedback = MESSAGE_NO_SEARCH_RESULTS;
+				}
 				break;
 			case "delete" :
 				currentTaskList = searchByName(userCommand.substring(7));
-				phase = "deletePhase1";
+				if (currentTaskList.size() > 0) {
+					phase = "deletePhase1";
+				}
+				else {
+					systemFeedback = MESSAGE_NO_SEARCH_RESULTS;
+				}
 				break;
 			case "clear" :
 				systemFeedback = executeClearCommand();
 				break;
 			case "undo" :
-				executeUndoCommand();
+				systemFeedback = executeUndoCommand();
 				break;
+			case "search" :
+				systemFeedback = search(userCommand.substring(7));
 			default : 
 				break;
 		}
@@ -481,8 +489,42 @@ public class CommandExecutor {
 	private String getFirstWord(String str) {
 		return str.trim().split("\\s+")[0];
 	}
-	//only used for JUnitTesting!
 	
+	private String search(String taskName){
+		String systemFeedback = "";
+		boolean isSearchingByDate = false;
+		
+		taskName = taskName.trim();
+		
+		try {
+			int date = Integer.parseInt(taskName);
+			if (taskName.length() == 6){
+				isSearchingByDate = true;
+			}
+			else {
+				isSearchingByDate = false;
+			}
+		} catch(NumberFormatException e) {
+			isSearchingByDate = false;
+		}
+		
+		if(isSearchingByDate) {
+			currentTaskList = searchByDate(taskName);
+		}
+		else {
+			currentTaskList = searchByName(taskName);
+		}
+		
+		if (currentTaskList.size() > 0) {
+			systemFeedback = formDisplayText(currentTaskList);
+		}
+		else {
+			systemFeedback = MESSAGE_NO_SEARCH_RESULTS;
+		}
+		return systemFeedback;
+	}
+	
+	//only used for JUnitTesting!
 	public String jUnitAutomatedTest() {
 		//basically combining all the println from various objects (UI, Task)
 		//and appending them to a StringBuilder. At the end, the StringBuilder is
@@ -510,41 +552,11 @@ public class CommandExecutor {
 			if(task.getLocation() != null){
 				sb.append("Location: " + task.getLocation()+"\n");
 			}
-
-			//task.printTaskDetails(count, gui);
 		}
 		return sb.toString();
 	}
 	
-	private void search(String taskName){
-		boolean searchDate = false;
-		taskName = taskName.trim();
-		
-		try{
-			int date = Integer.parseInt(taskName);
-			if(taskName.length()==6){
-				searchDate = true;
-			}
-			else{
-				searchDate = false;
-			}
-		}catch(NumberFormatException e){
-			searchDate = false;
-		}
-		
-		if(searchDate){
-			ArrayList<Task> matchedTasks = searchByDate(taskName);
-			//pls display matched task
-		}
-		else{
-			//search for the task
-			ArrayList<Task> matchedTasks = searchByName(taskName);
-			//pls display matched task
-			
-
-
-		}
-	}
+	
 
 
 

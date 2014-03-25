@@ -19,6 +19,7 @@ public class Storage {
 	private final static String FILE_INITIALIZING_ERROR = "Error initializing file! Please re-start program.";
 	private final static String FILE_READING_ERROR = "Error reading file! Please re-start program.";
 	private final static String FILE_SAVING_ERROR = "Error saving file! Please re-start program.";
+
 	//declaration
 	private ArrayList<Task> taskList;
 	private BufferedReader bufferedReader;

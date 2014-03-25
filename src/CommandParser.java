@@ -7,6 +7,7 @@
 import java.util.ArrayList;
 
 public class CommandParser {
+	
 	// get instance of gui @Dex
 
 	// constructor
@@ -92,9 +93,10 @@ public class CommandParser {
 	/**
 	 * @author Cai Di
 	 */
-	
 	// Analyze userInput and assign task details to myTask object
-	public void parse(String userInput, Task myTask) {
+	public String parse(String userInput, Task myTask) {
+		String systemFeedback = "";
+		
 		// String command is the update version of userInput string after each extraction
 		String command = "";
         
@@ -107,6 +109,7 @@ public class CommandParser {
 		// call parseType method to set the type of the task
 		setType(myTask);
 
+		return systemFeedback;
 	}
     
 	// set task name and update String command to userInput without task name
@@ -175,8 +178,8 @@ public class CommandParser {
 	}
 	
 	// mark task as done/undone
-	private String setIsDone(Task myTask, String command, int indexOfIsDone){
-		if(indexOfIsDone != -1){
+	private String setIsDone(Task myTask, String command, int indexOfIsDone) {
+		if(indexOfIsDone != -1) {
 			String[] temp = command.split("/mark");
 			
 			String isDone = getFirstWord(temp[1].trim());
@@ -200,6 +203,10 @@ public class CommandParser {
 			String[] temp = command.split("/at");
 
 			String deadline = temp[1].trim().substring(0, 4);
+			
+			boolean isTimeValid = ValidationCheck.isValidTime(deadline);
+			System.out.println("DeadlineTimeValidate:"+isTimeValid);
+			
 			myTask.setStartTime(deadline);
 
 			temp[1] = temp[1].trim().substring(4).trim();
@@ -215,6 +222,10 @@ public class CommandParser {
 			String[] temp = command.split("/on");
 
 			String date = temp[1].trim().substring(0, 6);
+			
+			boolean isDateValid = ValidationCheck.isValidDate(date);
+			System.out.println("DateValidate:"+isDateValid);
+			
 			myTask.setDate(date);
 
 			temp[1] = temp[1].trim().substring(6).trim();
@@ -233,6 +244,10 @@ public class CommandParser {
 			// extract first 4 digits as starting time
 			temp[1] = temp[1].trim();
 			String startTime = temp[1].substring(0, 4);
+			
+			boolean isTimeValid = ValidationCheck.isValidTime(startTime);
+			System.out.println("StartTimeValidate:"+isTimeValid);
+			
 			myTask.setStartTime(startTime);
 
 			// extract start time and update temp[1]
@@ -240,6 +255,10 @@ public class CommandParser {
 			temp[1] = temp[1].substring(2).trim();
 
 			String endTime = temp[1].substring(0, 4);
+			
+			isTimeValid = ValidationCheck.isValidTime(endTime);
+			System.out.println("EndTimeValidate:"+isTimeValid);
+			
 			myTask.setEndTime(endTime);
 
 			// extract start & end time and update String command 
@@ -269,10 +288,4 @@ public class CommandParser {
 		}
 
 	}
-
-	public boolean checkIfUserChoiceIsValid(ArrayList<Task> matchedTasks) {
-		// stub
-		return true;
-	}
-
 }
