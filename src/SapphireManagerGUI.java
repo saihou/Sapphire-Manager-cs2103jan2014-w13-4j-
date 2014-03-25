@@ -37,7 +37,7 @@ public class SapphireManagerGUI {
 	private final static String MESSAGE_NO_TASK_TO_DISPLAY_TODAY = "You have no tasks due today.\n";
 	private final static String MESSAGE_WELCOME = "Welcome to Sapphire Manager!";
 	private final static String MESSAGE_TASKS_FOUND = "Existing tasks found: ";
-	private final static String MESSAGE_TODAY_TASK_TITLE = "Today's task:";
+	private final static String MESSAGE_TODAY_TASK_TITLE = "Today's tasks:\n";
 	
 	private final static String PROMPT_FOR_NUMBER = "Enter a number: ";
 	private final static String PROMPT_FOR_EDITS = "Enter your edits: ";
@@ -74,15 +74,16 @@ public class SapphireManagerGUI {
 					if(todaysTasks.isEmpty()) {
 						displayBox.append(MESSAGE_NO_TASK_TO_DISPLAY_TODAY);
 					} else {
-						if(todaysTasks.size() == 1) {
+						displayBox.append(MESSAGE_TODAY_TASK_TITLE);
+						displayBox.append(myExecutor.executeDisplayCommand("/today"));
+						/*if(todaysTasks.size() == 1) {
 							displayBox.append(MESSAGE_TODAY_TASK_TITLE);
-							//todaysTasks.get(0).printTaskDetails(1, window);
 						} else {
 							displayBox.append(MESSAGE_TODAY_TASK_TITLE);
 							for(int i=0; i<todaysTasks.size(); i++) {
 								//todaysTasks.get(i).printTaskDetails((i+1), window);
 							}
-						}
+						}*/
 					}
 
 					guiWindow.guiFrame.setVisible(true);
@@ -372,7 +373,7 @@ public class SapphireManagerGUI {
 	}
 	
 	public void displaySingleTask(Task taskToDisplay) {	
-		String taskDetails = taskToDisplay.getTaskDetails();
+		String taskDetails = taskToDisplay.getAllTaskDetails();
 		printToDisplay(taskDetails);
 	}
 
@@ -384,7 +385,7 @@ public class SapphireManagerGUI {
 			int count = 1;
 			for(Task task: taskList) {
 				printToDisplay(count++ + ". ");
-				String taskDetails = task.getTaskDetails();
+				String taskDetails = task.getAllTaskDetails();
 				printToDisplay(taskDetails);
 			}
 		}
