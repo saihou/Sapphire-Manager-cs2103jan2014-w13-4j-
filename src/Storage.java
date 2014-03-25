@@ -218,7 +218,7 @@ public class Storage {
 			task.setLocation(null);
 		}
 		
-		if(!splitedTaskInfo[6].equals("false")) { //isDone
+		if(splitedTaskInfo[6].equals("false")) { //isDone
 			task.setIsDone(false);
 		} else {
 			task.setIsDone(true);
