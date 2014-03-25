@@ -70,7 +70,7 @@ public class SapphireManagerGUI {
 
 					myExecutor = new CommandExecutor();
 					
-					todaysTasks = myExecutor.getTodaysTasks(todaysDate);
+					todaysTasks = myExecutor.getTodaysTasks();
 					if(todaysTasks.isEmpty()) {
 						displayBox.append(MESSAGE_NO_TASK_TO_DISPLAY_TODAY);
 					} else {
@@ -202,6 +202,7 @@ public class SapphireManagerGUI {
 								printToDisplay(systemFeedback);
 								break;
 						}
+						
 						//printToDisplay(WRONG_COMMAND_ENTERED);
 						/*
 						 * String operation = getFirstWord(userCommand);
