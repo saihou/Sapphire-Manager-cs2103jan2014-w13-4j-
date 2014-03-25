@@ -199,7 +199,9 @@ public class SapphireManagerGUI {
 								displayExistingTasksFound(matchedTasks);
 								break;
 							default:
-								printToDisplay(systemFeedback);
+								if (!systemFeedback.startsWith("Error")) {
+									printToDisplay(systemFeedback);
+								}
 								break;
 						}
 						
@@ -370,7 +372,8 @@ public class SapphireManagerGUI {
 	}
 	
 	public void displaySingleTask(Task taskToDisplay) {	
-		//taskToDisplay.printTaskDetails(1, window);
+		String taskDetails = taskToDisplay.getTaskDetails();
+		printToDisplay(taskDetails);
 	}
 
 	public void displayTasksGivenList(ArrayList<Task> taskList) {
@@ -380,14 +383,15 @@ public class SapphireManagerGUI {
 			printToDisplay("Tasks available:");
 			int count = 1;
 			for(Task task: taskList) {
-				//printToDisplay(count++ + ". ");
-				//task.printTaskDetails(count++, window);
+				printToDisplay(count++ + ". ");
+				String taskDetails = task.getTaskDetails();
+				printToDisplay(taskDetails);
 			}
 		}
 	}
 
 	public void displayExistingTasksFound(ArrayList<Task> taskList) {
-		if (taskList != null) {
+		if (taskList != null && taskList.size() != 0) {
 			printToDisplay(MESSAGE_TASKS_FOUND);
 			displayTasksGivenList(taskList);
 			printToDisplay(PROMPT_FOR_NUMBER);
