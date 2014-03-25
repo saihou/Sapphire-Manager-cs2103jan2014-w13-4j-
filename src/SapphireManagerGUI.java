@@ -365,7 +365,8 @@ public class SapphireManagerGUI {
 		printToDisplay("\tLocation: '/loc [location name]'");
 		printToDisplay("\tCategory: '/c [one-word-name]'");
 		printToDisplay("\tReminder: '/r [time]'");
-
+		printToDisplay("\t*Time: 4-digit 24 hours [1159]: 11.59am; [2359]: 11.59pm");
+		printToDisplay("\t*Date: 6-digit [DDMMYYYY]");
 	}
 	
 	public void displaySingleTask(Task taskToDisplay) {	
