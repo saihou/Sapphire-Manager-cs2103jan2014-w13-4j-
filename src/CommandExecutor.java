@@ -284,7 +284,7 @@ public class CommandExecutor {
 			case "edit": 	//revert original copy of task
 				Task taskToRestore = history.getCopyOfLastTask();
 				deleteThisTask(pointerToLastTask);
-				addThisTask(taskToRestore);
+				addThisTask(taskToRestore); 
 				actionTakenToUndo = "reverted \"" + taskName + '"';
 				break;
 			default :
