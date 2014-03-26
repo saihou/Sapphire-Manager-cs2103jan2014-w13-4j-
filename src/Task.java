@@ -48,7 +48,9 @@ class Task implements Comparable<Task> {
 	public void setLocation(String location){
 		this.location = location;
 	}
-	
+	/**
+	 * @author Teck Sheng (Dex)
+	 */
 	public void setIsDone(boolean isDone) {
 		this.isDone = isDone;
 	}
@@ -76,7 +78,9 @@ class Task implements Comparable<Task> {
 	public String getLocation() {
 		return location;
 	}
-	
+	/**
+	 * @author Teck Sheng (Dex)
+	 */
 	public boolean getIsDone() {
 		return isDone;
 	}
@@ -185,9 +189,37 @@ class Task implements Comparable<Task> {
 		}
 		return reversedDate;
 	}
-
+	/*
 	/*private void println(String line){
 		System.out.println(line);
 	}*/
-
+	*/
+	/**
+	 * @author Teck Sheng (Dex)
+	 */
+	public boolean comparedTo(Task newTask) {
+		if(!getType().equals(newTask.getType())) {
+			return false;
+		}
+		if(!getName().equals(newTask.getName())) {
+			return false;
+		}
+		if(!getDate().equals(newTask.getDate())) {
+			return false;
+		}
+		if(!getStartTime().equals(newTask.getStartTime())) {
+			return false;
+		}
+		if(!getEndTime().equals(newTask.getEndTime())) {
+			return false;
+		}
+		if(!getLocation().equals(newTask.getLocation())) {
+			return false;
+		}
+		if(getIsDone() != newTask.getIsDone()) {
+			return false;
+		}
+		return true;
+		
+	}
 }
