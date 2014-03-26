@@ -89,8 +89,12 @@ public class SapphireManagerGUI {
 						displayNormalText(myExecutor.executeDisplayCommand("/today"));
 						//appendToPane(myExecutor.executeDisplayCommand("/today"), Color.RED);
 						/*if(todaysTasks.size() == 1) {
+						displayBox.append(MESSAGE_TODAY_TASK_TITLE);
+						displayBox.append(myExecutor.executeDisplayCommand("/today"));
+						/*if(todaysTasks.size() == 1) {
+						displayBox.append(MESSAGE_TODAY_TASK_TITLE);
+						/*if(todaysTasks.size() == 1) {
 							displayBox.append(MESSAGE_TODAY_TASK_TITLE);
-							//todaysTasks.get(0).printTaskDetails(1, window);
 						} else {
 							displayBox.append(MESSAGE_TODAY_TASK_TITLE);
 							for(int i=0; i<todaysTasks.size(); i++) {
@@ -388,7 +392,7 @@ public class SapphireManagerGUI {
 	}
 	
 	public void displaySingleTask(Task taskToDisplay) {	
-		String taskDetails = taskToDisplay.getTaskDetails();
+		String taskDetails = taskToDisplay.getAllTaskDetails();
 		printToDisplay(taskDetails);
 	}
 
@@ -400,7 +404,7 @@ public class SapphireManagerGUI {
 			int count = 1;
 			for(Task task: taskList) {
 				printToDisplay(count++ + ". ");
-				String taskDetails = task.getTaskDetails();
+				String taskDetails = task.getAllTaskDetails();
 				printToDisplay(taskDetails);
 			}
 		}
