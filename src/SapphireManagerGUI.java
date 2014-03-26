@@ -48,7 +48,7 @@ public class SapphireManagerGUI {
 	private final static String MESSAGE_NO_TASK_TO_DISPLAY_TODAY = "You have no tasks due today.\n";
 	private final static String MESSAGE_WELCOME = "Welcome to Sapphire Manager!";
 	private final static String MESSAGE_TASKS_FOUND = "Existing tasks found: ";
-	private final static String MESSAGE_TODAY_TASK_TITLE = "Today's task:\n";
+	private final static String MESSAGE_TODAY_TASK_TITLE = "Today's tasks:\n";
 	
 	private final static String PROMPT_FOR_NUMBER = "Enter a number: ";
 	private final static String PROMPT_FOR_EDITS = "Enter your edits: ";
@@ -85,8 +85,6 @@ public class SapphireManagerGUI {
 					if(todaysTasks.isEmpty()) {
 						displaySystemText(MESSAGE_NO_TASK_TO_DISPLAY_TODAY);
 					} else {
-						displaySystemText(MESSAGE_TODAY_TASK_TITLE);
-						displayNormalText(myExecutor.executeDisplayCommand("/today"));
 						//appendToPane(myExecutor.executeDisplayCommand("/today"), Color.RED);
 						/*if(todaysTasks.size() == 1) {
 						displayBox.append(MESSAGE_TODAY_TASK_TITLE);
