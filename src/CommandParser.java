@@ -65,14 +65,14 @@ public class CommandParser {
 			return displayType;
 		}
 		
-		if (isFutureKeywordPresent) {
-			displayType = "future";
+		if (isAllKeywordPresent) {
+			displayType = "all";
 		} else if (isPastKeywordPresent) {
 			displayType = "past";
 		} else if (isTodayKeywordPresent) {
 			displayType = "today";
 		} else {
-			displayType = "all";
+			displayType = "future";
 		}
 		return displayType;
 	}
