@@ -251,14 +251,17 @@ public class SapphireManagerGUI {
 						System.out.println(phase);
 						switch (phase) {
 						case "editPhase1" :
+							displayToHelpo(PROMPT_FOR_NUMBER);
 							matchedTasks = myExecutor.getCurrentTaskList();
 							displayExistingTasksFound(matchedTasks);
 							break;
 						case "editPhase2" :
+							displayToHelpo(PROMPT_FOR_EDITS);
 							Task myTask = myExecutor.getCurrentTask();
 							displayCurrentlyEditingSequence(myTask);
 							break;
 						case "deletePhase1" :
+							displayToHelpo(PROMPT_FOR_NUMBER);
 							matchedTasks = myExecutor.getCurrentTaskList();
 							displayExistingTasksFound(matchedTasks);
 							break;
@@ -267,6 +270,9 @@ public class SapphireManagerGUI {
 								displaySystemText(systemFeedback);
 							}
 							break;
+						} 
+						if(helpTip.getText().trim().equals("") || phase.equalsIgnoreCase("normal")) {
+							displayToHelpo(MESSAGE_HELP);
 						}
 						inputBox.setText("");
 					}
@@ -330,181 +336,99 @@ public class SapphireManagerGUI {
 	private void helpTipListener() {
 		inputBox.addCaretListener(new CaretListener() {
 			public void caretUpdate(CaretEvent arg0) {
-				String userInput = inputBox.getText().toLowerCase();
+				String userInput = inputBox.getText().toLowerCase().trim();
 
-				if(userInput.equals("")) {
-					helpTip.setText(MESSAGE_HELP);
+				if(userInput.equalsIgnoreCase("")) {
+					if(helpTip.getText().trim().equals("")) {
+						displayToHelpo(MESSAGE_HELP);
+					} else {
+						displayToHelpo(helpTip.getText());
+					}
 				} else if(userInput.startsWith("a")) { //add
-					helpTip.setText(inputAdd(userInput));
+					displayToHelpo(inputAdd(userInput));
 				} else if(userInput.startsWith("c")) { //clear
-					helpTip.setText(inputClear(userInput));
+					displayToHelpo(inputClear(userInput));
 				} else if(userInput.startsWith("d")) { //delete or display
-					helpTip.setText(inputD(userInput));
+					displayToHelpo(inputD(userInput));
 				} else if(userInput.startsWith("e")) { //edit
-					helpTip.setText(inputEdit(userInput));
+					displayToHelpo(inputEdit(userInput));
 				} else if(userInput.startsWith("s")) { //search
-					helpTip.setText(inputSearch(userInput));
+					displayToHelpo(inputSearch(userInput));
 				} else if(userInput.startsWith("u")) { //undo
-					helpTip.setText(inputUndo(userInput));
-				} else {
-					helpTip.setText(MESSAGE_HELP);
+					displayToHelpo(inputUndo(userInput));
 				}
-
-				//splitAndReadInput(userInput);
-
-				/*
-				//String addPattern1 = "[(aA)|(aAdD)|(aAdDdD)]"; //indicates to find the word "add"
-				String addPattern1 = "[a][d][d]";
-				//String addPattern2 = "^[aA][dD]"; //indicates to find the word "add"
-				//String addPattern3 = "^[aA]"; //indicates to find the word "add"
-				Pattern pattern = Pattern.compile(addPattern1);
-				Matcher matcher = pattern.matcher(userInput);
-				//if(Pattern.compile(addPattern1).matcher(userInput) != null) {
-				if(matcher.find()) {
-					helpTip.setText("add [task name] [options]");
-					if(userInput.endsWith("/")) {
-						helpTip.setText("LOL");
-					}
-					//System.out.println(matcher.group(0));
-				} else {
-					helpTip.setText("Match not found");
-					System.out.println("Match not found");
-				}*/
-
-				/*
-				if(userInput.equals("a") || userInput.equals("ad") || userInput.startsWith("add")) {
-					helpTip.setText("add [task name] [options]");
-					System.out.println("A: "+userInput);
-					if(userInput.endsWith("/")) {
-						//int firstSlash = userInput.indexOf("/");
-						//helpTip.setText(userInput.substring(0, firstSlash)+"/on [date]");
-						helpTip.setText("/on [date] /from [time] to [time] /loc [location name]");
-						System.out.println("B: "+userInput);
-					}
-
-					//if(userInput.endsWith("/on") || userInput.endsWith("/o")) {
-					if(userInput.endsWith("/o") || userInput.endsWith("/on")) {
-						//helpTip.setText("/on [date] /from [time] to [time] /loc [location name]");
-						helpTip.setText("options: /on [date]: 6 digit");
-					} 
-
-					if(userInput.endsWith("/f") || userInput.endsWith("/fr") || userInput.endsWith("/fro") || userInput.endsWith("/from")) {
-						helpTip.setText("options: /from [time] to [time]");
-					}
-				} else if(userInput.equals("c") || userInput.equals("cl") || userInput.equals("cle") || userInput.equals("clea") || userInput.startsWith("clear")) {
-					helpTip.setText("clear");
-					System.out.println("A: "+userInput);
-				} else {
-					if(!userInput.equals("")) {
-						helpTip.setText(MESSAGE_WRONG_INPUT+" "+MESSAGE_HELP);
-					}
-				}
-
-				//clear all tasks
-				if(userInput.equals("c") || userInput.equals("cl") || userInput.equals("cle") || userInput.equals("clea") || userInput.startsWith("clear")) {
-					helpTip.setText("clear");
-					System.out.println("A: "+userInput);
-				} else {
-					if(!userInput.equals("")) {
-						helpTip.setText(MESSAGE_WRONG_INPUT+" "+MESSAGE_HELP);
-					}
-				}
-
-				if(userInput.equals("u") || userInput.equals("un") || userInput.equals("und") || userInput.startsWith("undo")) {
-					helpTip.setText("undo");
-					System.out.println("A: "+userInput);
-				} else {
-					if(!userInput.equals("")) {
-						helpTip.setText(MESSAGE_WRONG_INPUT+" "+MESSAGE_HELP);
-					}
-				}
-
-				if(userInput.equals("e") || userInput.equals("ex") || userInput.equals("exi") || userInput.startsWith("exit")) {
-					helpTip.setText("exit");
-					System.out.println("A: "+userInput);
-				} else {
-					if(!userInput.equals("")) {
-						helpTip.setText(MESSAGE_WRONG_INPUT+" "+MESSAGE_HELP);
-					}
-				}
-
-				if(userInput.equals("q") || userInput.equals("qu") || userInput.equals("qui") || userInput.startsWith("quit")) {
-					helpTip.setText("quit");
-					System.out.println("A: "+userInput);
-				} else {
-					if(!userInput.equals("")) {
-						helpTip.setText(MESSAGE_WRONG_INPUT+" "+MESSAGE_HELP);
-					}
-				}*/
 			}
 		});
 	}
 
 	private String inputAdd(String userInput) {
 		if(userInput.equals("a") || userInput.equals("ad") || userInput.startsWith("add")) {
-			if(userInput.contains("/")) {
+			if(userInput.contains(" /")) {
 				return inputOptions("add", userInput);
 			}
-			return "add [task name] [options]";
+			return "add [task name] /[options]";
 		}
 		return MESSAGE_HELP;
 	}
 
 	private String inputOptions(String action, String userInput) {
 		if(action.equals("add")) {
-			Pattern p1 = Pattern.compile("add(.+?)[/\\/w]");
-			Matcher m1 = p1.matcher(userInput);
+			Pattern p = Pattern.compile("add(.+?)[/\\/w]");
+			Matcher m = p.matcher(userInput);
 
-			if(m1.find() && m1.group(1).trim().equals("")) {
+			if(m.find() && m.group(1).trim().equals("")) {
 				return "Please enter a task name";
 			} else {
+				Pattern pOn = Pattern.compile("(/on)( )([0-9]{6})");
+				Matcher mOn = pOn.matcher(userInput);
+				
+				Pattern pLoc = Pattern.compile("(/loc)( )(\\w{0,15})");
+				Matcher mLoc = pLoc.matcher(userInput);
+				
+				Pattern pFrom = Pattern.compile("(/from)( )([0-9]{4})");
+				Matcher mFrom = pFrom.matcher(userInput);
+				
+				Pattern pTo = Pattern.compile("(to)([0-9]{4})");
+				Matcher mTo = pTo.matcher(userInput);
+				
 				if(userInput.endsWith("/")) {
 					return "/on [date] /from [time] to [time] /loc [name of location]";
-				} else if((userInput.endsWith("/o") || userInput.endsWith("/on"))) {
-					Pattern p2 = Pattern.compile("^(/on)\\s*\\d{0,6}");
-					//Pattern p2 = Pattern.compile("(/on|/o)[\\s]");
-					Matcher m2 = p2.matcher(userInput);
-					int count = 0;
-					/*while(m2.find()) {
-						System.out.println("GG "+count+"."+m2.group(count++)+"."+m2.find());
-					}*/
-					System.out.println("m.find() = "+m2.find());
-					if(m2.find()) {
-						System.out.println("LOL");
-						return "/on [date] <-- date to be in DDMMYY format";
-					} else {
-						return "type properly leh!";
-					}
-					/*
-					p = Pattern.compile("/on\\s[\\d]{0,3}");
-					//p = Pattern.compile("(/on)[\\s](.)*(\\d)(.)*");
-					//p = Pattern.compile("(/on)[\\s+]([0-9]{0,6})");
-					m = p.matcher(userInput);
-					//System.out.println("A: "+p.toString());
-					count = 0;
-					while(m.find()) {
-						System.out.println("F:"+count+"."+m.group(count++)+"."+m.find());
-					} */
-				} else if(userInput.endsWith("/f") || userInput.endsWith("/fr") || userInput.endsWith("/fro") || userInput.endsWith("/from")) {
+				} else if(userInput.endsWith("/o") || userInput.endsWith("/on") && !mOn.find()) {
+					return "/on [date] <-- date to be in DDMMYY format"; 
+				} else if(userInput.endsWith("/l") || userInput.endsWith("/lo") || userInput.endsWith("/loc") && !mLoc.find()) {
+					return "/loc [name]"; 
+				} else if(userInput.endsWith("/f") || userInput.endsWith("/fr") || userInput.endsWith("/fro") || userInput.endsWith("/from") && !mFrom.find()) {
 					return "/from [time] to [time] <-- time to be in HHMM (24-hours) format";
-				} else if(userInput.endsWith("/l") || userInput.endsWith("/lo") || userInput.endsWith("/loc")) {
-					return "/loc [location name]";
-				}
+				} else if(userInput.endsWith("t") || userInput.endsWith("to") && !mTo.find()) {
+					return "/from [time] to [time] <-- time to be in HHMM (24-hours) format";
+				} 
 			}
-
-			/*
-			if(userInput.endsWith("/") && m.find()) {
-				System.out.println("Found: "+m.group(1).trim()+"|");
-				if(m.group(1).trim().equals("")) {
-					return "Please enter a task name";
-				} else {
-					return "/on [date] /from [time] to [time] /loc [name of location]";
-				}
-			}*/
-		} else {
-
+		} else if(action.equals("edit")) {
+			Pattern pOn = Pattern.compile("(/on)( )([0-9]{6})");
+			Matcher mOn = pOn.matcher(userInput);
+			
+			Pattern pLoc = Pattern.compile("(/loc)( )(\\w{0,15})");
+			Matcher mLoc = pLoc.matcher(userInput);
+			
+			Pattern pFrom = Pattern.compile("(/from)( )([0-9]{4})");
+			Matcher mFrom = pFrom.matcher(userInput);
+			
+			Pattern pTo = Pattern.compile("(to)([0-9]{4})");
+			Matcher mTo = pTo.matcher(userInput);
+			
+			if(userInput.endsWith("/")) {
+				return "/on [date] /from [time] to [time] /loc [name of location]";
+			} else if(userInput.endsWith("/o") || userInput.endsWith("/on") && !mOn.find()) {
+				return "/on [date] <-- date to be in DDMMYY format"; 
+			} else if(userInput.endsWith("/l") || userInput.endsWith("/lo") || userInput.endsWith("/loc") && !mLoc.find()) {
+				return "/loc [name]"; 
+			} else if(userInput.endsWith("/f") || userInput.endsWith("/fr") || userInput.endsWith("/fro") || userInput.endsWith("/from") && !mFrom.find()) {
+				return "/from [time] to [time] <-- time to be in HHMM (24-hours) format";
+			} else if(userInput.endsWith("t") || userInput.endsWith("to") && !mTo.find()) {
+				return "/from [time] to [time] <-- time to be in HHMM (24-hours) format";
+			}
 		}
-		return "add [task name] [options]";
+		return helpTip.getText();
 	}
 
 	private String inputClear(String userInput) {
@@ -561,17 +485,6 @@ public class SapphireManagerGUI {
 		return MESSAGE_HELP;
 	}
 
-	/*
-	private String splitAndReadInput(String userInput) {
-		String[] splited = userInput.split("(?!^)");
-		System.out.println(SPLIT_LINE);
-		for(int i=0; i<splited.length; i++) {
-			System.out.println(splited[i]);
-		}
-		System.out.println(SPLIT_LINE);
-		return "";
-	}*/
-
 	private void updateScrollBar() {
 		displayBox.setCaretPosition(displayBox.getDocument().getLength());
 		DefaultCaret caret = (DefaultCaret)displayBox.getCaret();  
@@ -590,10 +503,6 @@ public class SapphireManagerGUI {
 		appendToPane(message, new Color(0xff6c00));
 	}
 
-	public void displayHelpoText(String message) {
-		helpTip.setText(MESSAGE_HELP);
-	}
-
 	public static void displayHightlightText(String message) {
 		appendToPane(message, Color.CYAN);
 	}
@@ -609,6 +518,10 @@ public class SapphireManagerGUI {
 		displayBox.setCaretPosition(length);
 		displayBox.setCharacterAttributes(aset, false);
 		displayBox.replaceSelection(message+"\n");
+	}
+	
+	private void displayToHelpo(String message) {
+		helpTip.setText(message);
 	}
 
 	public void displayWelcomeMessage() {
