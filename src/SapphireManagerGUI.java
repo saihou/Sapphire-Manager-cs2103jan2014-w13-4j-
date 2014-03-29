@@ -90,6 +90,7 @@ public class SapphireManagerGUI {
 	private JPanel helpTipPanel;
 	private JPanel logoPanel;
 	private JPanel inputBoxPanel;
+	private String phase = "normal";
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -241,7 +242,7 @@ public class SapphireManagerGUI {
 						String userCommand = readCommandFromUser();
 
 						String systemFeedback = "";
-						String phase = "";
+						//String phase = "";
 						ArrayList<Task> matchedTasks = null;
 
 						systemFeedback = myExecutor.doUserOperation(userCommand);
@@ -337,9 +338,10 @@ public class SapphireManagerGUI {
 		inputBox.addCaretListener(new CaretListener() {
 			public void caretUpdate(CaretEvent arg0) {
 				String userInput = inputBox.getText().toLowerCase().trim();
-
+				System.out.println("userInput: "+userInput);
 				if(userInput.equalsIgnoreCase("")) {
-					if(helpTip.getText().trim().equals("")) {
+					System.out.println("HERE");
+					if(helpTip.getText().trim().equals("") && phase.equals("normal")) {
 						displayToHelpo(MESSAGE_HELP);
 					} else {
 						displayToHelpo(helpTip.getText());
