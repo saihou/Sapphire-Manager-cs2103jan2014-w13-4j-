@@ -35,7 +35,26 @@ public class ValidationCheck {
 		boolean isValid = validateOperation(operation);
 		return isValid;
 	}
-
+	
+	public static boolean isValidStatus(String status) {
+		boolean isValid = validateStatus(status);
+		return isValid;
+	}
+	
+	/**
+	 * @author Cai Di
+	 */
+	private static boolean validateStatus(String status) {
+		if (status.compareTo("done") == 0 || status.compareTo("undone") == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * @author Sai Hou
+	 */
 	private static boolean validateChoice(String input, int sizeOfList) {
 		try {
 			int choiceEntered = Integer.parseInt(input);

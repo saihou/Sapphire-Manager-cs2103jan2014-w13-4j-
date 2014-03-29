@@ -56,12 +56,7 @@ public class CommandExecutor {
 		
 		if (isParsable && isSettingTaskTypeSuccessful) {
 			
-			taskToBeAdded.setName(taskDetails[0]);
-			taskToBeAdded.setStartTime(taskDetails[1]);
-			taskToBeAdded.setEndTime(taskDetails[2]);
-			taskToBeAdded.setDate(taskDetails[3]);
-			taskToBeAdded.setLocation(taskDetails[4]);
-			taskToBeAdded.setIsDone(false);
+			setTaskDetails(taskToBeAdded, taskDetails);
 			
 			boolean isAdditionOfNewTaskSuccessful = addThisTask(taskToBeAdded);
 
@@ -72,8 +67,22 @@ public class CommandExecutor {
 			else {
 				systemFeedback = "Unable to add \"" + taskToBeAdded.getName() + "\".";
 			}
+		} else {
+			if (!isSettingTaskTypeSuccessful) {
+				systemFeedback = "Enter a date first! It doesn't make sense" +
+								" to schedule time/duration without date!";
+			}
 		}
 		return systemFeedback;
+	}
+
+	private void setTaskDetails(Task taskToBeAdded, String[] taskDetails) {
+		taskToBeAdded.setName(taskDetails[0]);
+		taskToBeAdded.setStartTime(taskDetails[1]);
+		taskToBeAdded.setEndTime(taskDetails[2]);
+		taskToBeAdded.setDate(taskDetails[3]);
+		taskToBeAdded.setLocation(taskDetails[4]);
+		taskToBeAdded.setIsDone(false);
 	}
 
 	private boolean setTaskType(String startTime, 
@@ -85,14 +94,14 @@ public class CommandExecutor {
 			taskToBeAdded.setType("fullDay");
 			return true;
 		} else if (date != null && startTime != null && endTime == null) {
-			taskToBeAdded.setType("targetTime");
+			taskToBeAdded.setType("targetedTime");
 			return true;
 		} else if (date != null && startTime != null && endTime != null) {
 			taskToBeAdded.setType("setDuration");
 			return true;
 		} else {
-			//the rest of the cases, e.g. entered deadline/duration 
-			//but never enter date 
+			//the rest of the cases, e.g. entered deadline/duration
+			//but never enter date
 			return false;
 		}
 	}
@@ -262,6 +271,7 @@ public class CommandExecutor {
 		}
 		return systemFeedback;
 	}
+	
 	private boolean editThisTask(Task taskToBeEdited, String userModifications) {
 		//modify array list
 		parser.extractTaskDetails(userModifications);

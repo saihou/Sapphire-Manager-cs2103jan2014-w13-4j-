@@ -4,8 +4,6 @@
  * It extracts task details and information from user input string.
  */
 
-import java.util.ArrayList;
-
 public class CommandParser {
 	
 	// get instance of gui @Dex
@@ -92,7 +90,6 @@ public class CommandParser {
 	/**
 	 * @author Cai Di
 	 */
-	private ValidationCheck validCheck = new ValidationCheck();
 	protected String invalidFeedBack;
 	protected String[] taskDetails;
 
@@ -162,7 +159,7 @@ public class CommandParser {
 		
 		return userInput;
 	}
-
+/*
 	private boolean isFourDigitInteger(String time) {
 		boolean feedBack = true;
 		if (time.length() != 4) {
@@ -190,25 +187,18 @@ public class CommandParser {
 		}
 		return feedBack;
 	}
-
-	private boolean isValidStatus(String status) {
-		if (status.compareTo("done") == 0 || status.compareTo("undone") == 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
+*/
 	private void extractDuration(String inputFragment) {
 		taskDetails[1] = getFirstWord(inputFragment.substring(4));
-		if (!validCheck.isValidTime(taskDetails[1]))
+		if (!ValidationCheck.isValidTime(taskDetails[1]))
 			invalidFeedBack = "Input starting time is not valid.";
 
 		try {
 			inputFragment = inputFragment.split("to")[1].trim();
 			taskDetails[2] = getFirstWord(inputFragment);
-			if (!validCheck.isValidTime(taskDetails[2]))
+			if (!ValidationCheck.isValidTime(taskDetails[2])) {
 				invalidFeedBack = "Input ending time is not valid.";
+			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			invalidFeedBack = "Input starting time without ending time.";
 		}
@@ -216,27 +206,29 @@ public class CommandParser {
 
 	private void extractDeadline(String inputFragment) {
 		taskDetails[1] = getFirstWord(inputFragment.substring(2));
-		if (!validCheck.isValidTime(taskDetails[1]))
+		if (!ValidationCheck.isValidTime(taskDetails[1])) {
 			invalidFeedBack = "Input deadline time is not valid.";
+		}
 	}
 
 	private void extractDate(String inputFragment) {
-		taskDetails[4] = getFirstWord(inputFragment.substring(2));
-		if (!validCheck.isValidDate(taskDetails[4]))
+		taskDetails[3] = getFirstWord(inputFragment.substring(2));
+		if (!ValidationCheck.isValidDate(taskDetails[3])) {
 			invalidFeedBack = "Input date is not valid";
+		}
 	}
 
 	private void extractStatus(String inputFragment) {
-		taskDetails[5] = getFirstWord(inputFragment.substring(4));
-		if (!isValidStatus(taskDetails[5]))
+		taskDetails[4] = getFirstWord(inputFragment.substring(4));
+		if (!ValidationCheck.isValidStatus(taskDetails[4])) {
 			invalidFeedBack = "Input status is not valid";
+		}
 	}
 
 	private void extractLocation(String inputFragment) {
-		taskDetails[6] = inputFragment.substring(3).trim();
+		taskDetails[5] = inputFragment.substring(3).trim();
 	}	
 }
-	
 
 	/**
 	 * @author Cai Di
