@@ -107,6 +107,11 @@ public class CommandParser {
 		taskDetails = new String[6];
 		invalidFeedBack = null;
 
+		//default value is null
+		for (int i = 0; i < taskDetails.length; i++) {
+			taskDetails[i] = null;
+		}
+		
 		input = extractName(input);
 		
 		if(input.indexOf("/") == -1){
@@ -151,7 +156,7 @@ public class CommandParser {
 
 		// have task name and have slash
 		else if (indexOfFirstSlash != -1) {
-			taskDetails[0] = userInput.substring(0, indexOfFirstSlash);
+			taskDetails[0] = userInput.substring(0, indexOfFirstSlash).trim();
 			userInput = userInput.substring(indexOfFirstSlash);
 		}
 
@@ -165,14 +170,15 @@ public class CommandParser {
 	
 	private void extractDuration(String inputFragment) {
 		taskDetails[1] = getFirstWord(inputFragment.substring(4));
-		if (!ValidationCheck.isValidTime(taskDetails[1]))
-			invalidFeedBack = "Input starting time is not valid.";
+		//if (!ValidationCheck.isValidTime(taskDetails[1]))
+		//	invalidFeedBack = "Input starting time is not valid.";
 
 		try {
 			inputFragment = inputFragment.split("to")[1].trim();
 			taskDetails[2] = getFirstWord(inputFragment);
-			if (!ValidationCheck.isValidTime(taskDetails[2])) {
-				invalidFeedBack = "Input ending time is not valid.";
+			//if (!ValidationCheck.isValidTime(taskDetails[2])) {
+			if (!ValidationCheck.isValidDuration(taskDetails[1], taskDetails[2])) {
+				invalidFeedBack = "Input duration is not valid.";
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			invalidFeedBack = "Input starting time without ending time.";
