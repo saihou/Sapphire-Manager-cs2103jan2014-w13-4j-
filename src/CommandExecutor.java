@@ -287,7 +287,7 @@ public class CommandExecutor {
 			case "edit": 	//revert original copy of task
 				Task taskToRestore = history.getCopyOfLastTask();
 				deleteThisTask(pointerToLastTask);
-				addThisTask(taskToRestore);
+				addThisTask(taskToRestore); 
 				actionTakenToUndo = "reverted \"" + taskName + '"';
 				break;
 			default :
@@ -449,8 +449,17 @@ public class CommandExecutor {
 		}
 		
 		switch (operation) {
+			case "new" :
+				systemFeedback = executeAddCommand(userCommand.substring(3));
+				break;
+			case "create" :
+				systemFeedback = executeAddCommand(userCommand.substring(6));
+				break;
 			case "add" :
-				systemFeedback = executeAddCommand(userCommand.substring(4));
+				systemFeedback = executeAddCommand(userCommand.substring(3));
+				break;
+			case "show" :
+				systemFeedback = executeDisplayCommand(userCommand.substring(4));
 				break;
 			case "display" :
 				systemFeedback = executeDisplayCommand(userCommand.substring(7));
@@ -458,7 +467,7 @@ public class CommandExecutor {
 			case "update" :
 				//fallthrough
 			case "edit" :
-				currentTaskList = searchByName(userCommand.substring(5));
+				currentTaskList = searchByName(userCommand.substring(4));
 				if (currentTaskList.size() > 0) {
 					phase = "editPhase1";
 				}
@@ -466,8 +475,10 @@ public class CommandExecutor {
 					systemFeedback = MESSAGE_NO_SEARCH_RESULTS;
 				}
 				break;
+			case "remove" :
+				//fallthrough
 			case "delete" :
-				currentTaskList = searchByName(userCommand.substring(7));
+				currentTaskList = searchByName(userCommand.substring(6));
 				if (currentTaskList.size() > 0) {
 					phase = "deletePhase1";
 				}
@@ -481,8 +492,11 @@ public class CommandExecutor {
 			case "undo" :
 				systemFeedback = executeUndoCommand();
 				break;
+			case "find" :
+				systemFeedback = search(userCommand.substring(4));
+				break;
 			case "search" :
-				systemFeedback = search(userCommand.substring(7));
+				systemFeedback = search(userCommand.substring(6));
 			default : 
 				break;
 		}
