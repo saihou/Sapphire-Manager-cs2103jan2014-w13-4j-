@@ -38,28 +38,13 @@ public class CommandExecutor {
 
 	public String executeAddCommand(String userCommand) {
 		String systemFeedback = "";
+		userCommand = userCommand.trim();
 		Task taskToBeAdded = new Task();
-		boolean isParsable = true;
-		boolean isSettingTaskTypeSuccessful;
 		
-		//parser.parse(userCommand, taskToBeAdded);
-		parser.extractTaskDetails(userCommand);
+		systemFeedback = parseAndModifyTask(userCommand, taskToBeAdded, "add");
 		
-		String [] taskDetails = parser.taskDetails;
-		if (parser.invalidFeedBack != null) {
-			isParsable = false;
-			systemFeedback = parser.invalidFeedBack;
-		}
-		
-		isSettingTaskTypeSuccessful = setTaskType(taskDetails[1], taskDetails[2], 
-											taskDetails[3], taskToBeAdded);
-		
-		if (isParsable && isSettingTaskTypeSuccessful) {
-			
-			setTaskDetails(taskToBeAdded, taskDetails);
-			
+		if (systemFeedback.equals("Successfully parsed")) {
 			boolean isAdditionOfNewTaskSuccessful = addThisTask(taskToBeAdded);
-
 			if (isAdditionOfNewTaskSuccessful) {
 				systemFeedback = "Successfully added \"" + taskToBeAdded.getName() + "\".";
 				updateHistory("add", taskToBeAdded, null);
@@ -67,37 +52,76 @@ public class CommandExecutor {
 			else {
 				systemFeedback = "Unable to add \"" + taskToBeAdded.getName() + "\".";
 			}
-		} else {
+		}
+		return systemFeedback;
+	}
+
+	private String parseAndModifyTask(String userCommand, Task taskToBeModified, String operation) {
+		String systemFeedback;
+		boolean isParsable = true;
+		boolean isSettingTaskTypeSuccessful;
+		
+		parser.extractTaskDetails(userCommand);
+		
+		String [] taskDetails = parser.taskDetails;
+		if (parser.invalidFeedBack != null) {
+			isParsable = false;
+		}
+		
+		if (!isParsable) {
+			systemFeedback = parser.invalidFeedBack;
+		}
+		else {
+			setTaskDetails(taskToBeModified, taskDetails);
+			isSettingTaskTypeSuccessful = setTaskType(taskToBeModified);
+			
 			if (!isSettingTaskTypeSuccessful) {
-				systemFeedback = "Enter a date first! It doesn't make sense" +
-								" to schedule time/duration without date!";
+				systemFeedback = "Entering a timestamp without a date doesn't make sense!";
+			}
+			else {
+				systemFeedback = "Successfully parsed";
 			}
 		}
 		return systemFeedback;
 	}
 
-	private void setTaskDetails(Task taskToBeAdded, String[] taskDetails) {
-		taskToBeAdded.setName(taskDetails[0]);
-		taskToBeAdded.setStartTime(taskDetails[1]);
-		taskToBeAdded.setEndTime(taskDetails[2]);
-		taskToBeAdded.setDate(taskDetails[3]);
-		taskToBeAdded.setLocation(taskDetails[4]);
-		taskToBeAdded.setIsDone(false);
+	private void setTaskDetails(Task task, String[] taskDetails) {
+		for (String s: taskDetails) System.out.println(s);
+		if (taskDetails[0] != null) {
+			task.setName(taskDetails[0]);
+		}
+		if (taskDetails[1] != null) {
+			task.setStartTime(taskDetails[1]);
+			task.setEndTime(taskDetails[2]);
+		}
+		if (taskDetails[3] != null) {
+			task.setDate(taskDetails[3]);
+		}
+		if (taskDetails[4] != null) {
+			if (taskDetails[4].equalsIgnoreCase("done")) {
+				task.setIsDone(true);
+			}
+			else {
+				task.setIsDone(false);
+			}
+		}
+		if (taskDetails[5] != null) {
+			task.setLocation(taskDetails[5]);
+		}
 	}
 
-	private boolean setTaskType(String startTime, 
-			String endTime, String date, Task taskToBeAdded) {
-		if (date == null && startTime == null && endTime == null) {
-			taskToBeAdded.setType("noSetTiming");
+	private boolean setTaskType(Task task) {
+		if (task.getDate() == null && task.getStartTime() == null && task.getEndTime() == null) {
+			task.setType("noSetTiming");
 			return true;
-		} else if (date != null && startTime == null && endTime == null) {
-			taskToBeAdded.setType("fullDay");
+		} else if (task.getDate() != null && task.getStartTime() == null && task.getEndTime() == null) {
+			task.setType("fullDay");
 			return true;
-		} else if (date != null && startTime != null && endTime == null) {
-			taskToBeAdded.setType("targetedTime");
+		} else if (task.getDate() != null && task.getStartTime() != null && task.getEndTime() == null) {
+			task.setType("targetedTime");
 			return true;
-		} else if (date != null && startTime != null && endTime != null) {
-			taskToBeAdded.setType("setDuration");
+		} else if (task.getDate() != null && task.getStartTime() != null && task.getEndTime() != null) {
+			task.setType("setDuration");
 			return true;
 		} else {
 			//the rest of the cases, e.g. entered deadline/duration
@@ -250,35 +274,25 @@ public class CommandExecutor {
 		
 		if (isValidChoice) {
 			int choice = convertToInteger(userChoice);
-			
 			currentTask = currentTaskList.get(choice-1);
-			
 			Task duplicatedOldTask = new Task(currentTask);
 			
 			String userModifications = userCommand.substring(userChoice.length()).trim();
 			
-			System.out.println(userCommand);
-			System.out.println(userModifications);
+			systemFeedback = parseAndModifyTask(userModifications, currentTask, "edit");
 			
-			boolean isEditSuccessful = editThisTask(currentTask, userModifications);
-
-			if (isEditSuccessful) {
-				systemFeedback = "Successfully made changes to \"" + currentTask.getName() +"\".";
-				updateHistory("edit", currentTask, duplicatedOldTask);
+			if (systemFeedback.equals("Successfully parsed")) {
+				boolean isEditSuccessful = taskStorage.writeTaskListToFile();
+	
+				if (isEditSuccessful) {
+					systemFeedback = "Successfully made changes to \"" + currentTask.getName() +"\".";
+					updateHistory("edit", currentTask, duplicatedOldTask);
+				}
 			}
 		} else {
 			systemFeedback = "Invalid number";
 		}
 		return systemFeedback;
-	}
-	
-	private boolean editThisTask(Task taskToBeEdited, String userModifications) {
-		//modify array list
-		parser.extractTaskDetails(userModifications);
-
-		//write changes to file
-		boolean isFileWritingSuccessful = taskStorage.writeTaskListToFile();
-		return isFileWritingSuccessful;
 	}
 
 	public String executeDeleteCommand(String userChoice) {	
@@ -408,6 +422,7 @@ public class CommandExecutor {
 		taskName = taskName.trim();
 		
 		try {
+			@SuppressWarnings("unused")
 			int date = Integer.parseInt(taskName);
 			if (taskName.length() == 6){
 				isSearchingByDate = true;

@@ -17,7 +17,7 @@ public class ValidationCheck {
 	}
 	
 	public static boolean isValidDuration(String from, String to) {
-		boolean isValid = ((!from.equals(to)) && validateTime(from) && validateTime(to));
+		boolean isValid = validateDuration(from, to);
 		return isValid;
 	}
 	
@@ -125,5 +125,14 @@ public class ValidationCheck {
 		}
 		return true;
 	}
-	
+	private static boolean validateDuration(String from, String to) {
+		try {
+			int start = Integer.parseInt(from);
+			int end = Integer.parseInt(to);
+			
+			return ( ((end - start) > 0) && validateTime(from) && validateTime(to) );
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
 }
