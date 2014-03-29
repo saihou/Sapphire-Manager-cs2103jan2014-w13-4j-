@@ -21,7 +21,6 @@ public class CommandParser {
 	/**
 	 * @param userCommand
 	 * @return displayType, "all", "future", "past" or "today"
-	 * 
 	 * @author Sai Hou
 	 */
 	public String parseDisplayType(String userCommand) {
@@ -41,13 +40,12 @@ public class CommandParser {
 	}
 
 	/**
-	 * 
 	 * @param isFutureKeywordPresent
 	 * @param isPastKeywordPresent
 	 * @param isTodayKeywordPresent
 	 * @param isAllKeywordPresent
 	 * @return error message if number of keywords > 1,
-	 * 		"all" if number of keywords == 0,
+	 * 		"future" if number of keywords == 0,
 	 * 		the respective display type otherwise.
 	 */
 	private String determineDisplayType(boolean isFutureKeywordPresent,
@@ -90,10 +88,162 @@ public class CommandParser {
 		return userCommand.trim().toLowerCase();
 	}
 	
+	
 	/**
 	 * @author Cai Di
 	 */
-	// Analyze userInput and assign task details to myTask object
+	private ValidationCheck validCheck = new ValidationCheck();
+	protected String invalidFeedBack;
+	protected String[] taskDetails;
+
+	/*
+	 * taskDetails[] 
+	 * [0] = task name 
+	 * [1] = task start time 
+	 * [2] = task end time
+	 * [3] = task date 
+	 * [4] = task done/undone 
+	 * [5] = task location
+	 */
+
+	public void extractTaskDetails(String input) {
+		taskDetails = new String[6];
+		invalidFeedBack = null;
+
+		input = extractName(input);
+		
+		String[] temp = input.split("/");
+		
+		for (int i = 0; i < temp.length; i++) {
+			// exit method if input is not valid
+			if (invalidFeedBack != null)
+				return;
+			
+			switch (getFirstWord(temp[i])) {
+			case "from":
+				extractDuration(temp[i]);
+				break;
+			case "at":
+				extractDeadline(temp[i]);
+				break;
+			case "on":
+				extractDate(temp[i]);
+				break;
+			case "mark":
+				extractStatus(temp[i]);
+				break;
+			case "loc":
+				extractLocation(temp[i]);
+				break;
+			}
+		}
+	}
+
+	private String extractName(String userInput) {
+		int indexOfFirstSlash = userInput.trim().indexOf("/");
+
+		// no task name but have slash
+		if (indexOfFirstSlash == 0) {
+			userInput = userInput.trim();
+			taskDetails[0] = null;
+		}
+
+		// have task name and have slash
+		else if (indexOfFirstSlash != -1) {
+			taskDetails[0] = userInput.substring(0, indexOfFirstSlash);
+			userInput = userInput.substring(indexOfFirstSlash);
+		}
+
+		// have task name but no slash
+		else {
+			taskDetails[0] = userInput.trim();
+			userInput = taskDetails[0];
+		}
+		
+		return userInput;
+	}
+
+	private boolean isFourDigitInteger(String time) {
+		boolean feedBack = true;
+		if (time.length() != 4) {
+			feedBack = false;
+		} else {
+			try {
+				Integer.parseInt(time);
+			} catch (NumberFormatException e) {
+				feedBack = false;
+			}
+		}
+		return feedBack;
+	}
+
+	private boolean isSixDigitInteger(String date) {
+		boolean feedBack = true;
+		if (date.length() != 6) {
+			feedBack = false;
+		} else {
+			try {
+				Integer.parseInt(date);
+			} catch (NumberFormatException e) {
+				feedBack = false;
+			}
+		}
+		return feedBack;
+	}
+
+	private boolean isValidStatus(String status) {
+		if (status.compareTo("done") == 0 || status.compareTo("undone") == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private void extractDuration(String inputFragment) {
+		taskDetails[1] = getFirstWord(inputFragment.substring(4));
+		if (!validCheck.isValidTime(taskDetails[1]))
+			invalidFeedBack = "Input starting time is not valid.";
+
+		try {
+			inputFragment = inputFragment.split("to")[1].trim();
+			taskDetails[2] = getFirstWord(inputFragment);
+			if (!validCheck.isValidTime(taskDetails[2]))
+				invalidFeedBack = "Input ending time is not valid.";
+		} catch (ArrayIndexOutOfBoundsException e) {
+			invalidFeedBack = "Input starting time without ending time.";
+		}
+	}
+
+	private void extractDeadline(String inputFragment) {
+		taskDetails[1] = getFirstWord(inputFragment.substring(2));
+		if (!validCheck.isValidTime(taskDetails[1]))
+			invalidFeedBack = "Input deadline time is not valid.";
+	}
+
+	private void extractDate(String inputFragment) {
+		taskDetails[4] = getFirstWord(inputFragment.substring(2));
+		if (!validCheck.isValidDate(taskDetails[4]))
+			invalidFeedBack = "Input date is not valid";
+	}
+
+	private void extractStatus(String inputFragment) {
+		taskDetails[5] = getFirstWord(inputFragment.substring(4));
+		if (!isValidStatus(taskDetails[5]))
+			invalidFeedBack = "Input status is not valid";
+	}
+
+	private void extractLocation(String inputFragment) {
+		taskDetails[6] = inputFragment.substring(3).trim();
+	}	
+}
+	
+
+	/**
+	 * @author Cai Di
+	 */
+
+/*
+    // Analyze userInput and assign task details to myTask object
 	public String parse(String userInput, Task myTask) {
 		String systemFeedback = "";
 		
@@ -112,6 +262,19 @@ public class CommandParser {
 		return systemFeedback;
 	}
     
+	//stub
+	public String[] parse() {
+		String[] stub = new String[5];
+		
+		for (int i = 0;i < stub.length; i++) {
+			stub[i] = null;
+		}
+		
+		stub[0] = "Task name";
+		stub[1] = "270314";
+		
+		return stub;
+	}
 	// set task name and update String command to userInput without task name
 	private String setTaskName(String userInput, Task myTask, String command) {
 		int indexOfFirstSlash = userInput.trim().indexOf("/");
@@ -289,3 +452,5 @@ public class CommandParser {
 
 	}
 }
+
+*/

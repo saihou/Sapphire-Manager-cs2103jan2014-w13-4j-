@@ -53,32 +53,22 @@ public class ValidationCheck {
 		operation = operation.toLowerCase();
 		switch (operation) {
 			case "add" :
-				//fallthrough
 			case "create" :
-				//fallthrough
 			case "new" :
-				//fallthrough
 			case "delete" :
-				//fallthrough
 			case "remove" :
-				//fallthrough
 			case "del" :
-				//fallthrough
 			case "display" :
-				//fallthrough
 			case "show" :
-				//fallthrough
 			case "edit" :
-				//fallthrough
 			case "update" :
-				//fallthrough
 			case "undo" :
-				//fallthrough
 			case "clear" :
-				//fallthrough
 			case "find" :
-				//fallthrough
 			case "search" :
+			case "exit" :
+			case "quit" :
+				//all valid operations should fallthrough to return true
 				return true;
 			default :
 				return false;
