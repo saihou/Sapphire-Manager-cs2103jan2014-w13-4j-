@@ -39,16 +39,71 @@ public class CommandExecutor {
 	public String executeAddCommand(String userCommand) {
 		String systemFeedback = "";
 		Task taskToBeAdded = new Task();
+		boolean isParsable = true;
+		boolean isSettingTaskTypeSuccessful;
+		
+		//parser.parse(userCommand, taskToBeAdded);
+		parser.extractTaskDetails(userCommand);
+		
+		String [] taskDetails = parser.taskDetails;
+		if (parser.invalidFeedBack != null) {
+			isParsable = false;
+			systemFeedback = parser.invalidFeedBack;
+		}
+		
+		isSettingTaskTypeSuccessful = setTaskType(taskDetails[1], taskDetails[2], 
+											taskDetails[3], taskToBeAdded);
+		
+		if (isParsable && isSettingTaskTypeSuccessful) {
+			
+			setTaskDetails(taskToBeAdded, taskDetails);
+			
+			boolean isAdditionOfNewTaskSuccessful = addThisTask(taskToBeAdded);
 
-		parser.parse(userCommand, taskToBeAdded);
-
-		boolean isAdditionOfNewTaskSuccessful = addThisTask(taskToBeAdded);
-
-		if (isAdditionOfNewTaskSuccessful) {
-			systemFeedback = "Successfully added \"" + taskToBeAdded.getName() + "\".";
-			updateHistory("add", taskToBeAdded, null);
+			if (isAdditionOfNewTaskSuccessful) {
+				systemFeedback = "Successfully added \"" + taskToBeAdded.getName() + "\".";
+				updateHistory("add", taskToBeAdded, null);
+			}
+			else {
+				systemFeedback = "Unable to add \"" + taskToBeAdded.getName() + "\".";
+			}
+		} else {
+			if (!isSettingTaskTypeSuccessful) {
+				systemFeedback = "Enter a date first! It doesn't make sense" +
+								" to schedule time/duration without date!";
+			}
 		}
 		return systemFeedback;
+	}
+
+	private void setTaskDetails(Task taskToBeAdded, String[] taskDetails) {
+		taskToBeAdded.setName(taskDetails[0]);
+		taskToBeAdded.setStartTime(taskDetails[1]);
+		taskToBeAdded.setEndTime(taskDetails[2]);
+		taskToBeAdded.setDate(taskDetails[3]);
+		taskToBeAdded.setLocation(taskDetails[4]);
+		taskToBeAdded.setIsDone(false);
+	}
+
+	private boolean setTaskType(String startTime, 
+			String endTime, String date, Task taskToBeAdded) {
+		if (date == null && startTime == null && endTime == null) {
+			taskToBeAdded.setType("noSetTiming");
+			return true;
+		} else if (date != null && startTime == null && endTime == null) {
+			taskToBeAdded.setType("fullDay");
+			return true;
+		} else if (date != null && startTime != null && endTime == null) {
+			taskToBeAdded.setType("targetedTime");
+			return true;
+		} else if (date != null && startTime != null && endTime != null) {
+			taskToBeAdded.setType("setDuration");
+			return true;
+		} else {
+			//the rest of the cases, e.g. entered deadline/duration
+			//but never enter date
+			return false;
+		}
 	}
 
 	private boolean addThisTask(Task taskToBeAdded) {
@@ -63,7 +118,7 @@ public class CommandExecutor {
 	 */
 	public String executeDisplayCommand(String userCommand) {
 		String systemFeedback = "";
-		ArrayList<Task> taskList = null;
+		//ArrayList<Task> taskList = null;
 		
 		if (allTasks.isEmpty()) {
 			 systemFeedback = "You have no tasks.\n";
@@ -72,17 +127,17 @@ public class CommandExecutor {
 			assert(displayType != null);
 			
 			try {
-				taskList = prepareTaskList(displayType, taskList);
+				currentTaskList = prepareTaskList(displayType, currentTaskList);
 			} catch (Exception ex) {
 				System.out.println(ex.getMessage());
 			}
 			
-			if (taskList.isEmpty()) {
+			if (currentTaskList.isEmpty()) {
 				systemFeedback = getFeedbackIfHaveNoTasks(displayType);
 			}
 			
 			if (systemFeedback.equals("")){
-				systemFeedback = formDisplayText(taskList);
+				systemFeedback = formDisplayText(currentTaskList);
 			}
 		}
 		return systemFeedback;
@@ -152,12 +207,12 @@ public class CommandExecutor {
 			} else {
 				String taskType = t.getType();
 				if (taskType.equals("noSetTiming")) {
-					count = 1;
+					//count = 1;
 					printingMemos = true;
 					displayText += "Memos: " + '\n';
 					displayText += formDisplayTextOfOneMemo(count, t);
 				} else {
-					count = 1;
+					//count = 1;
 					currentDate = taskDate;
 					displayText += formatDate(currentDate) + '\n';
 					displayText += formDisplayTextOfOneTask(count, t);
@@ -185,38 +240,65 @@ public class CommandExecutor {
 	/**
 	 * @author Sai Hou
 	 */
-	public String executeEditCommand(String userModifications){
+	public String executeEditCommand(String userCommand) {
 		String systemFeedback = "";
+		userCommand = userCommand.trim();
+		
+		String userChoice = getFirstWord(userCommand);
+		
+		boolean isValidChoice = ValidationCheck.isValidChoice(userChoice, currentTaskList.size());
+		
+		if (isValidChoice) {
+			int choice = convertToInteger(userChoice);
+			
+			currentTask = currentTaskList.get(choice-1);
+			
+			Task duplicatedOldTask = new Task(currentTask);
+			
+			String userModifications = userCommand.substring(userChoice.length()).trim();
+			
+			System.out.println(userCommand);
+			System.out.println(userModifications);
+			
+			boolean isEditSuccessful = editThisTask(currentTask, userModifications);
 
-		Task duplicatedOldTask = new Task(currentTask);
-
-		boolean isEditSuccessful = editThisTask(currentTask, userModifications);
-
-		if (isEditSuccessful) {
-			systemFeedback = "Successfully made changes to \"" + currentTask.getName() +"\".";
-			updateHistory("edit", currentTask, duplicatedOldTask);
+			if (isEditSuccessful) {
+				systemFeedback = "Successfully made changes to \"" + currentTask.getName() +"\".";
+				updateHistory("edit", currentTask, duplicatedOldTask);
+			}
+		} else {
+			systemFeedback = "Invalid number";
 		}
 		return systemFeedback;
 	}
+	
 	private boolean editThisTask(Task taskToBeEdited, String userModifications) {
 		//modify array list
-		parser.parse(userModifications, taskToBeEdited);
+		parser.extractTaskDetails(userModifications);
 
 		//write changes to file
 		boolean isFileWritingSuccessful = taskStorage.writeTaskListToFile();
 		return isFileWritingSuccessful;
 	}
 
-	public String executeDeleteCommand(int choice) {	
+	public String executeDeleteCommand(String userChoice) {	
 		String systemFeedback = "";
-		//retrieve the task to be removed
-		currentTask = currentTaskList.get(choice-1);
+		userChoice = userChoice.trim();
 		
-		boolean isDeletionSuccessful = deleteThisTask(currentTask);
-		
-		if (isDeletionSuccessful) {
-			systemFeedback = "Successfully deleted "+choice+". "+currentTask.getName() + ".";
-			updateHistory("delete", currentTask, null);
+		boolean isValidChoice = ValidationCheck.isValidChoice(userChoice, currentTaskList.size());
+		if (isValidChoice) {
+			int choice = convertToInteger(userChoice);
+			//retrieve the task to be removed
+			currentTask = currentTaskList.get(choice-1);
+			
+			boolean isDeletionSuccessful = deleteThisTask(currentTask);
+			
+			if (isDeletionSuccessful) {
+				systemFeedback = "Successfully deleted "+choice+". "+currentTask.getName() + ".";
+				updateHistory("delete", currentTask, null);
+			}
+		} else {
+			systemFeedback = "Invalid number";
 		}
 		return systemFeedback;
 	}
@@ -287,7 +369,7 @@ public class CommandExecutor {
 			case "edit": 	//revert original copy of task
 				Task taskToRestore = history.getCopyOfLastTask();
 				deleteThisTask(pointerToLastTask);
-				addThisTask(taskToRestore);
+				addThisTask(taskToRestore); 
 				actionTakenToUndo = "reverted \"" + taskName + '"';
 				break;
 			default :
@@ -317,9 +399,48 @@ public class CommandExecutor {
 	}
 
 	/**
+	 * @author Cai Di
+	 */
+	private String executeSearchCommand(String taskName){
+		String systemFeedback = "";
+		boolean isSearchingByDate = false;
+		
+		taskName = taskName.trim();
+		
+		try {
+			int date = Integer.parseInt(taskName);
+			if (taskName.length() == 6){
+				isSearchingByDate = true;
+			}
+			else {
+				isSearchingByDate = false;
+			}
+		} catch(NumberFormatException e) {
+			isSearchingByDate = false;
+		}
+		
+		Collections.sort(allTasks);
+		
+		if(isSearchingByDate) {
+			currentTaskList = searchByDate(taskName);
+		}
+		else {
+			currentTaskList = searchByName(taskName);
+		}
+		
+		if (currentTaskList.size() > 0) {
+			systemFeedback = "Search results:\n" + formDisplayText(currentTaskList);
+		}
+		else {
+			systemFeedback = MESSAGE_NO_SEARCH_RESULTS;
+		}
+		return systemFeedback;
+	}
+	/**
 	 * @author Sai Hou
 	 */
 	public ArrayList<Task> searchByName(String name) {
+		name = name.trim();
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 
 		for (Task t : allTasks) {
@@ -388,92 +509,62 @@ public class CommandExecutor {
 		return currentTask;
 	}
 	
+	private int convertToInteger(String userCommand) {
+		return Integer.parseInt(userCommand);
+	}
+	
+	private String getFirstWord(String str) {
+		return str.trim().split("\\s+")[0];
+	}
+	
 	public String doUserOperation(String userCommand) {
 		String systemFeedback = "";
 		
 		String operation = getOperation(userCommand);
+		
+		boolean isValidOperation = ValidationCheck.isValidOperation(operation);
+		if (!isValidOperation) {
+			return "Wrong command entered! Enter F1 for a list of commands.";
+		}
 		
 		if(operation.equalsIgnoreCase("exit") || operation.equalsIgnoreCase("quit")) {
 			System.out.println("exit");
 			System.exit(0);
 		}
 		
-		boolean isValidChoice = false;
-		switch (phase) {
-			case "normal" :
-				systemFeedback = executeOperation(operation, userCommand);
-				break;
-			case "editPhase1" :
-				isValidChoice = ValidationCheck.isValidChoice(userCommand, currentTaskList.size());
-				if (isValidChoice) {
-					int choice = convertToInteger(userCommand);
-					currentTask = currentTaskList.get(choice-1);
-					phase = "editPhase2";
-				}
-				break;
-			case "editPhase2" :
-				systemFeedback = executeEditCommand(userCommand);
-				phase = "normal";
-				break;
-			case "deletePhase1" :
-				isValidChoice = ValidationCheck.isValidChoice(userCommand, currentTaskList.size());
-				if (isValidChoice) {
-					int choice = convertToInteger(userCommand);
-					systemFeedback = executeDeleteCommand(choice);
-					phase = "normal";
-				}
-				break;
-			default :
-				break;
-		}
-		
-		if (phase.equals("normal")) {
-			currentTask = null;
-			currentTaskList = null;
-		}
+		systemFeedback = executeOperation(operation, userCommand);
 		
 		return systemFeedback;
-	}
-	
-	private int convertToInteger(String userCommand) {
-		return Integer.parseInt(userCommand);
 	}
 	
 	private String executeOperation(String operation, String userCommand) {
 		String systemFeedback = "";
 		
-		boolean isValidOperation = ValidationCheck.isValidOperation(operation);
-		
-		if (!isValidOperation) {
-			return "Wrong command entered! Enter F1 for a list of commands.";
-		}
-		
 		switch (operation) {
+			case "create" :
+				systemFeedback = executeAddCommand(userCommand.substring(6).trim());
+				break;
+			case "new" :
+				//fallthrough
 			case "add" :
-				systemFeedback = executeAddCommand(userCommand.substring(4));
+				systemFeedback = executeAddCommand(userCommand.substring(3).trim());
+				break;
+			case "show" :
+				systemFeedback = executeDisplayCommand(userCommand.substring(4).trim());
 				break;
 			case "display" :
-				systemFeedback = executeDisplayCommand(userCommand.substring(7));
+				systemFeedback = executeDisplayCommand(userCommand.substring(7).trim());
 				break;
 			case "update" :
-				//fallthrough
-			case "edit" :
-				currentTaskList = searchByName(userCommand.substring(5));
-				if (currentTaskList.size() > 0) {
-					phase = "editPhase1";
-				}
-				else {
-					systemFeedback = MESSAGE_NO_SEARCH_RESULTS;
-				}
+				systemFeedback = executeEditCommand(userCommand.substring(6).trim());
 				break;
+			case "edit" :
+				systemFeedback = executeEditCommand(userCommand.substring(4).trim());
+				break;
+			case "remove" :
+				//fallthrough
 			case "delete" :
-				currentTaskList = searchByName(userCommand.substring(7));
-				if (currentTaskList.size() > 0) {
-					phase = "deletePhase1";
-				}
-				else {
-					systemFeedback = MESSAGE_NO_SEARCH_RESULTS;
-				}
+				systemFeedback = executeDeleteCommand(userCommand.substring(6).trim());
 				break;
 			case "clear" :
 				systemFeedback = executeClearCommand();
@@ -481,50 +572,17 @@ public class CommandExecutor {
 			case "undo" :
 				systemFeedback = executeUndoCommand();
 				break;
-			case "search" :
-				systemFeedback = search(userCommand.substring(7));
-			default : 
+			case "find" :
+				systemFeedback = executeSearchCommand(userCommand.substring(4).trim());
 				break;
-		}
-		return systemFeedback;
-	}
-	
-	private String getFirstWord(String str) {
-		return str.trim().split("\\s+")[0];
-	}
-	
-	private String search(String taskName){
-		String systemFeedback = "";
-		boolean isSearchingByDate = false;
-		
-		taskName = taskName.trim();
-		
-		try {
-			int date = Integer.parseInt(taskName);
-			if (taskName.length() == 6){
-				isSearchingByDate = true;
-			}
-			else {
-				isSearchingByDate = false;
-			}
-		} catch(NumberFormatException e) {
-			isSearchingByDate = false;
-		}
-		
-		Collections.sort(allTasks);
-		
-		if(isSearchingByDate) {
-			currentTaskList = searchByDate(taskName);
-		}
-		else {
-			currentTaskList = searchByName(taskName);
-		}
-		
-		if (currentTaskList.size() > 0) {
-			systemFeedback = "Search results:\n" + formDisplayText(currentTaskList);
-		}
-		else {
-			systemFeedback = MESSAGE_NO_SEARCH_RESULTS;
+			case "search" :
+				systemFeedback = executeSearchCommand(userCommand.substring(6).trim());
+				break;
+			default : 
+				//assert false here
+				//if program reaches here, it should fail
+				assert false;
+				break;
 		}
 		return systemFeedback;
 	}
