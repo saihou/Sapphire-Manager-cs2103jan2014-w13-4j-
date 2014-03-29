@@ -111,6 +111,11 @@ public class CommandParser {
 		invalidFeedBack = null;
 
 		input = extractName(input);
+		
+		if(input.indexOf("/") == -1){
+			return;
+		}
+		
 		String[] temp = input.split("/");
 		
 		for (int i = 0; i < temp.length; i++) {
