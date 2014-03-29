@@ -90,47 +90,35 @@ class Task implements Comparable<Task> {
 	 * Returns a String that contains all task details in order for display Command :
 	 * Task name which all tasks must have, followed by time and then optional details.
 	 */
-	public String getTaskDetails() {
+	private String getTaskDetails(boolean haveDate) {
 		String taskDetails = this.name + '\n';
 		assert taskDetails != null;
 		
-		if(this.type.equals("setDuration")){
+		if (haveDate && !this.type.equals("noSetTiming")) {
+			taskDetails += "\tDate: " + this.date + '\n';
+		}
+		
+		if (this.type.equals("setDuration")) {
 			taskDetails += "\tTime: " + this.startTime + " to " + this.endTime + '\n';
-		} else if(this.type.equals("targetedTime")){
+		} else if (this.type.equals("targetedTime")){
 			taskDetails += "\tTime: " + this.startTime + '\n';
 		}
 		
-		if(getLocation() != null){
+		if (getLocation() != null) {
 			taskDetails += "\tLocation: " + this.location + '\n';
 		}
 		
 		return taskDetails;
 	}
-/*
-	public void printTaskDetails(int num, SapphireManagerGUI gui){
-		//Print task name which all tasks will have, followed by date/time if any,
-		//followed by other optional variables
-		gui.printToDisplay("\t"+num+". "+getName());
-		
-		if(getType().equals("fullDay")){
-			gui.printToDisplay("\tDate: " + getDate());
-		} else if(getType().equals("setDuration")){
-			gui.printToDisplay("\tDate: " + getDate());
-			gui.printToDisplay("\tTime: " + getStartTime() + " to " + getEndTime());
-		} else if(getType().equals("targetedTime")){
-			gui.printToDisplay("\tDate: " + getDate());
-			gui.printToDisplay("\tTime: " + getDeadline());
-		} else {
-			gui.printToDisplay("\tTo be completed during free-time.");
-		}
-		
-		if(getLocation() != null){
-			gui.printToDisplay("\tLocation: " + getLocation());
-		}
-		
-		gui.printToDisplay("");
+	
+	public String getTaskDetailsWithoutDate() {
+		return getTaskDetails(false);
 	}
-*/
+	
+	public String getAllTaskDetails(){
+		return getTaskDetails(true);
+	}
+
 	/* 
 	 * @author Si Rui
 	 * This function allows Collections objects that store Task to sort it according to these rules:
@@ -202,10 +190,10 @@ class Task implements Comparable<Task> {
 		return reversedDate;
 	}
 	/*
-	private void println(String line){
+	/*private void println(String line){
 		System.out.println(line);
-	}
-	*/
+	}*/
+	
 	/**
 	 * @author Teck Sheng (Dex)
 	 */

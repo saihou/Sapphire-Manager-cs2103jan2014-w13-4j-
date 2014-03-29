@@ -62,7 +62,7 @@ public class CommandExecutor {
 	 * @author Si Rui
 	 */
 	public String executeDisplayCommand(String userCommand) {
-		String systemFeedback = null;
+		String systemFeedback = "";
 		ArrayList<Task> taskList = null;
 		
 		if (allTasks.isEmpty()) {
@@ -81,7 +81,7 @@ public class CommandExecutor {
 				systemFeedback = getFeedbackIfHaveNoTasks(displayType);
 			}
 			
-			if (systemFeedback == null){
+			if (systemFeedback.equals("")){
 				systemFeedback = formDisplayText(taskList);
 			}
 		}
@@ -114,7 +114,8 @@ public class CommandExecutor {
 		return taskList;
 	}
 	
-	private ArrayList<Task> getTasksBasedOnCompletion(ArrayList<Task> taskList, boolean statusRequested) {
+	private ArrayList<Task> getTasksBasedOnCompletion(ArrayList<Task> taskList, 
+														boolean statusRequested) {
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 
 		for (Task t : taskList) {
@@ -126,7 +127,7 @@ public class CommandExecutor {
 	}
 	
 	private String getFeedbackIfHaveNoTasks(String displayType) {
-		String feedback = null;
+		String feedback = "";
 		if (displayType.equals("past")) {
 			feedback = "You have no completed tasks.";
 		} else if (displayType.equals("today")) {
@@ -138,9 +139,9 @@ public class CommandExecutor {
 	}
 	
 	private String formDisplayText(ArrayList<Task> taskList) {
-		Task firstTask = taskList.get(0);
-		String currentDate = firstTask.getDate();
-		String displayText = formatDate(currentDate) + '\n';
+		String displayText = "";
+		String currentDate = null;
+		
 		boolean printingMemos = false;
 		int count = 1;
 		
@@ -158,7 +159,7 @@ public class CommandExecutor {
 				} else {
 					count = 1;
 					currentDate = taskDate;
-					displayText += currentDate + '\n';
+					displayText += formatDate(currentDate) + '\n';
 					displayText += formDisplayTextOfOneTask(count, t);
 				}
 			}
@@ -168,11 +169,13 @@ public class CommandExecutor {
 	}
 	
 	private String formDisplayTextOfOneTask(int count, Task t) {
-		return "\t" + count + ". " + t.getTaskDetails() + '\n' + t.getIsDone();
+		System.out.println(t.getName() + '-' + t.getIsDone());
+		return "\t" + count + ". " + t.getTaskDetailsWithoutDate() + '\n';
 	}
 	
 	private String formDisplayTextOfOneMemo(int count, Task t) {
-		return "\t" + count + ". " + t.getTaskDetails();
+		System.out.println(t.getName() + '-' + t.getIsDone());
+		return "\t" + count + ". " + t.getTaskDetailsWithoutDate();
 	}
 	private String formatDate(String date){
 		//STUB
@@ -522,6 +525,8 @@ public class CommandExecutor {
 			isSearchingByDate = false;
 		}
 		
+		Collections.sort(allTasks);
+		
 		if(isSearchingByDate) {
 			currentTaskList = searchByDate(taskName);
 		}
@@ -530,7 +535,7 @@ public class CommandExecutor {
 		}
 		
 		if (currentTaskList.size() > 0) {
-			systemFeedback = formDisplayText(currentTaskList);
+			systemFeedback = "Search results:\n" + formDisplayText(currentTaskList);
 		}
 		else {
 			systemFeedback = MESSAGE_NO_SEARCH_RESULTS;
@@ -548,30 +553,18 @@ public class CommandExecutor {
 		int count = 1;
 		for(Task task : allTasks){
 			sb.append(count+ ". ");
-
-			sb.append(task.getName()+"\n");
-
-			if(task.getType().equals("fullDay")){
-				sb.append("Date: " + task.getDate()+"\n");
-			} else if(task.getType().equals("setDuration")){
-				sb.append("Date: " + task.getDate()+"\n");
-				sb.append("Time: " + task.getStartTime() + " to " + task.getEndTime()+"\n");
-			} else if(task.getType().equals("targetedTime")){
-				sb.append("Date: " + task.getDate()+"\n");
-				//sb.append("Time: " + task.getDeadline()+"\n");
-			} else {
-				sb.append("To be completed during free-time.\n");
-			}
-
-			if(task.getLocation() != null){
-				sb.append("Location: " + task.getLocation()+"\n");
-			}
+			sb.append(task.getAllTaskDetails());
 		}
 		return sb.toString();
 	}
 	
 	
-
+	/**
+	 * @author Si Rui
+	 */
+	public ActionHistory getHistoryInstance() {
+		return history;
+	}
 
 
 }
