@@ -201,7 +201,7 @@ public class SapphireManagerGUI {
 		helpTip.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		helpTip.setHorizontalAlignment(SwingConstants.LEFT);
 		helpTip.setPreferredSize(new Dimension(380, 30));
-		displayHelpoText(getTodayDate());
+		displayToHelpo(MESSAGE_HELP);
 	}
 
 	private void initializeLogoInPanel() {
