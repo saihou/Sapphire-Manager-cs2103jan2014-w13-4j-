@@ -93,178 +93,149 @@ public class CommandParser {
 	/**
 	 * @author Cai Di
 	 */
-	// Analyze userInput and assign task details to myTask object
-	public String parse(String userInput, Task myTask) {
-		String systemFeedback = "";
-		
-		// String command is the update version of userInput string after each extraction
-		String command = "";
-        
-		// set task name update command to userInput string without task name
-		command = setTaskName(userInput, myTask, command);
-        
-		// set task details to myTask object
-		setTaskDetails(myTask, command);
-        
-		// call parseType method to set the type of the task
-		setType(myTask);
+	public String invalidFeedBack;
+	public String[] taskDetails;
 
-		return systemFeedback;
+	/*
+	 * taskDetials[] 
+	 * [0] = task name 
+	 * [1] = task start time 
+	 * [2] = task end time
+	 * [3] = task date 
+	 * [4] = task done/undone 
+	 * [5] = task location
+	 */
+
+	public void extractTaskDetails(String input) {
+		taskDetails = new String[6];
+		invalidFeedBack = null;
+
+		input = extractName(input);
+		String[] temp = input.split("/");
+		
+		for (int i = 0; i < temp.length; i++) {
+			// exit method if input is not valid
+			if (invalidFeedBack != null)
+				return;
+			
+			switch (getFirstWord(temp[i])) {
+			case "from":
+				extractDuration(temp[i]);
+				break;
+			case "at":
+				extractDeadline(temp[i]);
+				break;
+			case "on":
+				extractDate(temp[i]);
+				break;
+			case "mark":
+				extractStatus(temp[i]);
+				break;
+			case "loc":
+				extractLocation(temp[i]);
+				break;
+			}
+		}
 	}
-    
-	// set task name and update String command to userInput without task name
-	private String setTaskName(String userInput, Task myTask, String command) {
+
+	private String extractName(String userInput) {
 		int indexOfFirstSlash = userInput.trim().indexOf("/");
 
 		// no task name but have slash
 		if (indexOfFirstSlash == 0) {
-			command = userInput.trim();
+			userInput = userInput.trim();
+			taskDetails[0] = null;
 		}
 
 		// have task name and have slash
 		else if (indexOfFirstSlash != -1) {
-			String taskName = userInput.substring(0, indexOfFirstSlash);
-			taskName = taskName.trim();
-			myTask.setName(taskName);
-
-			command = userInput.substring(indexOfFirstSlash);
+			taskDetails[0] = userInput.substring(0, indexOfFirstSlash);
+			userInput = userInput.substring(indexOfFirstSlash);
 		}
 
 		// have task name but no slash
 		else {
-			String taskName = userInput.trim();
-			myTask.setName(taskName);
+			taskDetails[0] = userInput.trim();
+			userInput = null;
 		}
-		return command;
+		
+		return userInput;
 	}
-    
-	// set task date, deadline, location, duration
-	private void setTaskDetails(Task myTask, String command) {
-		// index of the various commands in the command string
-		int indexOfFrom     = command.indexOf("/from");
-		int indexOfDate     = command.indexOf("/on");
-		int indexOfLocation = command.indexOf("/loc");
-		int indexOfDeadline = command.indexOf("/at");
-		int indexOfIsDone   = command.indexOf("/mark");
+
+	// now use validitycheck 
+	/*
+	private boolean isFourDigitInteger(String time) {
+		boolean feedBack = true;
+		if (time.length() != 4) {
+			feedBack = false;
+		} else {
+			try {
+				Integer.parseInt(time);
+			} catch (NumberFormatException e) {
+				feedBack = false;
+			}
+		}
+		return feedBack;
+	}
+
+	private boolean isSixDigitInteger(String date) {
+		boolean feedBack = true;
+		if (date.length() != 6) {
+			feedBack = false;
+		} else {
+			try {
+				Integer.parseInt(date);
+			} catch (NumberFormatException e) {
+				feedBack = false;
+			}
+		}
+		return feedBack;
+	}
+	*/
+
+	private boolean isValidStatus(String status) {
+		if (status.compareTo("done") == 0 || status.compareTo("undone") == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private void extractDuration(String inputFragment) {
+		taskDetails[1] = getFirstWord(inputFragment.substring(4));
+		if (!ValidationCheck.isValidTime(taskDetails[1]))
+			invalidFeedBack = "Input starting time is not valid.";
 
 		try {
-			// set start & end time
-			command = setDuration(myTask, command, indexOfFrom);
-
-			// set task date
-			command = setDate(myTask, command, indexOfDate);
-
-			// set task deadline
-			command = setDeadline(myTask, command, indexOfDeadline);
-			
-			// mark task as done/undone
-			command = setIsDone(myTask, command, indexOfIsDone);
-
-			// set task location
-			setLocation(myTask, command, indexOfLocation);
-			
-		} catch (StringIndexOutOfBoundsException
-				| ArrayIndexOutOfBoundsException e) {
-			System.out.println("User input is not valid!"); 
+			inputFragment = inputFragment.split("to")[1].trim();
+			taskDetails[2] = getFirstWord(inputFragment);
+			if (!ValidationCheck.isValidTime(taskDetails[2]))
+				invalidFeedBack = "Input ending time is not valid.";
+		} catch (ArrayIndexOutOfBoundsException e) {
+			invalidFeedBack = "Input starting time without ending time.";
 		}
 	}
-    
-	// set task location
-	private void setLocation(Task myTask, String command, int indexOfLocation) {
-		if (indexOfLocation != -1) {
-			String location = command.split("/loc")[1].trim();
-			myTask.setLocation(location);
-		}
+
+	private void extractDeadline(String inputFragment) {
+		taskDetails[1] = getFirstWord(inputFragment.substring(2));
+		if (!ValidationCheck.isValidTime(taskDetails[1]))
+			invalidFeedBack = "Input deadline time is not valid.";
 	}
-	
-	// mark task as done/undone
-	private String setIsDone(Task myTask, String command, int indexOfIsDone) {
-		if(indexOfIsDone != -1) {
-			String[] temp = command.split("/mark");
-			
-			String isDone = getFirstWord(temp[1].trim());
-			if(isDone.compareTo("done")==0){
-				myTask.setIsDone(true);
-				temp[1] = temp[1].trim().substring(4).trim();
-				command = temp[0] + temp[1];
-			}
-			else{
-				myTask.setIsDone(false);
-				temp[1] = temp[1].trim().substring(6);
-				command = temp[0] + temp[1];
-			}
-		}
-		return command;
+
+	private void extractDate(String inputFragment) {
+		taskDetails[4] = getFirstWord(inputFragment.substring(2));
+		if (!ValidationCheck.isValidDate(taskDetails[4]))
+			invalidFeedBack = "Input date is not valid";
 	}
-   
-	// set task deadline
-	private String setDeadline(Task myTask, String command, int indexOfDeadline) {
-		if (indexOfDeadline != -1) {
-			String[] temp = command.split("/at");
 
-			String deadline = temp[1].trim().substring(0, 4);
-			
-			boolean isTimeValid = ValidationCheck.isValidTime(deadline);
-			System.out.println("DeadlineTimeValidate:"+isTimeValid);
-			
-			myTask.setStartTime(deadline);
-
-			temp[1] = temp[1].trim().substring(4).trim();
-			command = temp[0] + temp[1];
-		}
-		return command;
+	private void extractStatus(String inputFragment) {
+		taskDetails[5] = getFirstWord(inputFragment.substring(4));
+		if (!isValidStatus(taskDetails[5]))
+			invalidFeedBack = "Input status is not valid";
 	}
-	
-    
-	// set task date
-	private String setDate(Task myTask, String command, int indexOfDate) {
-		if (indexOfDate != -1) {
-			String[] temp = command.split("/on");
 
-			String date = temp[1].trim().substring(0, 6);
-			
-			boolean isDateValid = ValidationCheck.isValidDate(date);
-			System.out.println("DateValidate:"+isDateValid);
-			
-			myTask.setDate(date);
-
-			temp[1] = temp[1].trim().substring(6).trim();
-			command = temp[0] + temp[1];
-
-		}
-		return command;
-	}
-    
-	//set the start & end time 
-	private String setDuration(Task myTask, String command, int indexOfFrom) {
-		if (indexOfFrom != -1) {
-			// split the command string into two Sting temp[0] & temp[1]
-			String[] temp = command.split("/from");
-
-			// extract first 4 digits as starting time
-			temp[1] = temp[1].trim();
-			String startTime = temp[1].substring(0, 4);
-			
-			boolean isTimeValid = ValidationCheck.isValidTime(startTime);
-			System.out.println("StartTimeValidate:"+isTimeValid);
-			
-			myTask.setStartTime(startTime);
-
-			// extract start time and update temp[1]
-			temp[1] = temp[1].trim().substring(4).trim();
-			temp[1] = temp[1].substring(2).trim();
-
-			String endTime = temp[1].substring(0, 4);
-			
-			isTimeValid = ValidationCheck.isValidTime(endTime);
-			System.out.println("EndTimeValidate:"+isTimeValid);
-			
-			myTask.setEndTime(endTime);
-
-			// extract start & end time and update String command 
-			command = temp[0] + temp[1].substring(4).trim();
-		}
-		return command;
+	private void extractLocation(String inputFragment) {
+		taskDetails[6] = inputFragment.substring(3).trim();
 	}
 
 	// set task type
