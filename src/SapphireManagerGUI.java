@@ -130,10 +130,10 @@ public class SapphireManagerGUI {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					todaysTasks = new ArrayList<Task>(); //instantiate ArrayList to store task list
 					guiWindow = new SapphireManagerGUI(); //instantiate GUI window
 					myExecutor = new CommandExecutor(); //instantiate CommandExecutor
-					todaysTasks = new ArrayList<Task>(); //instantiate ArrayList to store task list
-					todaysTasks = myExecutor.getTodaysTasks(); //get the task(s) for the day
+					todaysTasks = myExecutor.getTodaysTasks(); //get the task(s) for the day					
 
 					//checks if there available tasks and display the following information
 					if(todaysTasks.isEmpty()) {
@@ -145,7 +145,7 @@ public class SapphireManagerGUI {
 
 					guiWindow.guiFrame.setVisible(true);
 				} catch (Exception e) {
-					displaySystemMessage("Error!");
+					e.printStackTrace();
 				}
 			}
 		});
@@ -196,19 +196,19 @@ public class SapphireManagerGUI {
 	private void initializeDisplayBoxInScrollPane() {
 		displayBox = new JTextPane();
 		scrollPane = new JScrollPane(displayBox);
-
-		scrollPane.setBorder(null);
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.setPreferredSize(new Dimension(380, 450));
-		scrollPane.setWheelScrollingEnabled(false);
-
+		
 		displayBox.setBackground(new Color(0x231F20));
 		displayBox.setBorder(null);
 		displayBox.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		displayBox.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		displayBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		displayBox.setMargin(new Insets(20, 20, 20, 20));
-		displayBox.setPreferredSize(new Dimension(380, 440));		
+		displayBox.setPreferredSize(new Dimension(380, 440));	
+
+		scrollPane.setBorder(null);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setPreferredSize(new Dimension(380, 450));
+		scrollPane.setWheelScrollingEnabled(false);	
 	}
 
 	//initializes input text box within a panel
@@ -445,6 +445,7 @@ public class SapphireManagerGUI {
 		aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
 
 		int length = displayBox.getDocument().getLength();
+		System.out.println("Length: "+length);
 		displayBox.setCaretPosition(length);
 		displayBox.setCharacterAttributes(aset, false);
 		displayBox.replaceSelection(message+"\n");
