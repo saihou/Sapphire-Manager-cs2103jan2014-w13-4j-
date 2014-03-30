@@ -62,7 +62,7 @@ public class SapphireManagerGUI {
 	private final static String MESSAGE_HELP = "Enter F1 for a list of commands.";
 	private final static String MESSAGE_NO_TASK_TO_DISPLAY_TODAY = "You have no tasks due today.\n";
 	private final static String MESSAGE_SPLIT_LINE = "------------------------------------------";
-	private final static String MESSAGE_TODAY_TASK_TITLE = "Today's tasks:\n";
+	//private final static String MESSAGE_TODAY_TASK_TITLE = "Today's tasks:\n";
 	private final static String MESSAGE_WELCOME = "Welcome to Sapphire Manager!";
 
 	//HELPO MESSAGES	
@@ -139,8 +139,8 @@ public class SapphireManagerGUI {
 					if(todaysTasks.isEmpty()) {
 						displaySystemMessage(MESSAGE_NO_TASK_TO_DISPLAY_TODAY); //no tasks
 					} else {
-						displaySystemMessage(MESSAGE_TODAY_TASK_TITLE);
-						displayNormalMessage(myExecutor.executeDisplayCommand("/today"));
+						//displaySystemMessage(MESSAGE_TODAY_TASK_TITLE);
+						displayNormalMessage(myExecutor.executeDisplayCommand("today"));
 					}
 
 					guiWindow.guiFrame.setVisible(true);
@@ -443,7 +443,8 @@ public class SapphireManagerGUI {
 		aset = sc.addAttribute(aset, StyleConstants.FontSize, fontSize);
 		aset = sc.addAttribute(aset,  StyleConstants.FontFamily,  fontName);
 		aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
-
+		
+		System.out.println(displayBox);
 		int length = displayBox.getDocument().getLength();
 		System.out.println("Length: "+length);
 		displayBox.setCaretPosition(length);

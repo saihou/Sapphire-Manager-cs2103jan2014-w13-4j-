@@ -276,7 +276,11 @@ public class CommandExecutor {
 	}
 
 	private boolean isThisWeeksTask(String taskDate, String todaysDate) {
-		return (dateTimeConfig.isThisWeek(taskDate, todaysDate)) ? true : false;
+		if (taskDate.equals(todaysDate)) {
+			return false;
+		} else {
+			return (dateTimeConfig.isThisWeek(taskDate, todaysDate)) ? true : false;
+		}
 	}
 
 	private boolean isAfterThisWeeksTask(String taskDate, String todaysDate) {
@@ -284,7 +288,6 @@ public class CommandExecutor {
 	}
 
 	private String formDisplayTextOfOneTask(int count, Task t) {
-		System.out.println(t.getName() + '-' + t.getIsDone());
 		return "   " + count + ". " + t.getAllTaskDetails();
 	}
 

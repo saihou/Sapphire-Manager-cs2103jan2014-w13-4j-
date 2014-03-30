@@ -75,4 +75,8 @@ public class DateTimeConfiguration {
 		}
 		return reversedDate;
 	}
+
+	public String getTimeForDisplay(String time) {
+		return time.substring(0,2) + ':' + time.substring(2);
+	}
 }
