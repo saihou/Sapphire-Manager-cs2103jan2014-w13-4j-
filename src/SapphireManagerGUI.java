@@ -251,7 +251,9 @@ public class SapphireManagerGUI {
 		logoPanel.add(logoLabel);
 
 		logoPanel.setBackground(new Color(0x231F20));
-		ImageIcon icon = new ImageIcon("img/logo-trans.png");
+		ImageIcon icon = new ImageIcon(getClass().getResource("img/logo-trans.png"));
+		//ImageIO.read(getClass().getResource("/img/logo-trans.png"));
+		
 		//ImageIcon icon = new ImageIcon("http://i58.tinypic.com/2edpqa0.jpg");
 		/*Image image = null;
 		try {
@@ -425,12 +427,12 @@ public class SapphireManagerGUI {
 	private static void displaySystemMessage(String message) {
 		appendToDisplayBox(message, new Color(0xff6c00), "Courier", 14);
 	}
-
+/*
 	//displays highlighted message
 	private static void displayHightlightMessage(String message) {
 		appendToDisplayBox(message, Color.CYAN, "Segoe UI", 25);
 	}
-
+*/
 	//displays to helpo label
 	private void displayToHelpo(String message) {
 		helpo.setText(message);
