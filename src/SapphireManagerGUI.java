@@ -252,17 +252,6 @@ public class SapphireManagerGUI {
 
 		logoPanel.setBackground(new Color(0x231F20));
 		ImageIcon icon = new ImageIcon(getClass().getResource("img/logo-trans.png"));
-		//ImageIO.read(getClass().getResource("/img/logo-trans.png"));
-		
-		//ImageIcon icon = new ImageIcon("http://i58.tinypic.com/2edpqa0.jpg");
-		/*Image image = null;
-		try {
-			URL url = new URL("https://onedrive.live.com/redir?resid=FDAC10ED2A7F277D!11000&authkey=!AMXEMlxnhTmgGVk&v=3&ithint=photo%2c.png");
-			image = ImageIO.read(url);
-		} catch (Exception e) {
-			System.out.println("No image");
-		}*/
-		//logoLabel = new JLabel(new ImageIcon(image));		
 		logoLabel.setIcon(icon);
 
 	}
@@ -425,7 +414,7 @@ public class SapphireManagerGUI {
 
 	//displays system message
 	private static void displaySystemMessage(String message) {
-		appendToDisplayBox(message, new Color(0xff6c00), "Courier", 14);
+		appendToDisplayBox(message, new Color(0xff6c00), "Segoe UI", 14);
 	}
 /*
 	//displays highlighted message
