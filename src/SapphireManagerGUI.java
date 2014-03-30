@@ -99,7 +99,7 @@ public class SapphireManagerGUI {
 	private final static String HELPO_FORMAT_AT_BY = "[time]";
 	private final static String HELPO_FORMAT_ON = "[date]";
 	private final static String HELPO_FORMAT_DATE = "<-- date in DDMMYY format";
-	private final static String HELPO_FORMAT_DISPLAY = "[past|today|future]";
+	private final static String HELPO_FORMAT_DISPLAY = "[all|today|done|undone]";
 	private final static String HELPO_FORMAT_EDIT = "[name(if any)] /[options]";
 	private final static String HELPO_FORMAT_FROM_TO = "[time] to [time]";
 	private final static String HELPO_FORMAT_LOC = "[location name]";

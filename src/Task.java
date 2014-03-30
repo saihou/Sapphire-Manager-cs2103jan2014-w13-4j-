@@ -1,8 +1,10 @@
 class Task implements Comparable<Task> {
 	private String type, name, date, startTime, endTime, location;
+	private DateTimeConfiguration dateTimeConfig;
 	boolean isDone;
 	
 	public Task() {
+		dateTimeConfig = new DateTimeConfiguration();
 	}
 	
 	public Task(Task newTask) {
@@ -13,6 +15,7 @@ class Task implements Comparable<Task> {
 		setEndTime(newTask.getEndTime());
 		setLocation(newTask.getLocation());	
 		setIsDone(newTask.getIsDone());
+		dateTimeConfig = new DateTimeConfiguration();
 	}
 	
 	public Task(String type, String name, String date, String startTime, String endTime, String location, boolean isDone){
@@ -23,6 +26,7 @@ class Task implements Comparable<Task> {
 		setEndTime(endTime);
 		setLocation(location);
 		setIsDone(isDone);
+		dateTimeConfig = new DateTimeConfiguration();
 	}
 	
 	public void setType(String type){
@@ -30,7 +34,7 @@ class Task implements Comparable<Task> {
 	}
 	
 	public void setName(String name){
-		this.name = name;
+		this.name = formatName(name);
 	}
 	
 	public void setDate(String date){
@@ -95,17 +99,17 @@ class Task implements Comparable<Task> {
 		assert taskDetails != null;
 		
 		if (haveDate && !this.type.equals("noSetTiming")) {
-			taskDetails += "\tDate: " + this.date + '\n';
+			taskDetails += "      " + dateTimeConfig.getDateForDisplay(this.date) + '\n';
 		}
 		
 		if (this.type.equals("setDuration")) {
-			taskDetails += "\tTime: " + this.startTime + " to " + this.endTime + '\n';
+			taskDetails += "      From " + this.startTime + " to " + this.endTime + '\n';
 		} else if (this.type.equals("targetedTime")){
-			taskDetails += "\tTime: " + this.startTime + '\n';
+			taskDetails += "      At/By " + this.startTime + '\n';
 		}
 		
 		if (getLocation() != null) {
-			taskDetails += "\tLocation: " + this.location + '\n';
+			taskDetails += "   " + this.location + '\n';
 		}
 		
 		return taskDetails;
@@ -146,8 +150,8 @@ class Task implements Comparable<Task> {
 			return -1;
 		} else {
 			// Compare by date and within each, compare by type again
-			String thisDate = reverseDate(this.date);
-			String tDate = reverseDate(t.getDate());
+			String thisDate = dateTimeConfig.reverseDate(this.date);
+			String tDate = dateTimeConfig.reverseDate(t.getDate());
 			
 			// If both tasks have timing, compare date
 			/*if(thisDate != null && tDate != null){
@@ -176,19 +180,10 @@ class Task implements Comparable<Task> {
 		}
 	}
 	
-	/* 
-	 * @author Si Rui
-	 * Reverse specified date String from DDMMYY to YYMMDD format to directly compare values  
-	 * using pre-defined compareTo function in Java String class.
-	 */
-	private String reverseDate(String originalDate) {
-		String reversedDate = "";
-		for (int i = 6; i > 0; i -= 2){
-			String toAppend = originalDate.substring(i-2, i);
-			reversedDate += toAppend;
-		}
-		return reversedDate;
+	private String formatName(String name) {
+		return Character.toUpperCase(name.charAt(0)) + name.substring(1);
 	}
+	
 	/*
 	/*private void println(String line){
 		System.out.println(line);
@@ -198,7 +193,7 @@ class Task implements Comparable<Task> {
 	/**
 	 * @author Teck Sheng (Dex)
 	 */
-	public boolean comparedTo(Task newTask) {
+	public boolean equals(Task newTask) {
 		if(!getType().equals(newTask.getType())) {
 			return false;
 		}

@@ -26,10 +26,10 @@ public class CommandParser {
 		
 		userCommand = prepareUserCommandForParsing(userCommand);
 		
-		boolean isAllKeywordPresent = userCommand.contains("/all");
-		boolean isFutureKeywordPresent = userCommand.contains("/future");
-		boolean isPastKeywordPresent = userCommand.contains("/past");
-		boolean isTodayKeywordPresent = userCommand.contains("/today");
+		boolean isAllKeywordPresent = userCommand.contains("all");
+		boolean isFutureKeywordPresent = userCommand.contains("future");
+		boolean isPastKeywordPresent = userCommand.contains("past");
+		boolean isTodayKeywordPresent = userCommand.contains("today");
 		
 		displayType = determineDisplayType(isFutureKeywordPresent,
 				isPastKeywordPresent, isTodayKeywordPresent, isAllKeywordPresent); 
