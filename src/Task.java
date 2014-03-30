@@ -3,6 +3,8 @@ class Task implements Comparable<Task> {
 	private DateTimeConfiguration dateTimeConfig;
 	boolean isDone;
 	
+	private final static String spacing = "      ";
+	
 	public Task() {
 		dateTimeConfig = new DateTimeConfiguration();
 	}
@@ -34,7 +36,8 @@ class Task implements Comparable<Task> {
 	}
 	
 	public void setName(String name){
-		this.name = formatName(name);
+		name = capitalizeString(name);
+		this.name = name;
 	}
 	
 	public void setDate(String date){
@@ -50,6 +53,9 @@ class Task implements Comparable<Task> {
 	}
 
 	public void setLocation(String location){
+		if (location != null){
+			location = capitalizeString(location);
+		}
 		this.location = location;
 	}
 	/**
@@ -99,17 +105,19 @@ class Task implements Comparable<Task> {
 		assert taskDetails != null;
 		
 		if (haveDate && !this.type.equals("noSetTiming")) {
-			taskDetails += "      " + dateTimeConfig.getDateForDisplay(this.date) + '\n';
+			taskDetails += spacing + dateTimeConfig.getDateForDisplay(this.date) + '\n';
 		}
 		
 		if (this.type.equals("setDuration")) {
-			taskDetails += "      From " + this.startTime + " to " + this.endTime + '\n';
+			taskDetails += spacing + "From " + dateTimeConfig.getTimeForDisplay(this.startTime) +
+							" to " + dateTimeConfig.getTimeForDisplay(this.endTime) + '\n';
 		} else if (this.type.equals("targetedTime")){
-			taskDetails += "      At/By " + this.startTime + '\n';
+			taskDetails += spacing + "At/By " + 
+							dateTimeConfig.getTimeForDisplay(this.startTime) + '\n';
 		}
 		
 		if (getLocation() != null) {
-			taskDetails += "   " + this.location + '\n';
+			taskDetails += spacing + this.location + '\n';
 		}
 		
 		return taskDetails;
@@ -153,15 +161,6 @@ class Task implements Comparable<Task> {
 			String thisDate = dateTimeConfig.reverseDate(this.date);
 			String tDate = dateTimeConfig.reverseDate(t.getDate());
 			
-			// If both tasks have timing, compare date
-			/*if(thisDate != null && tDate != null){
-				thisDate = reverseDate(thisDate);
-				tDate = reverseDate(tDate);
-				if (thisDate.compareTo(tDate) != 0) {
-					return thisDate.compareTo(tDate);
-				}
-			}*/
-			
 			if (thisDate.equals(tDate)){
 				// They have the same date, so compare type
 				if (this.type.compareTo("fullDay") == 0) {
@@ -180,8 +179,8 @@ class Task implements Comparable<Task> {
 		}
 	}
 	
-	private String formatName(String name) {
-		return Character.toUpperCase(name.charAt(0)) + name.substring(1);
+	private String capitalizeString(String name) {
+		return (Character.toUpperCase(name.charAt(0)) + name.substring(1));
 	}
 	
 	/*
