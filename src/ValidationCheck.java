@@ -87,7 +87,7 @@ public class ValidationCheck {
 			case "search" :
 			case "exit" :
 			case "quit" :
-				//all valid operations should fallthrough to return true
+				//all valid operations should fall through to return true
 				return true;
 			default :
 				return false;

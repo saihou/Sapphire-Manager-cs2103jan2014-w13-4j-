@@ -8,14 +8,24 @@
  *
  */
 public class ActionHistory {
+	private static ActionHistory instance = null;
+	
 	private String lastAction;
 	private Task referenceToLastTask;
 	private Task copyOfLastTask;
 	
-	public ActionHistory(){
+	private ActionHistory(){
 		this.lastAction = null;
 	}
-	
+	public static ActionHistory getInstance() {
+		if (instance == null) {
+			instance = new ActionHistory();
+			return instance;
+		}
+		else {
+			return instance;
+		}
+	}
 	public void setLastAction(String lastAction){
 		this.lastAction = lastAction;
 	}

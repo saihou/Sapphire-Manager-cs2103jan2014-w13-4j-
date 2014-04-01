@@ -14,8 +14,6 @@ public class CommandExecutor {
 	protected DateTimeConfiguration dateTimeConfig;
 	protected ArrayList<Task> allTasks;
 
-	protected String phase;
-
 	protected Task currentTask;
 	protected ArrayList<Task> currentTaskList;
 
@@ -34,15 +32,14 @@ public class CommandExecutor {
 	 */
 	public CommandExecutor() {
 		parser = new CommandParser();
-		history = new ActionHistory();
-		taskStorage = new Storage();
+		history = ActionHistory.getInstance();
+		taskStorage = Storage.getInstance();
 		dateTimeConfig = new DateTimeConfiguration();
 		allTasks = taskStorage.getTaskList();
-		phase = "normal";
 		currentTask = null;
 		currentTaskList = null;
 	}
-
+	
 	public String executeAddCommand(String userCommand) {
 		String systemFeedback = "";
 		userCommand = userCommand.trim();
@@ -136,7 +133,8 @@ public class CommandExecutor {
 			return false;
 		}
 	}
-
+	
+	
 	private boolean addThisTask(Task taskToBeAdded) {
 		allTasks.add(taskToBeAdded);
 
@@ -147,15 +145,15 @@ public class CommandExecutor {
 	/**
 	 * @author Si Rui
 	 */
+	
 	public String executeDisplayCommand(String userCommand) {
 		String systemFeedback = "";
-
 		if (allTasks.isEmpty()) {
 			systemFeedback = "You have no tasks.\n";
 		} else {
 			String displayType = parser.parseDisplayType(userCommand);
 			assert(displayType != null);
-
+			System.out.println("displaying : "+ displayType);
 			try {
 				prepareCurrentTaskList(displayType);
 			} catch (Exception ex) {
@@ -347,10 +345,12 @@ public class CommandExecutor {
 	private String formDisplayTextOfOneTask(int count, Task t) {
 		return "   " + count + ". " + t.getAllTaskDetails();
 	}
-
+	
+	
 	/**
 	 * @author Sai Hou
 	 */
+	
 	public String executeEditCommand(String userCommand) {
 		String systemFeedback = "";
 		userCommand = userCommand.trim();
@@ -403,23 +403,26 @@ public class CommandExecutor {
 		}
 		return systemFeedback;
 	}
-
+	
+	
 	private boolean deleteThisTask(Task taskToBeRemoved) {
 		//delete from array list
 		allTasks.remove(taskToBeRemoved);
-
+		
 		//delete from text file
 		boolean isFileWritingSuccessful = taskStorage.writeTaskListToFile();
 		return isFileWritingSuccessful;
 	}
 
+	
 	public String executeClearCommand() {
 		String systemFeedback = "";
 		taskStorage.clear();
 		systemFeedback = "Successfully cleared all tasks.";
 		return systemFeedback;
 	}
-
+	
+	
 	/**
 	 * @author Si Rui
 	 * This class extends Command class and is used to undo the last entered event. 
@@ -502,6 +505,7 @@ public class CommandExecutor {
 	/**
 	 * @author Cai Di
 	 */
+	
 	private String executeSearchCommand(String taskName){
 		String systemFeedback = "";
 		boolean isSearchingByDate = false;
@@ -538,9 +542,11 @@ public class CommandExecutor {
 		}
 		return systemFeedback;
 	}
+	
 	/**
 	 * @author Sai Hou
 	 */
+	
 	public ArrayList<Task> searchByName(String name) {
 		name = name.trim();
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
@@ -555,10 +561,11 @@ public class CommandExecutor {
 		}
 		return matchedTasks;
 	}
-
+	
 	/**
 	 * @author Si Rui
 	 */
+	
 	private ArrayList<Task> searchByDate(String date) {
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 
@@ -573,7 +580,8 @@ public class CommandExecutor {
 		}
 		return matchedTasks;
 	}
-
+	
+	
 	public ArrayList<Task> getTodaysTasks(){
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 		String todaysDate = dateTimeConfig.getTodaysDate();
@@ -588,7 +596,7 @@ public class CommandExecutor {
 
 		return matchedTasks;
 	}
-
+	
 	/**
 	 * @author Sai Hou
 	 */
@@ -598,12 +606,34 @@ public class CommandExecutor {
 		history.setCopyOfLastTask(duplicatedTask);
 	}
 
-	public String getOperation(String userCommand) {
+	private boolean isTimeToExit(String operation) {
+		return operation.equalsIgnoreCase("exit") || operation.equalsIgnoreCase("quit");
+	}
+	
+	private String getOperation(String userCommand) {
 		return getFirstWord(userCommand);
 	}
-	public String getPhase() {
-		return phase;
+	
+	private String getFirstWord(String str) {
+		return str.trim().split("\\s+")[0];
 	}
+	
+	private String getSecondWordOnwards(String str) {
+		String [] individualWordsInArray = str.split(" ");
+		StringBuilder sb = new StringBuilder();
+		boolean isFirstWord = true;
+		
+		for (String word: individualWordsInArray) {
+			if (isFirstWord) {
+				isFirstWord = false;
+				continue;
+			}
+			sb.append(word + " ");
+		}
+		return sb.toString().trim();
+	}
+	
+	
 	public ArrayList<Task> getCurrentTaskList() {
 		return currentTaskList;
 	}
@@ -614,22 +644,18 @@ public class CommandExecutor {
 	private int convertToInteger(String userCommand) {
 		return Integer.parseInt(userCommand);
 	}
-
-	private String getFirstWord(String str) {
-		return str.trim().split("\\s+")[0];
-	}
-
+	
+	
 	public String doUserOperation(String userCommand) {
 		String systemFeedback = "";
-
 		String operation = getOperation(userCommand);
 
 		boolean isValidOperation = ValidationCheck.isValidOperation(operation);
 		if (!isValidOperation) {
-			return "Wrong command entered! Enter F1 for a list of commands.";
+			return "Wrong command entered! Press F1 for help.";
 		}
 
-		if(operation.equalsIgnoreCase("exit") || operation.equalsIgnoreCase("quit")) {
+		if(isTimeToExit(operation)) {
 			System.out.println("exit");
 			System.exit(0);
 		}
@@ -642,47 +668,67 @@ public class CommandExecutor {
 	private String executeOperation(String operation, String userCommand) {
 		String systemFeedback = "";
 
+		userCommand = getSecondWordOnwards(userCommand);
+		
 		switch (operation) {
 		case "create" :
-			systemFeedback = executeAddCommand(userCommand.substring(6).trim());
-			break;
+			//fall through
 		case "new" :
-			//fallthrough
+			//fall through
 		case "add" :
-			systemFeedback = executeAddCommand(userCommand.substring(3).trim());
+			//systemFeedback = executeAddCommand(userCommand.substring(3).trim());
+			Command add = new AddCommand();
+			add.execute(userCommand);
+			systemFeedback = add.getSystemFeedback();
 			break;
 		case "show" :
-			systemFeedback = executeDisplayCommand(userCommand.substring(4).trim());
-			break;
+			//fall through
 		case "display" :
-			systemFeedback = executeDisplayCommand(userCommand.substring(7).trim());
+			//systemFeedback = executeDisplayCommand(userCommand.substring(7).trim());
+			Command display = new DisplayCommand();
+			display.execute(userCommand);
+			systemFeedback = display.getSystemFeedback();
+			currentTaskList = display.getCurrentTaskList();
 			break;
 		case "update" :
-			systemFeedback = executeEditCommand(userCommand.substring(6).trim());
-			break;
+			//fall through
 		case "edit" :
-			systemFeedback = executeEditCommand(userCommand.substring(4).trim());
+			//systemFeedback = executeEditCommand(userCommand);
+			Command edit = new EditCommand(currentTaskList);
+			edit.execute(userCommand);
+			systemFeedback = edit.getSystemFeedback();
 			break;
+        case "del" :
+        	//fall through
 		case "remove" :
-			//fallthrough
+			//fall through
 		case "delete" :
-			systemFeedback = executeDeleteCommand(userCommand.substring(6).trim());
+             //systemFeedback = executeDeleteCommand(userCommand.substring(6).trim());
+        	Command delete = new DeleteCommand(currentTaskList);
+        	delete.execute(userCommand);
+        	systemFeedback = delete.getSystemFeedback();
 			break;
 		case "clear" :
-			systemFeedback = executeClearCommand();
+			//systemFeedback = executeClearCommand();
+			Command clear = new ClearCommand();
+			clear.execute(userCommand);
+			systemFeedback = clear.getSystemFeedback();
 			break;
 		case "undo" :
 			systemFeedback = executeUndoCommand();
 			break;
 		case "find" :
-			systemFeedback = executeSearchCommand(userCommand.substring(4).trim());
-			break;
+			//fall through
 		case "search" :
-			systemFeedback = executeSearchCommand(userCommand.substring(6).trim());
+			//systemFeedback = executeSearchCommand(userCommand);
+			Command search = new SearchCommand(currentTaskList);
+			search.execute(userCommand);
+			systemFeedback = search.getSystemFeedback();
 			break;
 		default : 
 			//assert false here
-			//if program reaches here, it should fail
+			//if program reaches here, it should fail because
+			//previously, already checked for valid operation
 			assert false;
 			break;
 		}
