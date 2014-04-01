@@ -15,6 +15,7 @@ public class ValidationCheckTest {
 		assertChoice();
 		assertOperation();
 		assertDuration();
+		assertStatus();
 	}
 	private void assertDuration() {
 		assertTrue("random valid duration", ValidationCheck.isValidDuration("1000", "1001"));

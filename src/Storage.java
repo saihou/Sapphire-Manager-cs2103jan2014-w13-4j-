@@ -26,13 +26,23 @@ public class Storage {
 	private BufferedWriter bufferedWriter;
 	private File file, newFile;
 	private Task task;
-
+	
+	//instance
+	private static Storage instance = null;
 	//constructor
-	public Storage() {
+	private Storage() {
 		taskList = new ArrayList<Task>();
 		readFile();
 	}
-
+	public static Storage getInstance() {
+		if (instance == null) {
+			instance = new Storage();
+			return instance;
+		}
+		else {
+			return instance;
+		}
+	}
 	//get-set tasklist
 	public ArrayList<Task> getTaskList() {
 		System.out.println("taskList size: "+taskList.size());

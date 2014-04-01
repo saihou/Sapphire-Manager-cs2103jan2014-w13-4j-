@@ -18,7 +18,7 @@ public class CommandParser {
 	}
 	/**
 	 * @param userCommand
-	 * @return displayType, "all", "future", "past" or "today"
+	 * @return displayType, "all", "undone", "done" or "today"
 	 * @author Sai Hou
 	 */
 	public String parseDisplayType(String userCommand) {
@@ -26,33 +26,33 @@ public class CommandParser {
 		
 		userCommand = prepareUserCommandForParsing(userCommand);
 		
-		boolean isAllKeywordPresent = userCommand.contains("all");
-		boolean isFutureKeywordPresent = userCommand.contains("future");
-		boolean isPastKeywordPresent = userCommand.contains("past");
-		boolean isTodayKeywordPresent = userCommand.contains("today");
+		boolean isAllKeywordPresent = userCommand.equals("all");
+		boolean isUndoneKeywordPresent = userCommand.equals("undone");
+		boolean isDoneKeywordPresent = userCommand.equals("done");
+		boolean isTodayKeywordPresent = userCommand.equals("today");
 		
-		displayType = determineDisplayType(isFutureKeywordPresent,
-				isPastKeywordPresent, isTodayKeywordPresent, isAllKeywordPresent); 
+		displayType = determineDisplayType(isUndoneKeywordPresent,
+				isDoneKeywordPresent, isTodayKeywordPresent, isAllKeywordPresent); 
 		
 		return displayType;
 	}
 
 	/**
-	 * @param isFutureKeywordPresent
-	 * @param isPastKeywordPresent
+	 * @param isUndoneKeywordPresent
+	 * @param isDoneKeywordPresent
 	 * @param isTodayKeywordPresent
 	 * @param isAllKeywordPresent
 	 * @return error message if number of keywords > 1,
 	 * 		"future" if number of keywords == 0,
 	 * 		the respective display type otherwise.
 	 */
-	private String determineDisplayType(boolean isFutureKeywordPresent,
-			boolean isPastKeywordPresent, boolean isTodayKeywordPresent,
+	private String determineDisplayType(boolean isUndoneKeywordPresent,
+			boolean isDoneKeywordPresent, boolean isTodayKeywordPresent,
 			boolean isAllKeywordPresent) {
-		String displayType;
+		String displayType = "";
 		
-		int numberOfKeywordsPresent = getNumberOfKeywordsPresent(isAllKeywordPresent, isFutureKeywordPresent,
-				isPastKeywordPresent, isTodayKeywordPresent);
+		int numberOfKeywordsPresent = getNumberOfKeywordsPresent(isAllKeywordPresent, isUndoneKeywordPresent,
+				isDoneKeywordPresent, isTodayKeywordPresent);
 		
 		assert numberOfKeywordsPresent >=0;
 		
@@ -63,29 +63,53 @@ public class CommandParser {
 		
 		if (isAllKeywordPresent) {
 			displayType = "all";
-		} else if (isPastKeywordPresent) {
-			displayType = "past";
+		} else if (isDoneKeywordPresent) {
+			displayType = "done";
 		} else if (isTodayKeywordPresent) {
 			displayType = "today";
 		} else {
-			displayType = "future";
+			//default
+			displayType = "undone";
 		}
 		return displayType;
 	}
 
 	private int getNumberOfKeywordsPresent(boolean isAllKeywordPresent,
-			boolean isFutureKeywordPresent, boolean isPastKeywordPresent,
+			boolean isUndoneKeywordPresent, boolean isDoneKeywordPresent,
 			boolean isTodayKeywordPresent) {
 		return (isAllKeywordPresent ? 1:0) + 
-				(isFutureKeywordPresent ? 1:0) +
-				(isPastKeywordPresent ? 1:0) + 
+				(isUndoneKeywordPresent ? 1:0) +
+				(isDoneKeywordPresent ? 1:0) + 
 				(isTodayKeywordPresent ? 1:0);
 	}
 
+	public String parseClearType(String userCommand) {
+		String clearType = "";
+		
+		userCommand = prepareUserCommandForParsing(userCommand);
+		
+		boolean isAllKeywordPresent = userCommand.equals("all");
+		
+		clearType = determineClearType(isAllKeywordPresent); 
+		
+		return clearType;
+	}
+	
+	private String determineClearType(boolean isAllKeywordPresent) {
+		String clearType = "";
+		
+		if (isAllKeywordPresent) {
+			clearType = "all";
+		} else {
+			//default
+			clearType = "done";
+		}
+		return clearType;
+	}
+	
 	private String prepareUserCommandForParsing(String userCommand) {
 		return userCommand.trim().toLowerCase();
 	}
-	
 	
 	/**
 	 * @author Cai Di
@@ -111,6 +135,10 @@ public class CommandParser {
 		for (int i = 0; i < taskDetails.length; i++) {
 			taskDetails[i] = null;
 		}
+
+		if (isSuppliedInputEmpty(input)) {
+			return;
+		}
 		
 		input = extractName(input);
 		
@@ -129,6 +157,8 @@ public class CommandParser {
 			case "from":
 				extractDuration(temp[i]);
 				break;
+			case "by":
+				//fall through
 			case "at":
 				extractDeadline(temp[i]);
 				break;
@@ -208,5 +238,16 @@ public class CommandParser {
 
 	private void extractLocation(String inputFragment) {
 		taskDetails[5] = inputFragment.substring(3).trim();
-	}	
+	}
+	
+	/**
+	 * @author Sai Hou
+	 */
+	private boolean isSuppliedInputEmpty(String input) {
+		if (input.trim().equals("")) {
+			invalidFeedBack = "Empty input!";
+			return true;
+		}
+		return false;
+	}
 }

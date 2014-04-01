@@ -130,19 +130,20 @@ public class SapphireManagerGUI {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					todaysTasks = new ArrayList<Task>(); //instantiate ArrayList to store task list
+					//todaysTasks = new ArrayList<Task>(); //instantiate ArrayList to store task list
 					guiWindow = new SapphireManagerGUI(); //instantiate GUI window
 					myExecutor = new CommandExecutor(); //instantiate CommandExecutor
-					todaysTasks = myExecutor.getTodaysTasks(); //get the task(s) for the day					
+					//todaysTasks = myExecutor.getTodaysTasks(); //get the task(s) for the day					
 
 					//checks if there available tasks and display the following information
-					if(todaysTasks.isEmpty()) {
+					/*if(todaysTasks.isEmpty()) {
 						displaySystemMessage(MESSAGE_NO_TASK_TO_DISPLAY_TODAY); //no tasks
 					} else {
 						//displaySystemMessage(MESSAGE_TODAY_TASK_TITLE);
 						displayNormalMessage(myExecutor.executeDisplayCommand("today"));
-					}
-
+					}*/
+					displayNormalMessage(myExecutor.doUserOperation("display today"));
+					
 					guiWindow.guiFrame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
