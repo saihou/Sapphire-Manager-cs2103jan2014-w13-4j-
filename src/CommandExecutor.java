@@ -182,8 +182,11 @@ public class CommandExecutor {
 		switch (displayType) {
 		case "all" : 
 			break;
+		case "overdue" :
+			currentTaskList = getOverdue();
+			//Fall through
 		case "memos" :
-			//currentTaskList = getMemos();
+			currentTaskList = getMemos();
 			//Fall through
 		case "today" :
 			currentTaskList = getTodaysTasks();
@@ -200,6 +203,28 @@ public class CommandExecutor {
 			throw new IllegalArgumentException(MESSAGE_INVALID_COMMAND);
 		}
 		return true;
+	}
+	
+	private ArrayList<Task> getOverdue(){
+		ArrayList<Task> matchedTasks = new ArrayList<Task>();
+		String todaysDate = dateTimeConfig.getTodaysDate();
+		for (Task t : allTasks) {
+			String taskDate = t.getDate();
+			if (taskDate != null && isOverdueTask(taskDate, todaysDate)) {
+				matchedTasks.add(t);
+			}
+		}
+		return matchedTasks;
+	}
+	
+	private ArrayList<Task> getMemos(){
+		ArrayList<Task> matchedTasks = new ArrayList<Task>();
+		for (Task t : allTasks) {
+			if (isMemo(t)) {
+				matchedTasks.add(t);
+			}
+		}
+		return matchedTasks;
 	}
 
 	private ArrayList<Task> getTasksBasedOnCompletion(ArrayList<Task> taskList, 
@@ -550,9 +575,15 @@ public class CommandExecutor {
 	}
 
 	public ArrayList<Task> getTodaysTasks(){
+		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 		String todaysDate = dateTimeConfig.getTodaysDate();
 
-		ArrayList<Task> matchedTasks = searchByDate(todaysDate);
+		for (Task t : allTasks) {
+			String taskDate = t.getDate();
+			if (taskDate != null && dateTimeConfig.isPastOrToday(taskDate, todaysDate)) {
+				matchedTasks.add(t);
+			}
+		}
 		matchedTasks = getTasksBasedOnCompletion(matchedTasks, false);
 
 		return matchedTasks;

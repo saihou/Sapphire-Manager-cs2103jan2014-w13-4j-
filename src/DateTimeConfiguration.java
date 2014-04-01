@@ -36,6 +36,15 @@ public class DateTimeConfiguration {
 		return displayDateFormat.format(date);
 	}
 	
+	public boolean isPastOrToday(String taskDate, String todaysDate) {
+		long differenceInDays = getDifferenceInDays(taskDate, todaysDate);
+		
+		if (differenceInDays <= 0) {
+			return true;
+		}
+		return false;
+	}
+	
 	public boolean isAfterAWeek(String taskDate, String todaysDate) {
 		long differenceInDays = getDifferenceInDays(taskDate, todaysDate);
 		
