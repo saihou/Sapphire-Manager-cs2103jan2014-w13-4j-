@@ -27,6 +27,7 @@ public class CommandExecutor {
 	private final static String HEADING_THIS_WEEK = "Tasks Occurring/Due Within This Week:\n";
 	private final static String HEADING_AFTER_A_WEEK = "Tasks Occurring/Due More Than A Week Later:\n";
 	private final static String HEADING_MEMO = "Memos:\n";
+	private final static String HEADING_COMPLETED = "Completed Tasks:\n";
 
 	/**
 	 * @author Sai Hou
@@ -181,6 +182,9 @@ public class CommandExecutor {
 		switch (displayType) {
 		case "all" : 
 			break;
+		case "memos" :
+			//currentTaskList = getMemos();
+			//Fall through
 		case "today" :
 			currentTaskList = getTodaysTasks();
 			//Fall through
@@ -223,6 +227,23 @@ public class CommandExecutor {
 	}
 
 	private String formDisplayText() {
+		ArrayList<Task> uncompletedTasks = getTasksBasedOnCompletion(currentTaskList, false);
+		ArrayList<Task> completedTasks = getTasksBasedOnCompletion(currentTaskList, true);
+		
+		String displayText = "";
+		int numberOfUncompletedTasks = 0;
+		if (!uncompletedTasks.isEmpty()) {
+			displayText += formDisplayTextUncompletedTasks(uncompletedTasks);
+			numberOfUncompletedTasks = uncompletedTasks.size();
+		}
+		if (!completedTasks.isEmpty()) {
+			displayText += formDisplayTextCompletedTasks(completedTasks, numberOfUncompletedTasks);
+		}
+		
+		return displayText;
+	}
+
+	private String formDisplayTextUncompletedTasks(ArrayList<Task> taskList) {
 		String displayText = "";
 		String todaysDate = dateTimeConfig.getTodaysDate();
 
@@ -234,7 +255,7 @@ public class CommandExecutor {
 
 		int count = 1;
 
-		for (Task t : currentTaskList) {
+		for (Task t : taskList) {
 			String taskDate = t.getDate();
 			if (isMemo(t)) {
 				if (!isPrintingMemos) {
@@ -242,7 +263,7 @@ public class CommandExecutor {
 					isPrintingMemos = true;
 				}
 			} else if (isOverdueTask(taskDate, todaysDate) && !isPrintingOverdue) {
-				displayText += '\n' + HEADING_OVERDUE;
+				displayText += HEADING_OVERDUE;
 				isPrintingOverdue = true;
 			} else if (isTodaysTask(taskDate, todaysDate) && !isPrintingToday) {
 				displayText += '\n' + HEADING_TODAY;
@@ -259,7 +280,22 @@ public class CommandExecutor {
 		}
 		return displayText;
 	}
-
+	
+	private String formDisplayTextCompletedTasks(ArrayList<Task> taskList, int continueNumbering) {
+		String displayText = "";
+		
+		if (continueNumbering == 0){
+			displayText += HEADING_COMPLETED;
+		} else {
+			displayText += '\n' + HEADING_COMPLETED;
+		}
+		
+		for (int i = 0; i < taskList.size(); i++) {
+			displayText += formDisplayTextOfOneTask((i+1)+continueNumbering, taskList.get(i));
+		}
+		return displayText;
+	}
+	
 	private boolean isMemo(Task t) {
 		String taskType = t.getType();
 		return (taskType.equals("noSetTiming")) ? true : false;
