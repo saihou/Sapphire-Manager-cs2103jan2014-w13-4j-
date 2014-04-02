@@ -40,20 +40,23 @@ public class DisplayCommand extends Command {
 		} else {
 			String displayType = parser.parseDisplayType(userCommand);
 			assert(displayType != null);
+			
 			System.out.println("displaying : "+ displayType);
+			
 			try {
 				prepareCurrentTaskList(displayType);
+				
+				if (currentTaskList.isEmpty()) {
+					systemFeedback = getFeedbackIfHaveNoTasks(displayType);
+				}
+
+				if (systemFeedback.equals("")){
+					systemFeedback = formDisplayText();
+				}
 			} catch (Exception ex) {
 				System.out.println(ex.getMessage());
-			}
-
-			if (currentTaskList.isEmpty()) {
-				systemFeedback = getFeedbackIfHaveNoTasks(displayType);
-			}
-
-			if (systemFeedback.equals("")){
-				systemFeedback = formDisplayText();
-			}
+				systemFeedback = ex.getMessage();
+			} 
 		}
 	}
 
@@ -61,22 +64,24 @@ public class DisplayCommand extends Command {
 		Collections.sort(allTasks);
 		currentTaskList = new ArrayList<Task>(allTasks);
 
-		boolean isDone;
+		boolean isDone = false;
 
 		switch (displayType) {
 		case "all" : 
 			break;
 		case "overdue" :
 			currentTaskList = getOverdue();
-			//Fall through
+			currentTaskList = getTasksBasedOnCompletion(currentTaskList, isDone);
+			break;
 		case "memos" :
 			currentTaskList = getMemos();
-			//Fall through
+			currentTaskList = getTasksBasedOnCompletion(currentTaskList, isDone);
+			break;
 		case "today" :
 			currentTaskList = getTodaysTasks();
-			//Fall through
+			currentTaskList = getTasksBasedOnCompletion(currentTaskList, isDone);
+			break;
 		case "undone" :
-			isDone = false;
 			currentTaskList = getTasksBasedOnCompletion(currentTaskList, isDone);
 			break;
 		case "done" :

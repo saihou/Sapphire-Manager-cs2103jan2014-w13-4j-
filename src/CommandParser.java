@@ -27,12 +27,15 @@ public class CommandParser {
 		userCommand = prepareUserCommandForParsing(userCommand);
 		
 		boolean isAllKeywordPresent = userCommand.equals("all");
-		boolean isUndoneKeywordPresent = userCommand.equals("undone");
+		boolean isUndoneKeywordPresent = userCommand.equals("undone") || userCommand.equals("");
 		boolean isDoneKeywordPresent = userCommand.equals("done");
 		boolean isTodayKeywordPresent = userCommand.equals("today");
+		boolean isOverdueKeywordPresent = userCommand.equals("overdue");
+		boolean isMemosKeywordPresent = userCommand.equals("memos");
 		
 		displayType = determineDisplayType(isUndoneKeywordPresent,
-				isDoneKeywordPresent, isTodayKeywordPresent, isAllKeywordPresent); 
+				isDoneKeywordPresent, isTodayKeywordPresent, isAllKeywordPresent,
+				isOverdueKeywordPresent, isMemosKeywordPresent); 
 		
 		return displayType;
 	}
@@ -42,22 +45,30 @@ public class CommandParser {
 	 * @param isDoneKeywordPresent
 	 * @param isTodayKeywordPresent
 	 * @param isAllKeywordPresent
+	 * @param isOverdueKeywordPresent
+	 * @param isMemoesKeywordPresent
 	 * @return error message if number of keywords > 1,
 	 * 		"future" if number of keywords == 0,
 	 * 		the respective display type otherwise.
 	 */
 	private String determineDisplayType(boolean isUndoneKeywordPresent,
 			boolean isDoneKeywordPresent, boolean isTodayKeywordPresent,
-			boolean isAllKeywordPresent) {
+			boolean isAllKeywordPresent, boolean isOverdueKeywordPresent,
+			boolean isMemosKeywordPresent) {
 		String displayType = "";
 		
 		int numberOfKeywordsPresent = getNumberOfKeywordsPresent(isAllKeywordPresent, isUndoneKeywordPresent,
-				isDoneKeywordPresent, isTodayKeywordPresent);
+				isDoneKeywordPresent, isTodayKeywordPresent, isOverdueKeywordPresent, isMemosKeywordPresent);
 		
 		assert numberOfKeywordsPresent >=0;
 		
 		if (numberOfKeywordsPresent > 1 ) {
 			displayType = "Invalid number of keywords!!";
+			return displayType;
+		}
+		
+		if (numberOfKeywordsPresent < 1) {
+			displayType = "Invalid keyword(s) entered!";
 			return displayType;
 		}
 		
@@ -67,7 +78,11 @@ public class CommandParser {
 			displayType = "done";
 		} else if (isTodayKeywordPresent) {
 			displayType = "today";
-		} else {
+		} else if (isOverdueKeywordPresent) {
+			displayType = "overdue";
+		} else if (isMemosKeywordPresent) {
+			displayType = "memos";
+		} else { 
 			//default
 			displayType = "undone";
 		}
@@ -76,11 +91,14 @@ public class CommandParser {
 
 	private int getNumberOfKeywordsPresent(boolean isAllKeywordPresent,
 			boolean isUndoneKeywordPresent, boolean isDoneKeywordPresent,
-			boolean isTodayKeywordPresent) {
+			boolean isTodayKeywordPresent, boolean isOverdueKeywordPresent,
+			boolean isMemosKeywordPresent) {
 		return (isAllKeywordPresent ? 1:0) + 
 				(isUndoneKeywordPresent ? 1:0) +
 				(isDoneKeywordPresent ? 1:0) + 
-				(isTodayKeywordPresent ? 1:0);
+				(isTodayKeywordPresent ? 1:0) +
+				(isOverdueKeywordPresent ? 1:0) +
+				(isMemosKeywordPresent ? 1:0);
 	}
 
 	public String parseClearType(String userCommand) {
