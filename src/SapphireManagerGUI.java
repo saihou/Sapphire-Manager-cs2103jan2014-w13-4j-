@@ -409,12 +409,12 @@ public class SapphireManagerGUI {
 
 	//displays normal message
 	private static void displayNormalMessage(String message) {
-		appendToDisplayBox(message, Color.WHITE, "Segoe UI", 14);
+		appendToDisplayBox(message, Color.WHITE, "Trebuchet MS", 14);
 	}
 
 	//displays system message
 	private static void displaySystemMessage(String message) {
-		appendToDisplayBox(message, new Color(0xff6c00), "Segoe UI", 14);
+		appendToDisplayBox(message, new Color(0xff6c00), "Trebuchet MS", 14);
 	}
 /*
 	//displays highlighted message
