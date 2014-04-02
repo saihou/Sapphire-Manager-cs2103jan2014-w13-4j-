@@ -741,13 +741,16 @@ public class CommandExecutor {
 		//and appending them to a StringBuilder. At the end, the StringBuilder is
 		//converted to a String and returned so that JUnit can assertEquals();
 
+		
 		StringBuilder sb = new StringBuilder();
 		int count = 1;
 		for(Task task : allTasks){
 			sb.append(count+ ". ");
 			sb.append(task.getAllTaskDetails());
 		}
+		
 		return sb.toString();
+		//return executeDisplayCommand("undone");
 	}
 
 

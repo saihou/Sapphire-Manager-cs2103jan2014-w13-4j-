@@ -51,16 +51,16 @@ public class CommandExecutorTest {
 	private void assertAddATaskWithNoSetTiming(CommandExecutor exec) {
 		exec.executeAddCommand("nosettiming");
 		assertEquals("Desc: Adding a task with no set timing", 
-				"1. nosettiming\n", exec.jUnitAutomatedTest());
+				"1. Nosettiming\n", exec.jUnitAutomatedTest());
 		
 		exec.executeClearCommand();
 	}
 	private void assertAddATaskWithDuration(CommandExecutor exec) {
 		exec.executeAddCommand("setduration /on 121214 /from 0000 to 0001");
 		assertEquals("Desc: Adding a task with set duration", 
-				"1. setduration\n" + 
-				"\tDate: 121214\n" +
-				"\tTime: 0000 to 0001\n", 
+				"1. Setduration\n" + 
+				"      12-Dec-2014\n" +
+				"      From 00:00 to 00:01\n", 
 				exec.jUnitAutomatedTest());
 
 		exec.executeClearCommand();
@@ -68,9 +68,9 @@ public class CommandExecutorTest {
 	private void assertAddATaskWithDeadline(CommandExecutor exec) {
 		exec.executeAddCommand("deadline /on 121214 /at 0000");
 		assertEquals("Desc: Adding a task with deadline",
-				"1. deadline\n" + 
-				"\tDate: 121214\n" +
-				"\tTime: 0000\n",  
+				"1. Deadline\n" + 
+				"      12-Dec-2014\n" +
+				"      At/By 00:00\n",  
 				exec.jUnitAutomatedTest());
 
 		exec.executeClearCommand();
@@ -78,8 +78,8 @@ public class CommandExecutorTest {
 	private void assertAddAFullDayTask(CommandExecutor exec) {
 		exec.executeAddCommand("fullday /on 121214");
 		assertEquals("Desc: Adding a full day task", 
-				"1. fullday\n" + 
-				"\tDate: 121214\n", 
+				"1. Fullday\n" + 
+				"      12-Dec-2014\n", 
 				exec.jUnitAutomatedTest());
 		
 		exec.executeClearCommand();
@@ -87,8 +87,8 @@ public class CommandExecutorTest {
 	private void assertAddATaskWithKeywordsInItsTaskName(CommandExecutor exec) {
 		exec.executeAddCommand("from to loc on at /on 121214");
 		assertEquals("Desc: Adding a task with keywords in task name", 
-				"1. from to loc on at\n" + 
-				"\tDate: 121214\n", 
+				"1. From to loc on at\n" + 
+				"      12-Dec-2014\n", 
 				exec.jUnitAutomatedTest());
 		
 		exec.executeClearCommand();
@@ -125,17 +125,21 @@ public class CommandExecutorTest {
 	//This is a boundary test case for one task in list
 	private void assertFeedbackForDisplayAll(CommandExecutor exec) {
 		assertEquals("Display all command execution", 
-				"121214\n" +
-						"\t1. Eat peanut butter\n" +
-						"\tLocation: Home\n\n",
+				"\nTasks Occurring/Due More Than A Week Later:\n" +
+						"   1. Eat peanut butter\n" +
+						"      12-Dec-2014\n" +
+						"      Home\n",
 				exec.executeDisplayCommand("/all"));
 	}
 	
 	//This is a boundary test case for no tasks in list
 	private void assertFeedbackForDisplayPast(CommandExecutor exec) {
 		assertEquals("Display past command execution", 
-				"You have no completed tasks.",
-				exec.executeDisplayCommand("/past"));
+				"\nTasks Occurring/Due More Than A Week Later:\n" +
+						"   1. Eat peanut butter\n" +
+						"      12-Dec-2014\n" +
+						"      Home\n",
+				exec.executeDisplayCommand("/done"));
 	}
 	
 	private void assertFeedbackForUndoAfterAdd(CommandExecutor exec) {
