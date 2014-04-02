@@ -36,14 +36,25 @@ public class DateTimeConfiguration {
 		return displayDateFormat.format(date);
 	}
 	
-	public boolean isAfterAWeek(String taskD, String todaysD) {
-		if (!isThisWeek(taskD, todaysD)) {
+	public boolean isAfterAWeek(String taskDate, String todaysDate) {
+		long differenceInDays = getDifferenceInDays(taskDate, todaysDate);
+		
+		if (differenceInDays >= 7) {
 			return true;
 		}
 		return false;
 	}
 
-	public boolean isThisWeek(String taskD, String todaysD) {
+	public boolean isThisWeekButNotToday(String taskDate, String todaysDate) {
+		long differenceInDays = getDifferenceInDays(taskDate, todaysDate);
+		
+		if (differenceInDays > 0 && differenceInDays < 7) {
+			return true;
+		}
+		return false;
+	}
+	
+	private long getDifferenceInDays(String taskD, String todaysD) {
 		Date taskDate = null;
 		Date todaysDate = null;
 		try {
@@ -56,10 +67,7 @@ public class DateTimeConfiguration {
 		long differenceInMilliseconds = taskDate.getTime() - todaysDate.getTime();
 		long differenceInDays = TimeUnit.MILLISECONDS.toDays(differenceInMilliseconds); 
 		
-		if (differenceInDays < 7) {
-			return true;
-		}
-		return false;
+		return differenceInDays;
 	}
 
 	/* 

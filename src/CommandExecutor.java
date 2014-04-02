@@ -247,7 +247,7 @@ public class CommandExecutor {
 			} else if (isTodaysTask(taskDate, todaysDate) && !isPrintingToday) {
 				displayText += '\n' + HEADING_TODAY;
 				isPrintingToday = true;
-			} else if (isThisWeeksTask(taskDate, todaysDate) && !isPrintingWeek) {
+			} else if (isThisWeeksButNotTodaysTask(taskDate, todaysDate) && !isPrintingWeek) {
 				displayText += '\n' + HEADING_THIS_WEEK;
 				isPrintingWeek = true;
 			} else if (isAfterThisWeeksTask(taskDate, todaysDate) && !isPrintingAfterAWeek) {
@@ -275,12 +275,8 @@ public class CommandExecutor {
 		return (taskDate.equals(todaysDate)) ? true : false;
 	}
 
-	private boolean isThisWeeksTask(String taskDate, String todaysDate) {
-		if (taskDate.equals(todaysDate)) {
-			return false;
-		} else {
-			return (dateTimeConfig.isThisWeek(taskDate, todaysDate)) ? true : false;
-		}
+	private boolean isThisWeeksButNotTodaysTask(String taskDate, String todaysDate) {
+		return (dateTimeConfig.isThisWeekButNotToday(taskDate, todaysDate)) ? true : false;
 	}
 
 	private boolean isAfterThisWeeksTask(String taskDate, String todaysDate) {
