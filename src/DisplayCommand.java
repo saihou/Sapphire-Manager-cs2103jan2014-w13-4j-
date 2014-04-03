@@ -62,31 +62,32 @@ public class DisplayCommand extends Command {
 
 	private boolean prepareCurrentTaskList(String displayType) throws IllegalArgumentException {
 		Collections.sort(allTasks);
-		currentTaskList = new ArrayList<Task>(allTasks);
 
+		//Set currentTaskList to default: all undone tasks
 		boolean isDone = false;
+		currentTaskList = getTasksBasedOnCompletion(allTasks, isDone);
 
 		switch (displayType) {
 		case "all" : 
+			//Append completed tasks at the end of list
+			isDone = true;
+			ArrayList<Task> completedTasks = getTasksBasedOnCompletion(allTasks, isDone);
+			currentTaskList.addAll(completedTasks);
 			break;
 		case "overdue" :
-			currentTaskList = getOverdue();
-			currentTaskList = getTasksBasedOnCompletion(currentTaskList, isDone);
+			currentTaskList = getOverdue(currentTaskList);
 			break;
 		case "memos" :
-			currentTaskList = getMemos();
-			currentTaskList = getTasksBasedOnCompletion(currentTaskList, isDone);
+			currentTaskList = getMemos(currentTaskList);
 			break;
 		case "today" :
 			currentTaskList = getTodaysTasks();
-			currentTaskList = getTasksBasedOnCompletion(currentTaskList, isDone);
 			break;
 		case "undone" :
-			currentTaskList = getTasksBasedOnCompletion(currentTaskList, isDone);
 			break;
 		case "done" :
 			isDone = true;
-			currentTaskList = getTasksBasedOnCompletion(currentTaskList, isDone);
+			currentTaskList = getTasksBasedOnCompletion(allTasks, isDone);
 			break;
 		default :
 			throw new IllegalArgumentException(MESSAGE_INVALID_COMMAND);
@@ -94,10 +95,10 @@ public class DisplayCommand extends Command {
 		return true;
 	}
 	
-	private ArrayList<Task> getOverdue(){
+	private ArrayList<Task> getOverdue(ArrayList<Task> taskList){
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 		String todaysDate = dateTimeConfig.getTodaysDate();
-		for (Task t : allTasks) {
+		for (Task t : taskList) {
 			String taskDate = t.getDate();
 			if (taskDate != null && isOverdueTask(taskDate, todaysDate)) {
 				matchedTasks.add(t);
@@ -106,9 +107,9 @@ public class DisplayCommand extends Command {
 		return matchedTasks;
 	}
 	
-	private ArrayList<Task> getMemos(){
+	private ArrayList<Task> getMemos(ArrayList<Task> taskList){
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
-		for (Task t : allTasks) {
+		for (Task t : taskList) {
 			if (isMemo(t)) {
 				matchedTasks.add(t);
 			}
