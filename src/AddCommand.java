@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class AddCommand extends Command {
 	
 	public CommandParser parser = null;
@@ -12,21 +10,19 @@ public class AddCommand extends Command {
 	@Override
 	public void execute(String userCommand) {
 		userCommand = userCommand.trim();
-		Task taskToBeAdded = new Task();
+		currentTask = new Task();
 		
-		systemFeedback = parseAndModifyTask(userCommand, taskToBeAdded, "add");
+		systemFeedback = parseAndModifyTask(userCommand, currentTask, "add");
 		
 		if (systemFeedback.equals("Successfully parsed")) {
-			boolean isAdditionOfNewTaskSuccessful = addThisTask(taskToBeAdded);
+			boolean isAdditionOfNewTaskSuccessful = addThisTask(currentTask);
 			if (isAdditionOfNewTaskSuccessful) {
-				systemFeedback = "Successfully added \"" + taskToBeAdded.getName() + "\".";
-				updateHistory("add", taskToBeAdded, null);
+				systemFeedback = "Successfully added \"" + currentTask.getName() + "\".";
 			}
 			else {
-				systemFeedback = "Unable to add \"" + taskToBeAdded.getName() + "\".";
+				systemFeedback = "Unable to add \"" + currentTask.getName() + "\".";
 			}
 		}
-		task = taskToBeAdded;
 	}
 	
 	protected String parseAndModifyTask(String userCommand, Task taskToBeModified, String operation) {
@@ -59,7 +55,6 @@ public class AddCommand extends Command {
 	}
 
 	private void setTaskDetails(Task task, String[] taskDetails) {
-		for (String s: taskDetails) System.out.println(s);
 		if (taskDetails[0] != null) {
 			task.setName(taskDetails[0]);
 		}
@@ -103,10 +98,22 @@ public class AddCommand extends Command {
 		}
 	}
 
-	private boolean addThisTask(Task taskToBeAdded) {
+	protected boolean addThisTask(Task taskToBeAdded) {
 		allTasks.add(taskToBeAdded);
 		
 		boolean isFileWritingSuccessful = taskStorage.writeATaskToFile(taskToBeAdded, true);
 		return isFileWritingSuccessful;
+	}
+	
+	@Override
+	public void undo() {
+		allTasks.remove(currentTask);
+		
+		if (taskStorage.writeTaskListToFile()) {
+			systemFeedback = "Undo previous addition: Successfully deleted \""+ currentTask.getName() + "\"";
+		}
+		else {
+			systemFeedback = "Cannot undo!";
+		}
 	}
 }

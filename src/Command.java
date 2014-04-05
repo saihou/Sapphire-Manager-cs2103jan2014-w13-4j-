@@ -3,19 +3,19 @@ import java.util.ArrayList;
 public abstract class Command {
 	
 	protected String systemFeedback;
+	protected Task currentTask;
 	protected ArrayList<Task> currentTaskList;
 	protected ArrayList<Task> allTasks;
-	protected ActionHistory history;
 	protected Storage taskStorage;
-	protected Task task;
+	protected Result result;
 	
 	public Command() {
 		systemFeedback = "";
-		history = ActionHistory.getInstance();
 		taskStorage = Storage.getInstance();
 		allTasks = taskStorage.getTaskList();
 		currentTaskList = allTasks;
-		task = null;
+		currentTask = null;
+		result = new Result();
 	}
 	
 	public Command(ArrayList<Task> current) {
@@ -23,19 +23,33 @@ public abstract class Command {
 		currentTaskList = current;
 	}
 	
+	//to be implemented
 	public abstract void execute(String s);
+	
+	//undo-able commands = add, edit and delete
+	//undo-able commands should override this method
+	public void undo() {
+		return;
+	}
 	
 	public String getSystemFeedback() {
 		return systemFeedback;
+	}
+	
+	public Result getResult() {
+		return result;
 	}
 	
 	public ArrayList<Task> getCurrentTaskList() {
 		return currentTaskList;
 	}
 	
-	public void updateHistory(String lastAction, Task reference, Task duplicatedTask) {
-		history.setLastAction(lastAction);
-		history.setReferenceToLastTask(reference);
-		history.setCopyOfLastTask(duplicatedTask);
+	public Task getCurrentTask() {
+		return currentTask;
+	}
+	
+	//edit command should override this method
+	public Task getEditedTask() {
+		return new Task();
 	}
 }
