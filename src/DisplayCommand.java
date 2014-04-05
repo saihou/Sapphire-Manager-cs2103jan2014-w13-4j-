@@ -18,6 +18,13 @@ public class DisplayCommand extends Command {
 	private final static String HEADING_MEMO = "Memos:\n";
 	private final static String HEADING_COMPLETED = "Completed Tasks:\n";
 	
+	private final static String FEEDBACK_NO_OVERDUE = "You have no overdue tasks.";
+	private final static String FEEDBACK_NO_MEMOS = "You have no memos.";
+	private final static String FEEDBACK_NO_DONE = "You have no completed tasks.";
+	private final static String FEEDBACK_NO_TODAY = "You have no tasks for today.";
+	private final static String FEEDBACK_NO_UNDONE = "You have no uncompleted tasks.";
+	private final static String FEEDBACK_NO_TASKS = "You have no tasks.";
+	
 	public DisplayCommand() {
 		super();
 		dateTimeConfig = new DateTimeConfiguration();
@@ -36,7 +43,7 @@ public class DisplayCommand extends Command {
 	public void executeDisplayCommand(String userCommand) {
 		systemFeedback = "";
 		if (allTasks.isEmpty()) {
-			systemFeedback = "You have no tasks.\n";
+			systemFeedback = FEEDBACK_NO_TASKS;
 		} else {
 			String displayType = parser.parseDisplayType(userCommand);
 			assert(displayType != null);
@@ -131,12 +138,16 @@ public class DisplayCommand extends Command {
 
 	private String getFeedbackIfHaveNoTasks(String displayType) {
 		String feedback = "";
-		if (displayType.equals("past")) {
-			feedback = "You have no completed tasks.";
+		if (displayType.equals("overdue")) {
+			feedback = FEEDBACK_NO_OVERDUE;
+		} else if (displayType.equals("memos")) {
+			feedback = FEEDBACK_NO_MEMOS;
+		} else if (displayType.equals("done")) {
+			feedback = FEEDBACK_NO_DONE;
 		} else if (displayType.equals("today")) {
-			feedback = "You have no tasks for today.";
-		} else if (displayType.equals("future")) {
-			feedback = "You have no uncompleted tasks.";
+			feedback = FEEDBACK_NO_TODAY;
+		} else if (displayType.equals("undone")) {
+			feedback = FEEDBACK_NO_UNDONE;
 		}
 		return feedback;
 	}
@@ -251,11 +262,5 @@ public class DisplayCommand extends Command {
 		matchedTasks = getTasksBasedOnCompletion(matchedTasks, false);
 
 		return matchedTasks;
-	}
-	
-	private String getTodaysDate(){
-		SimpleDateFormat dateFormatter = new SimpleDateFormat("ddMMyy");
-		Calendar date = Calendar.getInstance();
-		return dateFormatter.format(date.getTime());
 	}
 }

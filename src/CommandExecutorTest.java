@@ -96,10 +96,13 @@ public class CommandExecutorTest {
 	
 	private void assertFeedbackForCommands(CommandExecutor exec) {
 		assertFeedbackForClear(exec);
+		assertFeedbackForDisplayDefaultNoTasks(exec);
+		
 		assertFeedbackForAdd(exec);
 		assertFeedbackForDisplayAll(exec);
-		assertFeedbackForDisplayPast(exec);
+		assertFeedbackForDisplayOthers(exec);
 		assertFeedbackForUndoAfterAdd(exec);
+		
 		
 		//assertFeedbackForEdit(exec);
 		//assertFeedbackForUndoAfterEdit(exec);
@@ -129,17 +132,41 @@ public class CommandExecutorTest {
 						"   1. Eat peanut butter\n" +
 						"      12-Dec-2014\n" +
 						"      Home\n",
-				exec.executeDisplayCommand("/all"));
-	}
-	
-	//This is a boundary test case for no tasks in list
-	private void assertFeedbackForDisplayPast(CommandExecutor exec) {
-		assertEquals("Display past command execution", 
+				exec.executeDisplayCommand("all"));
+		assertEquals("Display undone command execution",
 				"\nTasks Occurring/Due More Than A Week Later:\n" +
 						"   1. Eat peanut butter\n" +
 						"      12-Dec-2014\n" +
 						"      Home\n",
-				exec.executeDisplayCommand("/done"));
+				exec.executeDisplayCommand("undone"));
+		assertEquals("Display default command execution",
+				"\nTasks Occurring/Due More Than A Week Later:\n" +
+						"   1. Eat peanut butter\n" +
+						"      12-Dec-2014\n" +
+						"      Home\n",
+				exec.executeDisplayCommand(""));
+	}
+	
+	//This is a boundary test case for no done tasks, todays tasks, memos in list
+	private void assertFeedbackForDisplayOthers(CommandExecutor exec) {
+		assertEquals("Display done command execution", 
+				"You have no completed tasks.\n",
+				exec.executeDisplayCommand("done"));
+		assertEquals("Display done command execution", 
+				"You have no memos.\n",
+				exec.executeDisplayCommand("memos"));
+		assertEquals("Display overdue command execution",
+				"You have no overdue tasks.\n",
+				exec.executeDisplayCommand("overdue"));
+		assertEquals("Display overdue command execution",
+				"You have no tasks for today.\n",
+				exec.executeDisplayCommand("today"));	
+	}
+	
+	private void assertFeedbackForDisplayDefaultNoTasks(CommandExecutor exec) {
+		assertEquals("Display default command execution",
+				"You have no tasks.\n",
+				exec.executeDisplayCommand(""));
 	}
 	
 	private void assertFeedbackForUndoAfterAdd(CommandExecutor exec) {
