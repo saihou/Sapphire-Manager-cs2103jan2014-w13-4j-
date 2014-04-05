@@ -8,6 +8,7 @@
  *
  */
 public class ActionHistory {
+	
 	private static ActionHistory instance = null;
 	
 	private String lastAction;

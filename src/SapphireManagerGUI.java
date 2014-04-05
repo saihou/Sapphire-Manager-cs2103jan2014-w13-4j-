@@ -275,6 +275,9 @@ public class SapphireManagerGUI {
 				updateScrollBar();
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 					if(!inputBox.getText().trim().equals("")) {
+						
+						//clearDisplayBox();
+						
 						String userCommand = readCommandFromUser();
 						String systemFeedback = myExecutor.doUserOperation(userCommand);
 

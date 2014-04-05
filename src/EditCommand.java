@@ -3,8 +3,12 @@ import java.util.ArrayList;
 
 public class EditCommand extends AddCommand {
 	
+	Task editedTask;
+	ArrayList<Task> state;
+	
 	public EditCommand(ArrayList<Task> current) {
 		super();
+		state = new ArrayList<Task>(allTasks);
 		currentTaskList = current;
 	}
 	
@@ -19,20 +23,23 @@ public class EditCommand extends AddCommand {
 
 			if (isValidChoice) {
 				int choice = convertToInteger(userChoice);
-				Task currentTask = currentTaskList.get(choice-1);
-				task = new Task(currentTask);
+				currentTask = currentTaskList.get(choice-1);
+				editedTask = new Task(currentTask);
 
 				String userModifications = userCommand.substring(userChoice.length()).trim();
 
-				systemFeedback = parseAndModifyTask(userModifications, currentTask, "edit");
+				systemFeedback = parseAndModifyTask(userModifications, editedTask, "edit");
 
 				if (systemFeedback.equals("Successfully parsed")) {
-					boolean isEditSuccessful = taskStorage.writeTaskListToFile();
-
-					if (isEditSuccessful) {
-						systemFeedback = "Successfully made changes to \"" + currentTask.getName() +"\".";
-						updateHistory("edit", currentTask, task);
+					boolean success = addFirstTaskAndDeleteSecondTask(editedTask, currentTask);
+					
+					if (success) {
+						systemFeedback = "Successfully made changes to \"" + editedTask.getName() +"\".";
+					} else {
+						systemFeedback = "Unable to edit";
 					}
+				} else {
+					systemFeedback = "Unable to parse input";
 				}
 			} else {
 				systemFeedback = "Invalid number";
@@ -41,7 +48,33 @@ public class EditCommand extends AddCommand {
 		else {
 			systemFeedback = "No list displayed at the moment!";
 		}
+	}
+	
+	@Override
+	public void undo() {
+		boolean success = addFirstTaskAndDeleteSecondTask(currentTask, editedTask);
 		
+		if (success) {
+			systemFeedback = "Undo previous update: Successfully reverted \""+ currentTask.getName() + "\"";
+		}
+		else {
+			systemFeedback = "Cannot undo!";
+		}
+	}
+	
+	private boolean addFirstTaskAndDeleteSecondTask(Task task1, Task task2) {
+		//parent method
+		boolean addSuccess = addThisTask(task1);
+		
+		DeleteCommand del = new DeleteCommand();
+		boolean delSuccess = del.deleteThisTask(task2);
+		
+		if (delSuccess && addSuccess) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	
 	private String getFirstWord(String str) {
@@ -50,5 +83,9 @@ public class EditCommand extends AddCommand {
 	
 	private int convertToInteger(String userCommand) {
 		return Integer.parseInt(userCommand);
+	}
+	
+	public Task getEditedTask() {
+		return editedTask;
 	}
 }

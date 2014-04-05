@@ -1,13 +1,14 @@
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 
 
 public class DisplayCommand extends Command {
 
-	public CommandParser parser = null;
+	protected CommandParser parser;
 	protected DateTimeConfiguration dateTimeConfig;
+	
+	protected Task taskToHighlight;
 	
 	private final static String MESSAGE_INVALID_COMMAND = "Invalid command entered. Please try again.";
 	
@@ -32,7 +33,6 @@ public class DisplayCommand extends Command {
 	/**
 	 * @author Si Rui
 	 */
-	
 	public void executeDisplayCommand(String userCommand) {
 		systemFeedback = "";
 		if (allTasks.isEmpty()) {
@@ -142,6 +142,7 @@ public class DisplayCommand extends Command {
 	}
 
 	protected String formDisplayText() {
+		
 		ArrayList<Task> uncompletedTasks = getTasksBasedOnCompletion(currentTaskList, false);
 		ArrayList<Task> completedTasks = getTasksBasedOnCompletion(currentTaskList, true);
 		
@@ -154,6 +155,8 @@ public class DisplayCommand extends Command {
 		if (!completedTasks.isEmpty()) {
 			displayText += formDisplayTextCompletedTasks(completedTasks, numberOfUncompletedTasks);
 		}
+		
+		result.printResult();
 		
 		return displayText;
 	}
@@ -169,7 +172,7 @@ public class DisplayCommand extends Command {
 		boolean isPrintingMemos = false;
 
 		int count = 1;
-
+		
 		for (Task t : taskList) {
 			String taskDate = t.getDate();
 			if (isMemo(t)) {
@@ -180,35 +183,73 @@ public class DisplayCommand extends Command {
 			} else if (isOverdueTask(taskDate, todaysDate) && !isPrintingOverdue) {
 				displayText += HEADING_OVERDUE;
 				isPrintingOverdue = true;
+				
+				result.savePreviousHeading();
+				result.pushNewHeadingText(HEADING_OVERDUE);
+				
 			} else if (isTodaysTask(taskDate, todaysDate) && !isPrintingToday) {
 				displayText += '\n' + HEADING_TODAY;
 				isPrintingToday = true;
+				
+				result.savePreviousHeading();
+				result.pushNewHeadingText(HEADING_TODAY);
+				
 			} else if (isThisWeeksButNotTodaysTask(taskDate, todaysDate) && !isPrintingWeek) {
 				displayText += '\n' + HEADING_THIS_WEEK;
 				isPrintingWeek = true;
+				
+				result.savePreviousHeading();
+				result.pushNewHeadingText(HEADING_THIS_WEEK);
 			} else if (isAfterThisWeeksTask(taskDate, todaysDate) && !isPrintingAfterAWeek) {
 				displayText += '\n' + HEADING_AFTER_A_WEEK;
 				isPrintingAfterAWeek = true;
+				
+				result.savePreviousHeading();
+				result.pushNewHeadingText(HEADING_AFTER_A_WEEK);
 			}
+			
+			
+			
 			displayText += formDisplayTextOfOneTask(count, t);
-			count++; 
+			result.pushTaskToCurrentHeading(formDisplayTextOfOneTask(count, t));
+			count++;
+			
+			if (t == taskToHighlight) {
+				result.saveHighlightIndex();
+				result.printHighlightIndex();
+			}
 		}
+		
+		result.savePreviousHeading();
 		return displayText;
 	}
 	
 	private String formDisplayTextCompletedTasks(ArrayList<Task> taskList, int continueNumbering) {
 		String displayText = "";
 		
-		if (continueNumbering == 0){
+		if (continueNumbering == 0) {
 			displayText += HEADING_COMPLETED;
+			
+			result.savePreviousHeading();
+			result.pushNewHeadingText(HEADING_COMPLETED);
 		} else {
 			displayText += '\n' + HEADING_COMPLETED;
+			
+			result.savePreviousHeading();
+			result.pushNewHeadingText('\n' + HEADING_COMPLETED);
 		}
 		
 		for (int i = 0; i < taskList.size(); i++) {
 			displayText += formDisplayTextOfOneTask((i+1)+continueNumbering, taskList.get(i));
+			result.pushTaskToCurrentHeading(formDisplayTextOfOneTask((i+1)+continueNumbering, taskList.get(i)));
 		}
+		
+		result.savePreviousHeading();
 		return displayText;
+	}
+	
+	private String formDisplayTextOfOneTask(int count, Task t) {
+		return "   " + count + ". " + t.getAllTaskDetails();
 	}
 	
 	private boolean isMemo(Task t) {
@@ -234,10 +275,6 @@ public class DisplayCommand extends Command {
 		return (dateTimeConfig.isAfterAWeek(taskDate, todaysDate)) ? true : false;
 	}
 
-	private String formDisplayTextOfOneTask(int count, Task t) {
-		return "   " + count + ". " + t.getAllTaskDetails();
-	}
-
 	public ArrayList<Task> getTodaysTasks(){
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 		String todaysDate = dateTimeConfig.getTodaysDate();
@@ -253,9 +290,7 @@ public class DisplayCommand extends Command {
 		return matchedTasks;
 	}
 	
-	private String getTodaysDate(){
-		SimpleDateFormat dateFormatter = new SimpleDateFormat("ddMMyy");
-		Calendar date = Calendar.getInstance();
-		return dateFormatter.format(date.getTime());
+	public void setTaskToHighlight(Task task) {
+		taskToHighlight = task;
 	}
 }
