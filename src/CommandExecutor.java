@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Stack;
 
 /**
  *   This class is the main executor that will execute the commands
@@ -13,7 +12,7 @@ public class CommandExecutor {
 	protected ArrayList<Task> allTasks;
 	protected ArrayList<Task> currentTaskList;
 
-	protected Stack<Command> hist;
+	protected ActionHistory<Command> history;
 	
 	private final String MESSAGE_INVALID_COMMAND = "No such command! Press F1 for help.";
 	
@@ -25,31 +24,30 @@ public class CommandExecutor {
 		dateTimeConfig = new DateTimeConfiguration();
 		allTasks = taskStorage.getTaskList();
 		currentTaskList = null;
-		hist = new Stack<Command>();
+		history = new ActionHistory<Command>();
 	}
 	
-	public String doUserOperation(String userCommand) {
-		String systemFeedback = "";
+	public Result doUserOperation(String userCommand) {
+		Result result = null;
 		String operation = "";
 		
 		operation = getOperation(userCommand);
 
 		boolean isValidOperation = ValidationCheck.isValidOperation(operation);
 		if (!isValidOperation) {
-			return MESSAGE_INVALID_COMMAND;
-			//return new Result(MESSAGE_INVALID_COMMAND);
+			//return MESSAGE_INVALID_COMMAND;
+			return new Result(MESSAGE_INVALID_COMMAND);
 		}
 
 		if(isExit(operation)) {
 			System.exit(0);
 		}
-
-		systemFeedback = executeOperation(operation, userCommand);
-
-		return systemFeedback;
+		
+		result = executeOperation(operation, userCommand);
+		return result;
 	}
 
-	private String executeOperation(String operation, String userCommand) {
+	private Result executeOperation(String operation, String userCommand) {
 		String systemFeedback = "";
 		Result result = null;
 		
@@ -65,11 +63,11 @@ public class CommandExecutor {
 				add.execute(userCommand);
 				systemFeedback = add.getSystemFeedback();
 				result = add.getResult();
-				hist.push(add);
-				
-				DisplayCommand disp = new DisplayCommand();
-				disp.setTaskToHighlight(add.getCurrentTask());
-				disp.execute("undone");
+				boolean success = result.isSuccessful();
+				if (success) {
+					history.push(add);
+				}
+				result = displayTaskListWithHighlightAfterAddCommand(systemFeedback, add);
 				break;
 				
 			case "show" :
@@ -77,7 +75,6 @@ public class CommandExecutor {
 			case "display" :
 				Command display = new DisplayCommand();
 				display.execute(userCommand);
-				systemFeedback = display.getSystemFeedback();
 				result = display.getResult();
 				currentTaskList = display.getCurrentTaskList();
 				break;
@@ -89,11 +86,12 @@ public class CommandExecutor {
 				edit.execute(userCommand);
 				systemFeedback = edit.getSystemFeedback();
 				result = edit.getResult();
-				hist.push(edit);
+				success = result.isSuccessful();
+				if (success) {
+					history.push(edit);
+				}
 				
-				disp = new DisplayCommand();
-				disp.setTaskToHighlight(edit.getEditedTask());
-				disp.execute("undone");
+				result = displayTaskListWithHighlightAfterEditCommand(systemFeedback, edit);
 				break;
 				
 	        case "del" :
@@ -101,11 +99,16 @@ public class CommandExecutor {
 			case "remove" :
 				//fall through
 			case "delete" :
-	        	Command delete = new DeleteCommand(currentTaskList);
-	        	delete.execute(userCommand);
-	        	result = delete.getResult();
-	        	systemFeedback = delete.getSystemFeedback();
-	        	hist.push(delete);
+				Command delete = new DeleteCommand(currentTaskList);
+				delete.execute(userCommand);
+				result = delete.getResult();
+				systemFeedback = delete.getSystemFeedback();
+				success = result.isSuccessful();
+				if (success) {
+					history.push(delete);
+				}
+				
+				result = displayTaskListAfterCommand(systemFeedback);
 				break;
 				
 			case "clear" :
@@ -113,6 +116,8 @@ public class CommandExecutor {
 				clear.execute(userCommand);
 				result = clear.getResult();
 				systemFeedback = clear.getSystemFeedback();
+				
+				result = displayTaskListAfterCommand(systemFeedback);
 				break;
 				
 			case "find" :
@@ -121,19 +126,18 @@ public class CommandExecutor {
 				Command search = new SearchCommand(currentTaskList);
 				search.execute(userCommand);
 				result = search.getResult();
-				systemFeedback = search.getSystemFeedback();
 				currentTaskList = search.getCurrentTaskList();
 				break;
 				
 			case "undo" :
-				if (!hist.empty()) {
-					Command lastCommand = hist.pop();
+				if (!history.isEmpty()) {
+					Command lastCommand = history.pop();
 					lastCommand.undo();
 					result = lastCommand.getResult();
-					systemFeedback = lastCommand.getSystemFeedback();
+					systemFeedback = result.getSystemFeedback();
+					result = displayTaskListWithHighlightAfterUndoCommand(systemFeedback, lastCommand);
 				} else {
-					result = new Result();
-					systemFeedback = "Nothing to undo!";
+					result = displayTaskListAfterCommand("Nothing to undo!");
 				}
 				break;
 				
@@ -144,7 +148,53 @@ public class CommandExecutor {
 				assert false;
 				break;
 			}
-		return systemFeedback;
+		return result;
+	}
+
+	private Result displayTaskListAfterCommand(String systemFeedback) {
+		Result result;
+		DisplayCommand disp = new DisplayCommand();
+		disp.execute("undone");
+		result = disp.getResult();
+		result.setSystemFeedback(systemFeedback);
+		currentTaskList = disp.getCurrentTaskList();
+		return result;
+	}
+	
+	private Result displayTaskListWithHighlightAfterUndoCommand(
+			String systemFeedback, Command undo) {
+		Result result;
+		DisplayCommand disp = new DisplayCommand();
+		disp.setTaskToHighlight(undo.getCurrentTask());
+		disp.execute("undone");
+		result = disp.getResult();
+		result.setSystemFeedback(systemFeedback);
+		currentTaskList = disp.getCurrentTaskList();
+		return result;
+	}
+	
+	private Result displayTaskListWithHighlightAfterEditCommand(
+			String systemFeedback, Command edit) {
+		Result result;
+		DisplayCommand disp = new DisplayCommand();
+		disp.setTaskToHighlight(edit.getEditedTask());
+		disp.execute("undone");
+		result = disp.getResult();
+		result.setSystemFeedback(systemFeedback);
+		currentTaskList = disp.getCurrentTaskList();
+		return result;
+	}
+
+	private Result displayTaskListWithHighlightAfterAddCommand(String systemFeedback,
+			Command add) {
+		Result result;
+		DisplayCommand disp = new DisplayCommand();
+		disp.setTaskToHighlight(add.getCurrentTask());
+		disp.execute("undone");
+		result = disp.getResult();
+		result.setSystemFeedback(systemFeedback);
+		currentTaskList = disp.getCurrentTaskList();
+		return result;
 	}
 	
 	private boolean isExit(String operation) {
