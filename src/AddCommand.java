@@ -14,44 +14,80 @@ public class AddCommand extends Command {
 		
 		systemFeedback = parseAndModifyTask(userCommand, currentTask, "add");
 		
-		if (systemFeedback.equals("Successfully parsed")) {
-			boolean isAdditionOfNewTaskSuccessful = addThisTask(currentTask);
-			if (isAdditionOfNewTaskSuccessful) {
-				systemFeedback = "Successfully added \"" + currentTask.getName() + "\".";
-			}
-			else {
-				systemFeedback = "Unable to add \"" + currentTask.getName() + "\".";
-			}
+		//if parsing is successful
+		if (systemFeedback.equals("parsing success")) {
+			add();
+		} else {
+			//do nothing; parsing error message is already contained in systemFeedback
+		}
+		
+		result.setSystemFeedback(systemFeedback);
+	}
+
+	private void add() {
+		boolean isAdditionOfNewTaskSuccessful = addThisTask(currentTask);
+		if (isAdditionOfNewTaskSuccessful) {
+			result.setSuccess(true);
+			systemFeedback = "Successfully added \"" + currentTask.getName() + "\".";
+		}
+		else {
+			systemFeedback = "Unable to add \"" + currentTask.getName() + "\".";
 		}
 	}
 	
 	protected String parseAndModifyTask(String userCommand, Task taskToBeModified, String operation) {
 		String systemFeedback;
 		boolean isParsable = true;
-		boolean isSettingTaskTypeSuccessful;
+		String [] taskDetails;
 		
-		parser.extractTaskDetails(userCommand);
-		
-		String [] taskDetails = parser.taskDetails;
-		if (parser.invalidFeedBack != null) {
-			isParsable = false;
-		}
+		taskDetails = parseUserCommand(userCommand);
+		isParsable = checkParsability(isParsable);
 		
 		if (!isParsable) {
 			systemFeedback = parser.invalidFeedBack;
 		}
 		else {
-			setTaskDetails(taskToBeModified, taskDetails);
-			isSettingTaskTypeSuccessful = setTaskType(taskToBeModified);
-			
-			if (!isSettingTaskTypeSuccessful) {
-				systemFeedback = "Entering a timestamp without a date doesn't make sense!";
-			}
-			else {
-				systemFeedback = "Successfully parsed";
-			}
+			systemFeedback = proceedToTaskModification(taskToBeModified, taskDetails);
+		}
+		
+		return systemFeedback;
+	}
+
+	private String proceedToTaskModification(Task taskToBeModified,
+			String[] taskDetails) {
+		String systemFeedback;
+		boolean isModificationSuccessful;
+		isModificationSuccessful = modifyTask(taskToBeModified, taskDetails);
+		
+		if (!isModificationSuccessful) {
+			systemFeedback = "Entering a timestamp without a date doesn't make sense!";
+		}
+		else {
+			systemFeedback = "parsing success";
 		}
 		return systemFeedback;
+	}
+
+	private boolean modifyTask(Task taskToBeModified, String[] taskDetails) {
+		boolean isSettingTaskTypeSuccessful;
+		setTaskDetails(taskToBeModified, taskDetails);
+		isSettingTaskTypeSuccessful = setTaskType(taskToBeModified);
+		return isSettingTaskTypeSuccessful;
+	}
+
+	private boolean checkParsability(boolean isParsable) {
+		if (parser.invalidFeedBack != null) {
+			isParsable = false;
+		}
+		return isParsable;
+	}
+
+	private String[] parseUserCommand(String userCommand) {
+		String[] taskDetails;
+		parser.extractTaskDetails(userCommand);
+		
+		taskDetails = parser.taskDetails;
+		return taskDetails;
 	}
 
 	private void setTaskDetails(Task task, String[] taskDetails) {
@@ -115,5 +151,6 @@ public class AddCommand extends Command {
 		else {
 			systemFeedback = "Cannot undo!";
 		}
+		result.setSystemFeedback(systemFeedback);
 	}
 }

@@ -43,10 +43,12 @@ public class SearchCommand extends DisplayCommand {
 		}
 
 		if (currentTaskList.size() > 0) {
-			systemFeedback = "Search results:\n" + formDisplayText();
+			formDisplayText(result);
+			systemFeedback = "Search results:";
 		}
 		else {
 			systemFeedback = MESSAGE_NO_SEARCH_RESULTS;
 		}
+		result.setSystemFeedback(systemFeedback);
 	}
 }

@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -28,6 +27,8 @@ public class DisplayCommand extends Command {
 	public void execute(String userCommand) {
 		parser = new CommandParser();
 		executeDisplayCommand(userCommand);
+		
+		result.setSystemFeedback(systemFeedback);
 	}
 	
 	/**
@@ -41,8 +42,6 @@ public class DisplayCommand extends Command {
 			String displayType = parser.parseDisplayType(userCommand);
 			assert(displayType != null);
 			
-			System.out.println("displaying : "+ displayType);
-			
 			try {
 				prepareCurrentTaskList(displayType);
 				
@@ -50,8 +49,9 @@ public class DisplayCommand extends Command {
 					systemFeedback = getFeedbackIfHaveNoTasks(displayType);
 				}
 
-				if (systemFeedback.equals("")){
-					systemFeedback = formDisplayText();
+				if (systemFeedback.equals("")) {
+					formDisplayText(result);
+					systemFeedback = getFeedbackIfHaveTasks(displayType);
 				}
 			} catch (Exception ex) {
 				System.out.println(ex.getMessage());
@@ -128,20 +128,46 @@ public class DisplayCommand extends Command {
 		}
 		return matchedTasks;
 	}
-
+	
+	private String getFeedbackIfHaveTasks(String displayType) {
+		String feedback = "";
+		if (displayType.equals("done")) {
+			feedback = "Displaying completed tasks.";
+		} else if (displayType.equals("today")) {
+			feedback = "Displaying tasks for today.";
+		} else if (displayType.equals("undone")) {
+			feedback = "Displaying undone tasks.";
+		}  else if (displayType.equals("all")) {
+			feedback = "Displaying all tasks.";
+		} else if (displayType.equals("memos")) {
+			feedback = "Displaying memos.";
+		} else if (displayType.equals("overdue")) {
+			feedback = "Displaying overdue tasks.";
+		}
+		
+		return feedback;
+	}
+	
 	private String getFeedbackIfHaveNoTasks(String displayType) {
 		String feedback = "";
-		if (displayType.equals("past")) {
+		if (displayType.equals("done")) {
 			feedback = "You have no completed tasks.";
 		} else if (displayType.equals("today")) {
 			feedback = "You have no tasks for today.";
-		} else if (displayType.equals("future")) {
+		} else if (displayType.equals("undone")) {
 			feedback = "You have no uncompleted tasks.";
+		}  else if (displayType.equals("all")) {
+			feedback = "You have no tasks.";
+		} else if (displayType.equals("memos")) {
+			feedback = "You have no memos.";
+		} else if (displayType.equals("overdue")) {
+			feedback = "You have no overdue tasks.";
 		}
+		
 		return feedback;
 	}
 
-	protected String formDisplayText() {
+	protected String formDisplayText(Result result) {
 		
 		ArrayList<Task> uncompletedTasks = getTasksBasedOnCompletion(currentTaskList, false);
 		ArrayList<Task> completedTasks = getTasksBasedOnCompletion(currentTaskList, true);
@@ -149,19 +175,19 @@ public class DisplayCommand extends Command {
 		String displayText = "";
 		int numberOfUncompletedTasks = 0;
 		if (!uncompletedTasks.isEmpty()) {
-			displayText += formDisplayTextUncompletedTasks(uncompletedTasks);
+			displayText += formDisplayTextUncompletedTasks(uncompletedTasks, result);
 			numberOfUncompletedTasks = uncompletedTasks.size();
 		}
 		if (!completedTasks.isEmpty()) {
-			displayText += formDisplayTextCompletedTasks(completedTasks, numberOfUncompletedTasks);
+			displayText += formDisplayTextCompletedTasks(completedTasks, numberOfUncompletedTasks, result);
 		}
 		
-		result.printResult();
+		//result.printResult();
 		
 		return displayText;
 	}
 
-	private String formDisplayTextUncompletedTasks(ArrayList<Task> taskList) {
+	private String formDisplayTextUncompletedTasks(ArrayList<Task> taskList, Result result) {
 		String displayText = "";
 		String todaysDate = dateTimeConfig.getTodaysDate();
 
@@ -179,6 +205,9 @@ public class DisplayCommand extends Command {
 				if (!isPrintingMemos) {
 					displayText += '\n' + HEADING_MEMO;
 					isPrintingMemos = true;
+					
+					result.savePreviousHeading();
+					result.pushNewHeadingText(HEADING_MEMO);
 				}
 			} else if (isOverdueTask(taskDate, todaysDate) && !isPrintingOverdue) {
 				displayText += HEADING_OVERDUE;
@@ -224,7 +253,7 @@ public class DisplayCommand extends Command {
 		return displayText;
 	}
 	
-	private String formDisplayTextCompletedTasks(ArrayList<Task> taskList, int continueNumbering) {
+	private String formDisplayTextCompletedTasks(ArrayList<Task> taskList, int continueNumbering, Result result) {
 		String displayText = "";
 		
 		if (continueNumbering == 0) {
