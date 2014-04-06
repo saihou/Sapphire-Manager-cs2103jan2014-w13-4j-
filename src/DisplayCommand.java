@@ -331,4 +331,5 @@ public class DisplayCommand extends Command {
 	}
 	public void setTaskToHighlight(Task task) {
 		taskToHighlight = task;
+	}
 }
