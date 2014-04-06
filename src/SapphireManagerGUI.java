@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 //JAVA-UTIL LIBRARIES
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -142,7 +143,9 @@ public class SapphireManagerGUI {
 						//displaySystemMessage(MESSAGE_TODAY_TASK_TITLE);
 						displayNormalMessage(myExecutor.executeDisplayCommand("today"));
 					}*/
-					displayNormalMessage(myExecutor.doUserOperation("display today"));
+					
+					Result result = myExecutor.doUserOperation("display today");
+					printResults(result);
 					
 					guiWindow.guiFrame.setVisible(true);
 				} catch (Exception e) {
@@ -275,12 +278,19 @@ public class SapphireManagerGUI {
 				updateScrollBar();
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 					if(!inputBox.getText().trim().equals("")) {
+						
+						//clearDisplayBox();
+						
 						String userCommand = readCommandFromUser();
-						String systemFeedback = myExecutor.doUserOperation(userCommand);
-
-						if (!systemFeedback.startsWith("Error")) {
-							displaySystemMessage(systemFeedback);
-						}
+						//String systemFeedback = myExecutor.doUserOperation(userCommand);
+						Result result = myExecutor.doUserOperation(userCommand);
+						printResults(result);
+						
+						//if (!systemFeedback.startsWith("Error")) {
+						//	displaySystemMessage(systemFeedback);
+						
+						//}
+						
 						if(helpo.getText().trim().equals("")) {
 							displayToHelpo(MESSAGE_HELP);
 						}
@@ -317,7 +327,7 @@ public class SapphireManagerGUI {
 			}
 		});
 	}
-
+	
 	//Listener for GUI Frame
 	private void guiFrameListener() {
 		guiFrame.addFocusListener(new FocusAdapter() {
@@ -417,12 +427,12 @@ public class SapphireManagerGUI {
 	private static void displaySystemMessage(String message) {
 		appendToDisplayBox(message, new Color(0xff6c00), "Trebuchet MS", 14);
 	}
-/*
+
 	//displays highlighted message
-	private static void displayHightlightMessage(String message) {
-		appendToDisplayBox(message, Color.CYAN, "Segoe UI", 25);
+	private static void displayHighlightMessage(String message) {
+		appendToDisplayBox(message, Color.CYAN, "Trebuchet MS", 14);
 	}
-*/
+
 	//displays to helpo label
 	private void displayToHelpo(String message) {
 		helpo.setText(message);
@@ -811,4 +821,40 @@ public class SapphireManagerGUI {
 		Calendar date = Calendar.getInstance();
 		return dateFormatter.format(date.getTime());
 	}
+	
+	//modify this
+	private static void printResults(Result result) {
+		Queue<String> headings = result.getHeadings();
+		Queue<Queue<String>> body = result.getBody();
+		int highlightIndexI = result.getHighlightIndexI();
+		int highlightIndexJ = result.getHighlightIndexJ();
+		
+		//system feedback
+		displayNormalMessage(result.getSystemFeedback());
+		
+		int numOfHeadings = headings.size();
+		for (int i = 0; i < numOfHeadings; i++) {
+			String heading = headings.poll();
+			//heading
+			displaySystemMessage(heading);
+			headings.offer(heading);
+			
+			Queue<String> bodyOfThisHeading = body.poll();
+			
+			int numOfTasks = bodyOfThisHeading.size();
+			for (int j = 0; j < numOfTasks ; j++) {
+				String task = bodyOfThisHeading.poll();
+				if (i == highlightIndexI && j == highlightIndexJ) {
+					//highlighted task
+					displayHighlightMessage(task);
+				}
+				else {
+					//task
+					displaySystemMessage(task);
+				}
+				bodyOfThisHeading.offer(task);
+			}
+		}
+	}
+	
 }

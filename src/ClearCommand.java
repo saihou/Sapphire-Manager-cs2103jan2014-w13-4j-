@@ -16,10 +16,12 @@ public class ClearCommand extends Command {
 
 		if (clearType.equals("all")) {
 			clearAll();
-		} else {
+		} else if (clearType.equals("done")){
 			clearDone();
+		} else {
+			systemFeedback = clearType;
 		}
-		
+		result.setSystemFeedback(systemFeedback);
 	}
 	
 	private void clearDone() {

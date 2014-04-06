@@ -107,20 +107,23 @@ public class CommandParser {
 		userCommand = prepareUserCommandForParsing(userCommand);
 		
 		boolean isAllKeywordPresent = userCommand.equals("all");
+		boolean isDoneKeywordPresent = userCommand.equals("done") || userCommand.equals("");
 		
-		clearType = determineClearType(isAllKeywordPresent); 
+		clearType = determineClearType(isAllKeywordPresent, isDoneKeywordPresent); 
 		
 		return clearType;
 	}
 	
-	private String determineClearType(boolean isAllKeywordPresent) {
+	private String determineClearType(boolean isAllKeywordPresent, boolean isDoneKeywordPresent) {
 		String clearType = "";
 		
 		if (isAllKeywordPresent) {
 			clearType = "all";
-		} else {
+		} else if (isDoneKeywordPresent) {
 			//default
 			clearType = "done";
+		} else {
+			clearType = "Invalid keyword(s) entered!";
 		}
 		return clearType;
 	}

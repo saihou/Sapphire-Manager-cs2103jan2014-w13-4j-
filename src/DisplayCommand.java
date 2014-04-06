@@ -1,13 +1,13 @@
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 
 
 public class DisplayCommand extends Command {
 
-	public CommandParser parser = null;
+	protected CommandParser parser;
 	protected DateTimeConfiguration dateTimeConfig;
+	
+	protected Task taskToHighlight;
 	
 	private final static String MESSAGE_INVALID_COMMAND = "Invalid command entered. Please try again.";
 	
@@ -34,12 +34,13 @@ public class DisplayCommand extends Command {
 	public void execute(String userCommand) {
 		parser = new CommandParser();
 		executeDisplayCommand(userCommand);
+		
+		result.setSystemFeedback(systemFeedback);
 	}
 	
 	/**
 	 * @author Si Rui
 	 */
-	
 	public void executeDisplayCommand(String userCommand) {
 		systemFeedback = "";
 		if (allTasks.isEmpty()) {
@@ -48,8 +49,6 @@ public class DisplayCommand extends Command {
 			String displayType = parser.parseDisplayType(userCommand);
 			assert(displayType != null);
 			
-			System.out.println("displaying : "+ displayType);
-			
 			try {
 				prepareCurrentTaskList(displayType);
 				
@@ -57,8 +56,9 @@ public class DisplayCommand extends Command {
 					systemFeedback = getFeedbackIfHaveNoTasks(displayType);
 				}
 
-				if (systemFeedback.equals("")){
-					systemFeedback = formDisplayText();
+				if (systemFeedback.equals("")) {
+					formDisplayText(result);
+					systemFeedback = getFeedbackIfHaveTasks(displayType);
 				}
 			} catch (Exception ex) {
 				System.out.println(ex.getMessage());
@@ -135,7 +135,26 @@ public class DisplayCommand extends Command {
 		}
 		return matchedTasks;
 	}
-
+	
+	private String getFeedbackIfHaveTasks(String displayType) {
+		String feedback = "";
+		if (displayType.equals("done")) {
+			feedback = "Displaying completed tasks.";
+		} else if (displayType.equals("today")) {
+			feedback = "Displaying tasks for today.";
+		} else if (displayType.equals("undone")) {
+			feedback = "Displaying undone tasks.";
+		}  else if (displayType.equals("all")) {
+			feedback = "Displaying all tasks.";
+		} else if (displayType.equals("memos")) {
+			feedback = "Displaying memos.";
+		} else if (displayType.equals("overdue")) {
+			feedback = "Displaying overdue tasks.";
+		}
+		
+		return feedback;
+	}
+	
 	private String getFeedbackIfHaveNoTasks(String displayType) {
 		String feedback = "";
 		if (displayType.equals("overdue")) {
@@ -148,28 +167,38 @@ public class DisplayCommand extends Command {
 			feedback = FEEDBACK_NO_TODAY;
 		} else if (displayType.equals("undone")) {
 			feedback = FEEDBACK_NO_UNDONE;
+		}  else if (displayType.equals("all")) {
+			feedback = "You have no tasks.";
+		} else if (displayType.equals("memos")) {
+			feedback = "You have no memos.";
+		} else if (displayType.equals("overdue")) {
+			feedback = "You have no overdue tasks.";
 		}
+		
 		return feedback;
 	}
 
-	protected String formDisplayText() {
+	protected String formDisplayText(Result result) {
+		
 		ArrayList<Task> uncompletedTasks = getTasksBasedOnCompletion(currentTaskList, false);
 		ArrayList<Task> completedTasks = getTasksBasedOnCompletion(currentTaskList, true);
 		
 		String displayText = "";
 		int numberOfUncompletedTasks = 0;
 		if (!uncompletedTasks.isEmpty()) {
-			displayText += formDisplayTextUncompletedTasks(uncompletedTasks);
+			displayText += formDisplayTextUncompletedTasks(uncompletedTasks, result);
 			numberOfUncompletedTasks = uncompletedTasks.size();
 		}
 		if (!completedTasks.isEmpty()) {
-			displayText += formDisplayTextCompletedTasks(completedTasks, numberOfUncompletedTasks);
+			displayText += formDisplayTextCompletedTasks(completedTasks, numberOfUncompletedTasks, result);
 		}
+		
+		//result.printResult();
 		
 		return displayText;
 	}
 
-	private String formDisplayTextUncompletedTasks(ArrayList<Task> taskList) {
+	private String formDisplayTextUncompletedTasks(ArrayList<Task> taskList, Result result) {
 		String displayText = "";
 		String todaysDate = dateTimeConfig.getTodaysDate();
 
@@ -180,46 +209,87 @@ public class DisplayCommand extends Command {
 		boolean isPrintingMemos = false;
 
 		int count = 1;
-
+		
 		for (Task t : taskList) {
 			String taskDate = t.getDate();
 			if (isMemo(t)) {
 				if (!isPrintingMemos) {
 					displayText += '\n' + HEADING_MEMO;
 					isPrintingMemos = true;
+					
+					result.savePreviousHeading();
+					result.pushNewHeadingText(HEADING_MEMO);
 				}
 			} else if (isOverdueTask(taskDate, todaysDate) && !isPrintingOverdue) {
 				displayText += HEADING_OVERDUE;
 				isPrintingOverdue = true;
+				
+				result.savePreviousHeading();
+				result.pushNewHeadingText(HEADING_OVERDUE);
+				
 			} else if (isTodaysTask(taskDate, todaysDate) && !isPrintingToday) {
 				displayText += '\n' + HEADING_TODAY;
 				isPrintingToday = true;
+				
+				result.savePreviousHeading();
+				result.pushNewHeadingText(HEADING_TODAY);
+				
 			} else if (isThisWeeksButNotTodaysTask(taskDate, todaysDate) && !isPrintingWeek) {
 				displayText += '\n' + HEADING_THIS_WEEK;
 				isPrintingWeek = true;
+				
+				result.savePreviousHeading();
+				result.pushNewHeadingText(HEADING_THIS_WEEK);
 			} else if (isAfterThisWeeksTask(taskDate, todaysDate) && !isPrintingAfterAWeek) {
 				displayText += '\n' + HEADING_AFTER_A_WEEK;
 				isPrintingAfterAWeek = true;
+				
+				result.savePreviousHeading();
+				result.pushNewHeadingText(HEADING_AFTER_A_WEEK);
 			}
+			
+			
+			
 			displayText += formDisplayTextOfOneTask(count, t);
-			count++; 
+			result.pushTaskToCurrentHeading(formDisplayTextOfOneTask(count, t));
+			count++;
+			
+			if (t == taskToHighlight) {
+				result.saveHighlightIndex();
+				result.printHighlightIndex();
+			}
 		}
+		
+		result.savePreviousHeading();
 		return displayText;
 	}
 	
-	private String formDisplayTextCompletedTasks(ArrayList<Task> taskList, int continueNumbering) {
+	private String formDisplayTextCompletedTasks(ArrayList<Task> taskList, int continueNumbering, Result result) {
 		String displayText = "";
 		
-		if (continueNumbering == 0){
+		if (continueNumbering == 0) {
 			displayText += HEADING_COMPLETED;
+			
+			result.savePreviousHeading();
+			result.pushNewHeadingText(HEADING_COMPLETED);
 		} else {
 			displayText += '\n' + HEADING_COMPLETED;
+			
+			result.savePreviousHeading();
+			result.pushNewHeadingText('\n' + HEADING_COMPLETED);
 		}
 		
 		for (int i = 0; i < taskList.size(); i++) {
 			displayText += formDisplayTextOfOneTask((i+1)+continueNumbering, taskList.get(i));
+			result.pushTaskToCurrentHeading(formDisplayTextOfOneTask((i+1)+continueNumbering, taskList.get(i)));
 		}
+		
+		result.savePreviousHeading();
 		return displayText;
+	}
+	
+	private String formDisplayTextOfOneTask(int count, Task t) {
+		return "   " + count + ". " + t.getAllTaskDetails();
 	}
 	
 	private boolean isMemo(Task t) {
@@ -245,10 +315,6 @@ public class DisplayCommand extends Command {
 		return (dateTimeConfig.isAfterAWeek(taskDate, todaysDate)) ? true : false;
 	}
 
-	private String formDisplayTextOfOneTask(int count, Task t) {
-		return "   " + count + ". " + t.getAllTaskDetails();
-	}
-
 	public ArrayList<Task> getTodaysTasks(){
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 		String todaysDate = dateTimeConfig.getTodaysDate();
@@ -263,4 +329,6 @@ public class DisplayCommand extends Command {
 
 		return matchedTasks;
 	}
+	public void setTaskToHighlight(Task task) {
+		taskToHighlight = task;
 }
