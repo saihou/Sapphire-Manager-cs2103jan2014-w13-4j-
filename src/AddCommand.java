@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class AddCommand extends Command {
 	
 	public CommandParser parser = null;
@@ -12,54 +10,87 @@ public class AddCommand extends Command {
 	@Override
 	public void execute(String userCommand) {
 		userCommand = userCommand.trim();
-		Task taskToBeAdded = new Task();
+		currentTask = new Task();
 		
-		systemFeedback = parseAndModifyTask(userCommand, taskToBeAdded, "add");
+		systemFeedback = parseAndModifyTask(userCommand, currentTask, "add");
 		
-		if (systemFeedback.equals("Successfully parsed")) {
-			boolean isAdditionOfNewTaskSuccessful = addThisTask(taskToBeAdded);
-			if (isAdditionOfNewTaskSuccessful) {
-				systemFeedback = "Successfully added \"" + taskToBeAdded.getName() + "\".";
-				updateHistory("add", taskToBeAdded, null);
-			}
-			else {
-				systemFeedback = "Unable to add \"" + taskToBeAdded.getName() + "\".";
-			}
+		//if parsing is successful
+		if (systemFeedback.equals("parsing success")) {
+			add();
+		} else {
+			//do nothing; parsing error message is already contained in systemFeedback
 		}
-		task = taskToBeAdded;
+		
+		result.setSystemFeedback(systemFeedback);
+	}
+
+	private void add() {
+		boolean isAdditionOfNewTaskSuccessful = addThisTask(currentTask);
+		if (isAdditionOfNewTaskSuccessful) {
+			result.setSuccess(true);
+			systemFeedback = "Successfully added \"" + currentTask.getName() + "\".";
+		}
+		else {
+			systemFeedback = "Unable to add \"" + currentTask.getName() + "\".";
+		}
 	}
 	
 	protected String parseAndModifyTask(String userCommand, Task taskToBeModified, String operation) {
 		String systemFeedback;
 		boolean isParsable = true;
-		boolean isSettingTaskTypeSuccessful;
+		String [] taskDetails;
 		
-		parser.extractTaskDetails(userCommand);
-		
-		String [] taskDetails = parser.taskDetails;
-		if (parser.invalidFeedBack != null) {
-			isParsable = false;
-		}
+		taskDetails = parseUserCommand(userCommand);
+		isParsable = checkParsability(isParsable);
 		
 		if (!isParsable) {
 			systemFeedback = parser.invalidFeedBack;
 		}
 		else {
-			setTaskDetails(taskToBeModified, taskDetails);
-			isSettingTaskTypeSuccessful = setTaskType(taskToBeModified);
-			
-			if (!isSettingTaskTypeSuccessful) {
-				systemFeedback = "Entering a timestamp without a date doesn't make sense!";
-			}
-			else {
-				systemFeedback = "Successfully parsed";
-			}
+			systemFeedback = proceedToTaskModification(taskToBeModified, taskDetails);
+		}
+		
+		return systemFeedback;
+	}
+
+	private String proceedToTaskModification(Task taskToBeModified,
+			String[] taskDetails) {
+		String systemFeedback;
+		boolean isModificationSuccessful;
+		isModificationSuccessful = modifyTask(taskToBeModified, taskDetails);
+		
+		if (!isModificationSuccessful) {
+			systemFeedback = "Entering a timestamp without a date doesn't make sense!";
+		}
+		else {
+			systemFeedback = "parsing success";
 		}
 		return systemFeedback;
 	}
 
+	private boolean modifyTask(Task taskToBeModified, String[] taskDetails) {
+		boolean isSettingTaskTypeSuccessful;
+		setTaskDetails(taskToBeModified, taskDetails);
+		isSettingTaskTypeSuccessful = setTaskType(taskToBeModified);
+		return isSettingTaskTypeSuccessful;
+	}
+
+	private boolean checkParsability(boolean isParsable) {
+		if (parser.invalidFeedBack != null) {
+			isParsable = false;
+		}
+		return isParsable;
+	}
+
+	private String[] parseUserCommand(String userCommand) {
+		String[] taskDetails;
+		parser.extractTaskDetails(userCommand);
+		
+		taskDetails = parser.taskDetails;
+		return taskDetails;
+	}
+
 	private void setTaskDetails(Task task, String[] taskDetails) {
-		for (String s: taskDetails) System.out.println(s);
 		if (taskDetails[0] != null) {
 			task.setName(taskDetails[0]);
 		}
@@ -103,10 +134,23 @@ public class AddCommand extends Command {
 		}
 	}
 
-	private boolean addThisTask(Task taskToBeAdded) {
+	protected boolean addThisTask(Task taskToBeAdded) {
 		allTasks.add(taskToBeAdded);
 		
 		boolean isFileWritingSuccessful = taskStorage.writeATaskToFile(taskToBeAdded, true);
 		return isFileWritingSuccessful;
+	}
+	
+	@Override
+	public void undo() {
+		allTasks.remove(currentTask);
+		
+		if (taskStorage.writeTaskListToFile()) {
+			systemFeedback = "Undo previous addition: Successfully deleted \""+ currentTask.getName() + "\"";
+		}
+		else {
+			systemFeedback = "Cannot undo!";
+		}
+		result.setSystemFeedback(systemFeedback);
 	}
 }
