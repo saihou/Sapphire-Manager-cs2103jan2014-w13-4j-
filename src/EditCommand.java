@@ -19,34 +19,54 @@ public class EditCommand extends AddCommand {
 		String userChoice = getFirstWord(userCommand);
 		
 		if (currentTaskList != null) {
-			boolean isValidChoice = ValidationCheck.isValidChoice(userChoice, currentTaskList.size());
-
-			if (isValidChoice) {
-				int choice = convertToInteger(userChoice);
-				currentTask = currentTaskList.get(choice-1);
-				editedTask = new Task(currentTask);
-
-				String userModifications = userCommand.substring(userChoice.length()).trim();
-
-				systemFeedback = parseAndModifyTask(userModifications, editedTask, "edit");
-
-				if (systemFeedback.equals("Successfully parsed")) {
-					boolean success = addFirstTaskAndDeleteSecondTask(editedTask, currentTask);
-					
-					if (success) {
-						systemFeedback = "Successfully made changes to \"" + editedTask.getName() +"\".";
-					} else {
-						systemFeedback = "Unable to edit";
-					}
-				} else {
-					systemFeedback = "Unable to parse input";
-				}
-			} else {
-				systemFeedback = "Invalid number";
-			}
-		}
-		else {
+			proceedWithEditOnlyIfValidChoice(userCommand, userChoice);
+		} else {
 			systemFeedback = "No list displayed at the moment!";
+		}
+		result.setSystemFeedback(systemFeedback);
+	}
+
+	private void proceedWithEditOnlyIfValidChoice(String userCommand, String userChoice) {
+		boolean isValidChoice = ValidationCheck.isValidChoice(userChoice, currentTaskList.size());
+
+		if (isValidChoice) {
+			proceedWithEdit(userCommand, userChoice);
+		} else {
+			systemFeedback = "Invalid task number!";
+		}
+	}
+
+	private void proceedWithEdit(String userCommand, String userChoice) {
+		String userModifications = prepareUserModifications(userCommand, userChoice);
+		systemFeedback = parseAndModifyTask(userModifications, editedTask, "edit");
+		
+		//if parsing is successful
+		if (systemFeedback.equals("parsing success")) {
+			edit();
+		} else {
+			//do nothing; parsing error message is already contained in systemFeedback
+			//systemFeedback = "Unable to parse input";
+		}
+	}
+
+	private String prepareUserModifications(String userCommand,
+			String userChoice) {
+		int choice = convertToInteger(userChoice);
+		currentTask = currentTaskList.get(choice-1);
+		editedTask = new Task(currentTask);
+
+		String userModifications = userCommand.substring(userChoice.length()).trim();
+		return userModifications;
+	}
+
+	private void edit() {
+		boolean success = addFirstTaskAndDeleteSecondTask(editedTask, currentTask);
+		
+		if (success) {
+			result.setSuccess(true);
+			systemFeedback = "Successfully made changes to \"" + editedTask.getName() +"\".";
+		} else {
+			systemFeedback = "Unable to edit";
 		}
 	}
 	
@@ -60,6 +80,7 @@ public class EditCommand extends AddCommand {
 		else {
 			systemFeedback = "Cannot undo!";
 		}
+		result.setSystemFeedback(systemFeedback);
 	}
 	
 	private boolean addFirstTaskAndDeleteSecondTask(Task task1, Task task2) {

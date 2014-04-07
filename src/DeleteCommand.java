@@ -17,20 +17,34 @@ public class DeleteCommand extends Command {
 	public void execute(String userChoice) {
 		parser = new CommandParser();
 	    userChoice = userChoice.trim();
-	      
-	    boolean isValidChoice = ValidationCheck.isValidChoice(userChoice, currentTaskList.size());
-	      if (isValidChoice) {
-	         int choice = convertToInteger(userChoice);
-	         //retrieve the task to be removed
-	         currentTask = currentTaskList.get(choice-1);
-	         boolean isDeletionSuccessful = deleteThisTask(currentTask);
-	         
-	         if (isDeletionSuccessful) {
-	            systemFeedback = "Successfully deleted "+choice+". "+currentTask.getName() + ".";
-	         }
-	      } else {
-	         systemFeedback = "Invalid number";
-	      }
+	    
+	    if (currentTaskList != null) {
+		    proceedWithDeleteOnlyIfValidChoice(userChoice);
+	    } else {
+	    	systemFeedback = "No list displayed at the moment!";
+	    }
+	    result.setSystemFeedback(systemFeedback);
+	}
+
+	private void proceedWithDeleteOnlyIfValidChoice(String userChoice) {
+		boolean isValidChoice = ValidationCheck.isValidChoice(userChoice, currentTaskList.size());
+		if (isValidChoice) {
+			delete(userChoice);
+		} else {
+			systemFeedback = "Invalid task number!";
+		}
+	}
+
+	private void delete(String userChoice) {
+		int choice = convertToInteger(userChoice);
+		//retrieve the task to be removed
+		currentTask = currentTaskList.get(choice-1);
+		boolean isDeletionSuccessful = deleteThisTask(currentTask);
+
+		if (isDeletionSuccessful) {
+			result.setSuccess(true);
+			systemFeedback = "Successfully deleted "+choice+". "+currentTask.getName() + ".";
+		}
 	}
 	
 	protected boolean deleteThisTask(Task taskToBeRemoved) {
@@ -51,6 +65,7 @@ public class DeleteCommand extends Command {
 		else {
 			systemFeedback = "Cannot undo!";
 		}
+		result.setSystemFeedback(systemFeedback);
 	}
 	
 	private int convertToInteger(String userCommand) {

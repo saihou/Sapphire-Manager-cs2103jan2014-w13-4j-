@@ -1,3 +1,5 @@
+import java.util.ArrayDeque;
+
 /**
  * @author Si Rui
  *	This class stores the history of the last user action, a pointer to the last task 
@@ -7,8 +9,30 @@
  *	Possible requests: set and get lastAction, pointerToLastTask and copyOfLastTask
  *
  */
-public class ActionHistory {
+public class ActionHistory<E> {
 	
+	private ArrayDeque<E> historyOfCommands;
+	
+	public ActionHistory() {
+		historyOfCommands = new ArrayDeque<E>();
+	}
+	
+	public void push(E command) {
+		historyOfCommands.push(command);
+	}
+	
+	public E pop() {
+		return historyOfCommands.pop();
+	}
+	
+	public E peek() {
+		return historyOfCommands.peek();
+	}
+	
+	public boolean isEmpty() {
+		return historyOfCommands.isEmpty();
+	}
+	/*
 	private static ActionHistory instance = null;
 	
 	private String lastAction;
@@ -50,4 +74,5 @@ public class ActionHistory {
 	public Task getCopyOfLastTask(){
 		return this.copyOfLastTask;
 	}
+	*/
 }
