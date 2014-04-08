@@ -379,6 +379,8 @@ public class SapphireManagerGUI {
             		timer.stop();
             		displayToHelpo(MESSAGE_HELP);
             		systemFeedbackStatus = false;
+
+					inputBox.setText("");
             	}
             }
         });
@@ -413,6 +415,10 @@ public class SapphireManagerGUI {
 					displayToHelpo(helpoS(userInput));
 				} else if(userInput.startsWith("u")) { //update or undo
 					displayToHelpo(helpoU(userInput));
+				} else {
+					displayToHelpo("Wrong command entered!");
+					systemFeedbackStatus = true;
+					timer.start();
 				}
 			}
 		});
