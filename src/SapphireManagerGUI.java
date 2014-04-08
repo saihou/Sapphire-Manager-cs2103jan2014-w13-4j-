@@ -11,6 +11,8 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -38,6 +40,8 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+
 //JAVAX-SWING LIBRARIES
 import javax.swing.BoxLayout;
 import javax.swing.event.CaretListener;
@@ -56,6 +60,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 
 //SapphireManagerGUI CLASS
 public class SapphireManagerGUI {
@@ -72,6 +77,7 @@ public class SapphireManagerGUI {
 	private final static String HELPO_OPTIONS_AT = "/at";
 	private final static String HELPO_OPTIONS_BY = "/by";
 	private final static String HELPO_OPTIONS_AT_BY = "/(at|by)";
+	private final static String HELPO_OPTIONS_CLEAR_ALL = "all";
 	private final static String HELPO_OPTIONS_FROM = "/from";
 	private final static String HELPO_OPTIONS_LOC = "/loc";
 	private final static String HELPO_OPTIONS_MARK = "/mark";
@@ -113,10 +119,11 @@ public class SapphireManagerGUI {
 	private static ArrayList<Task> todaysTasks;
 	private static CommandExecutor myExecutor;
 	private static SapphireManagerGUI guiWindow;
+	private static Timer timer;
+	private static boolean systemFeedbackStatus;
 
 	//GUI COMPONENT DECLARATIONS
 	private JFrame guiFrame;
-	private JLabel helpo;
 	private JLabel logoLabel;
 	private JPanel helpoPanel;
 	private JPanel inputBoxPanel;
@@ -124,6 +131,7 @@ public class SapphireManagerGUI {
 	private JScrollPane scrollPane;
 	private JTextField inputBox;
 	private Toolkit toolkit;
+	private static JLabel helpo;
 	private static JTextPane displayBox;
 
 	//MAIN METHOD
@@ -235,6 +243,7 @@ public class SapphireManagerGUI {
 
 	//initializes helpo label within a panel
 	private void initializeHelpoInPanel() {
+		systemFeedbackStatus = false;
 		helpo = new JLabel();
 		helpoPanel = new JPanel();
 		helpoPanel.add(helpo);
@@ -279,7 +288,7 @@ public class SapphireManagerGUI {
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 					if(!inputBox.getText().trim().equals("")) {
 						
-						//clearDisplayBox();
+						clearDisplayBox();
 						
 						String userCommand = readCommandFromUser();
 						//String systemFeedback = myExecutor.doUserOperation(userCommand);
@@ -363,12 +372,24 @@ public class SapphireManagerGUI {
 
 	//Listener for Helpo
 	private void helpoListener() {
+		timer = new Timer(5000, new ActionListener() {
+			@Override
+            public void actionPerformed(ActionEvent e) {
+            	if(systemFeedbackStatus == true) {
+            		timer.stop();
+            		displayToHelpo(MESSAGE_HELP);
+            		systemFeedbackStatus = false;
+            	}
+            }
+        });
+		
 		inputBox.addCaretListener(new CaretListener() {
+			@Override
 			public void caretUpdate(CaretEvent arg0) {
 				String userInput = inputBox.getText().toLowerCase().trim();
 				if(userInput.equalsIgnoreCase("")) {
 					if(inputBox.getText().trim().equals("")) {
-						displayToHelpo(MESSAGE_HELP);
+						//displayToHelpo(MESSAGE_HELP);
 					} else {
 						displayToHelpo(helpo.getText());
 					}
@@ -434,7 +455,7 @@ public class SapphireManagerGUI {
 	}
 
 	//displays to helpo label
-	private void displayToHelpo(String message) {
+	private static void displayToHelpo(String message) {
 		helpo.setText(message);
 	}
 
@@ -621,7 +642,7 @@ public class SapphireManagerGUI {
 	//Helpo - Clear
 	private String helpoClear(String userInput) {
 		if(userInput.equals("c") || userInput.equals("cl") || userInput.equals("cle") || userInput.equals("clea") || userInput.startsWith("clear")) {
-			return HELPO_ACTIONS_CLEAR;
+			return HELPO_ACTIONS_CLEAR+" ("+HELPO_OPTIONS_CLEAR_ALL+"-clear everything (no confirmation))";
 		}
 		return MESSAGE_HELP;
 	}
@@ -830,7 +851,9 @@ public class SapphireManagerGUI {
 		int highlightIndexJ = result.getHighlightIndexJ();
 		
 		//system feedback
-		displayNormalMessage(result.getSystemFeedback());
+		displayToHelpo(result.getSystemFeedback());
+		systemFeedbackStatus = true;
+		timer.start();
 		
 		int numOfHeadings = headings.size();
 		for (int i = 0; i < numOfHeadings; i++) {
