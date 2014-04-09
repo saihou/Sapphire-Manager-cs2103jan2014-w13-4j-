@@ -38,17 +38,62 @@ public class EditCommand extends AddCommand {
 
 	private void proceedWithEdit(String userCommand, String userChoice) {
 		String userModifications = prepareUserModifications(userCommand, userChoice);
-		systemFeedback = parseAndModifyTask(userModifications, editedTask, "edit");
+		systemFeedback = parseAndModifyTask(userModifications, editedTask);
 		
 		//if parsing is successful
 		if (systemFeedback.equals("parsing success")) {
-			edit();
+			systemFeedback = parseRemovalKeywordsAndModifyTask(userCommand);
+			
+			if (systemFeedback.equals("parsing success")) {
+				edit();
+			}
+			else {
+				//do nothing; parsing error message is already contained in systemFeedback
+			}
 		} else {
 			//do nothing; parsing error message is already contained in systemFeedback
-			//systemFeedback = "Unable to parse input";
 		}
 	}
-
+	private String parseRemovalKeywordsAndModifyTask(String userCommand) {
+		String feedback = "";
+		int countNumberOfEdits = 0;
+		boolean [] fieldsToRemove = parser.extractFieldsToRemove(userCommand);
+		
+		if (fieldsToRemove[0]) {
+			feedback = "Error: Invalid keyword(s)!";
+			return feedback;
+		}
+		
+		if (fieldsToRemove[1]) {
+			countNumberOfEdits++;
+			editedTask.setLocation(null);
+		}
+		
+		if (fieldsToRemove[2]) {
+			countNumberOfEdits++;
+			editedTask.setStartTime(null);
+			editedTask.setEndTime(null);
+		}
+		
+		if (fieldsToRemove[3]) {
+			countNumberOfEdits++;
+			//can only remove date if there is no time
+			if (editedTask.getStartTime() == null && editedTask.getEndTime() == null) {
+				editedTask.setDate(null);
+			} else {
+				feedback = "Error: Cannot remove date without removing time!";
+				return feedback;
+			}
+		}
+		
+		if (countNumberOfEdits == 0) {
+			feedback = "Error: Nothing to remove!";
+		} else {
+			setTaskType(editedTask);
+			feedback = "parsing success";
+		}
+		return feedback;
+	}
 	private String prepareUserModifications(String userCommand,
 			String userChoice) {
 		int choice = convertToInteger(userChoice);
