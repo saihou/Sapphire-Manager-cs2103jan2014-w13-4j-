@@ -12,7 +12,7 @@ public class AddCommand extends Command {
 		userCommand = userCommand.trim();
 		currentTask = new Task();
 		
-		systemFeedback = parseAndModifyTask(userCommand, currentTask, "add");
+		systemFeedback = parseAndModifyTask(userCommand, currentTask);
 		
 		//if parsing is successful
 		if (systemFeedback.equals("parsing success")) {
@@ -35,7 +35,7 @@ public class AddCommand extends Command {
 		}
 	}
 	
-	protected String parseAndModifyTask(String userCommand, Task taskToBeModified, String operation) {
+	protected String parseAndModifyTask(String userCommand, Task taskToBeModified) {
 		String systemFeedback;
 		boolean isParsable = true;
 		String [] taskDetails;
@@ -114,7 +114,7 @@ public class AddCommand extends Command {
 		}
 	}
 
-	private boolean setTaskType(Task task) {
+	protected boolean setTaskType(Task task) {
 		if (task.getDate() == null && task.getStartTime() == null && task.getEndTime() == null) {
 			task.setType("noSetTiming");
 			return true;
