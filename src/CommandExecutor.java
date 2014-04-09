@@ -7,11 +7,7 @@ import java.util.ArrayList;
 
 public class CommandExecutor {
 
-	protected Storage taskStorage;
-	protected DateTimeConfiguration dateTimeConfig;
-	protected ArrayList<Task> allTasks;
 	protected ArrayList<Task> currentTaskList;
-
 	protected ActionHistory<Command> history;
 	
 	private final String MESSAGE_INVALID_COMMAND = "No such command! Press F1 for help.";
@@ -20,9 +16,6 @@ public class CommandExecutor {
 	 * @author Sai Hou
 	 */
 	public CommandExecutor() {
-		taskStorage = Storage.getInstance();
-		dateTimeConfig = new DateTimeConfiguration();
-		allTasks = taskStorage.getTaskList();
 		currentTaskList = null;
 		history = new ActionHistory<Command>();
 	}
@@ -229,7 +222,7 @@ public class CommandExecutor {
 		//basically combining all the println from various objects (UI, Task)
 		//and appending them to a StringBuilder. At the end, the StringBuilder is
 		//converted to a String and returned so that JUnit can assertEquals();
-		
+		/*
 		StringBuilder sb = new StringBuilder();
 		int count = 1;
 		for(Task task : allTasks){
@@ -238,6 +231,8 @@ public class CommandExecutor {
 		}
 		
 		return sb.toString();
+		*/
 		//return executeDisplayCommand("undone");
+		return "";
 	}
 }

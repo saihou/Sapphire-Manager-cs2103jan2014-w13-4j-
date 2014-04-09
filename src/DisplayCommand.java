@@ -4,6 +4,7 @@ import java.util.Collections;
 
 public class DisplayCommand extends Command {
 
+	
 	protected CommandParser parser;
 	protected DateTimeConfiguration dateTimeConfig;
 	
@@ -25,6 +26,13 @@ public class DisplayCommand extends Command {
 	private final static String FEEDBACK_NO_UNDONE = "You have no uncompleted tasks.";
 	private final static String FEEDBACK_NO_TASKS = "You have no tasks.";
 	
+	private final static String FEEDBACK_DISPLAY_OVERDUE = "Displaying overdue tasks.";
+	private final static String FEEDBACK_DISPLAY_MEMOS = "Displaying memos.";
+	private final static String FEEDBACK_DISPLAY_DONE = "Displaying completed tasks.";
+	private final static String FEEDBACK_DISPLAY_TODAY = "Displaying tasks for today.";
+	private final static String FEEDBACK_DISPLAY_UNDONE = "Displaying uncompleted tasks.";
+	private final static String FEEDBACK_DISPLAY_ALL = "Displaying all tasks.";
+
 	public DisplayCommand() {
 		super();
 		dateTimeConfig = new DateTimeConfiguration();
@@ -34,7 +42,6 @@ public class DisplayCommand extends Command {
 	public void execute(String userCommand) {
 		parser = new CommandParser();
 		executeDisplayCommand(userCommand);
-		
 		result.setSystemFeedback(systemFeedback);
 	}
 	
@@ -139,17 +146,17 @@ public class DisplayCommand extends Command {
 	private String getFeedbackIfHaveTasks(String displayType) {
 		String feedback = "";
 		if (displayType.equals("done")) {
-			feedback = "Displaying completed tasks.";
+			feedback = FEEDBACK_DISPLAY_DONE;
 		} else if (displayType.equals("today")) {
-			feedback = "Displaying tasks for today.";
+			feedback = FEEDBACK_DISPLAY_TODAY;
 		} else if (displayType.equals("undone")) {
-			feedback = "Displaying undone tasks.";
+			feedback = FEEDBACK_DISPLAY_UNDONE;
 		}  else if (displayType.equals("all")) {
-			feedback = "Displaying all tasks.";
+			feedback = FEEDBACK_DISPLAY_ALL;
 		} else if (displayType.equals("memos")) {
-			feedback = "Displaying memos.";
+			feedback = FEEDBACK_DISPLAY_MEMOS;
 		} else if (displayType.equals("overdue")) {
-			feedback = "Displaying overdue tasks.";
+			feedback = FEEDBACK_DISPLAY_OVERDUE;
 		}
 		
 		return feedback;
@@ -256,7 +263,6 @@ public class DisplayCommand extends Command {
 			
 			if (t == taskToHighlight) {
 				result.saveHighlightIndex();
-				result.printHighlightIndex();
 			}
 		}
 		
@@ -276,7 +282,7 @@ public class DisplayCommand extends Command {
 			displayText += '\n' + HEADING_COMPLETED;
 			
 			result.savePreviousHeading();
-			result.pushNewHeadingText('\n' + HEADING_COMPLETED);
+			result.pushNewHeadingText(HEADING_COMPLETED);
 		}
 		
 		for (int i = 0; i < taskList.size(); i++) {
