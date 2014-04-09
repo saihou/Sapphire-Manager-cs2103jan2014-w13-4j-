@@ -60,7 +60,7 @@ public class CommandParser {
 		int numberOfKeywordsPresent = getNumberOfKeywordsPresent(isAllKeywordPresent, isUndoneKeywordPresent,
 				isDoneKeywordPresent, isTodayKeywordPresent, isOverdueKeywordPresent, isMemosKeywordPresent);
 		
-		assert numberOfKeywordsPresent >=0;
+		assert numberOfKeywordsPresent >= 0;
 		
 		if (numberOfKeywordsPresent > 1 ) {
 			displayType = "Invalid number of keywords!!";
@@ -132,6 +132,62 @@ public class CommandParser {
 		return userCommand.trim().toLowerCase();
 	}
 	
+	/**
+	 * 
+	 * @param userCommand
+	 * @return boolean array
+	 * fieldsToRemove[1] = true | indicates removal of location
+	 * fieldsToRemove[2] = true | indicates removal of time
+	 * fieldsToRemove[3] = true | indicates removal of date
+	 * fieldsToRemove[0] = true | indicates parsing failed, i.e. user typed nonsense
+	 */
+	public boolean [] extractFieldsToRemove(String userCommand) {
+		boolean [] fieldsToRemove = new boolean[4];
+		int countInvalidKeywords = 0;
+		
+		if (userCommand.contains("/rm")) {
+			String[] arrayOfKeywords = prepareArrayOfKeywords(userCommand);
+			
+			for (String keyword : arrayOfKeywords) {
+				switch (keyword) {
+				case "loc" : 
+					fieldsToRemove[0] = true;
+					break;
+				case "time" :
+					fieldsToRemove[1] = true;
+					break;
+				case "date" :
+					fieldsToRemove[2] = true;
+					break;
+				default :
+					countInvalidKeywords++;
+					//not a removal keyword
+					break;
+				}
+			}
+		}
+		
+		if (countInvalidKeywords > 0) {
+			fieldsToRemove[0] = true;
+		}
+		
+		return fieldsToRemove;
+	}
+
+	private String [] prepareArrayOfKeywords(String userCommand) {
+		userCommand = userCommand.trim();
+		String [] splitUserCommand = userCommand.split("/rm");
+		if (splitUserCommand.length > 1) {
+			String stringOfKeywords = userCommand.split("/rm")[1];
+			if (stringOfKeywords != "") {
+				stringOfKeywords = stringOfKeywords.toLowerCase().trim();
+			}
+			return stringOfKeywords.split("\\s+");
+		} else {
+			return new String[0];
+		}
+	}
+
 	/**
 	 * @author Cai Di
 	 */

@@ -64,25 +64,36 @@ public class ValidationCheckTest {
 		//boundary cases: first and last value in "invalid" partition
 		assertFalse("exceed max hours", ValidationCheck.isValidTime("2459"));
 		assertFalse("exceed max min", ValidationCheck.isValidTime("2360"));
-		assertFalse("exceed min time", ValidationCheck.isValidTime("-120"));
+		assertFalse("negative", ValidationCheck.isValidTime("-120"));
+		assertFalse("alphabets", ValidationCheck.isValidTime("abcd"));
 	}
 	private void assertChoice() {
 		assertTrue("random choice", ValidationCheck.isValidChoice("1", 2));
 		
 		assertTrue("max possible value", ValidationCheck.isValidChoice("1", 1));
 		
-		//boundary cases: exceed max value by 1
+		//boundary cases
 		assertFalse("exceed max possible value", ValidationCheck.isValidChoice("2", 1));
+		assertFalse("0", ValidationCheck.isValidChoice("0", 1));
+		assertFalse("negative value", ValidationCheck.isValidChoice("-2", 1));
 	}
 	private void assertOperation() {
 		assertTrue("add", ValidationCheck.isValidOperation("add"));
+		assertTrue("add", ValidationCheck.isValidOperation("new"));
+		assertTrue("add", ValidationCheck.isValidOperation("create"));
 		assertTrue("delete", ValidationCheck.isValidOperation("delete"));
+		assertTrue("delete", ValidationCheck.isValidOperation("remove"));
+		assertTrue("delete", ValidationCheck.isValidOperation("del"));
 		assertTrue("display", ValidationCheck.isValidOperation("display"));
+		assertTrue("delete", ValidationCheck.isValidOperation("show"));
 		assertTrue("edit", ValidationCheck.isValidOperation("edit"));
 		assertTrue("update", ValidationCheck.isValidOperation("update"));
 		assertTrue("undo", ValidationCheck.isValidOperation("undo"));
 		assertTrue("clear", ValidationCheck.isValidOperation("clear"));
 		assertTrue("search", ValidationCheck.isValidOperation("search"));
+		assertTrue("delete", ValidationCheck.isValidOperation("find"));
+		assertTrue("delete", ValidationCheck.isValidOperation("exit"));
+		assertTrue("delete", ValidationCheck.isValidOperation("quit"));
 		
 		assertFalse("invalid", ValidationCheck.isValidOperation("101"));
 		assertFalse("invalid", ValidationCheck.isValidOperation("abc"));
