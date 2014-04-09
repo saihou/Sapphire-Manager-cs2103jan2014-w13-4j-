@@ -31,6 +31,7 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 //JAVAX-SWING LIBRARIES
 import javax.swing.BoxLayout;
 import javax.swing.event.CaretListener;
@@ -49,6 +50,7 @@ import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
+
 import java.awt.FlowLayout;
 
 //SapphireManagerGUI CLASS
@@ -57,6 +59,7 @@ public class SapphireManagerGUI {
 	private final static String MESSAGE_HELP = "Enter F1 for a list of commands.";
 	private final static String MESSAGE_NL = "\n";
 	private final static String MESSAGE_SPLIT_LINE = "-------------------------------------------------------------------------------------------------------------------"+MESSAGE_NL;
+	private final static String MESSAGE_INVALID_COMMAND = "No such command! Press F1 for help.";
 
 	//HELPO MESSAGES	
 	//HELPO MESSAGES - OPTIONS
@@ -108,7 +111,8 @@ public class SapphireManagerGUI {
 	private static boolean systemFeedbackStatus;
 	private static CommandExecutor myExecutor;
 	private static SapphireManagerGUI guiWindow;
-	private static Timer timer;
+	private static ActionListener timeListener;
+	private static Timer timer = new Timer(5000, timeListener);;
 
 	//GUI COMPONENT DECLARATIONS
 	private JFrame guiFrame;
@@ -117,11 +121,11 @@ public class SapphireManagerGUI {
 	private JPanel helpoPanel;
 	private JPanel inputBoxPanel;
 	private JPanel logoPanel;
-	private JScrollPane scrollPane;
-	private JTextField inputBox;
+	private static JScrollPane scrollPane;
 	private Toolkit toolkit;
 	private static JLabel dateLabel;
 	private static JLabel helpo;
+	private static JTextField inputBox;
 	private static JTextPane displayBox;
 
 	//MAIN METHOD
@@ -157,6 +161,7 @@ public class SapphireManagerGUI {
 		initializeDisplayBoxInScrollPane();
 		initializeHelpoInPanel();
 		initializeInputBoxInPanel();
+		initializeTimer();
 		contentPaneDisplay();	
 	}
 
@@ -166,13 +171,14 @@ public class SapphireManagerGUI {
 		guiFrameListener();
 		inputBoxListener();
 		displayBoxListener();
-		helpoListener();
+		helpoListener();		
+		timerListener();
 	}
 
 	//build the main frame for GUI 
 	private void initializeSapphireManager() {
 		guiFrame = new JFrame();
-		guiFrame.setBounds(100, 100, 400, 600);
+		guiFrame.setBounds(100, 100, 450, 700);
 		guiFrame.getContentPane().setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		guiFrame.getContentPane().setBackground(new Color(0x231F20));
 		guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -187,41 +193,41 @@ public class SapphireManagerGUI {
 
 	//initializes date label within a panel
 	private void initializeDateLabelInPanel() {
-		datePanel = new JPanel();
 		dateLabel = new JLabel();
-		dateLabel.setVerticalAlignment(SwingConstants.TOP);
-		dateLabel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		datePanel = new JPanel();
 		datePanel.add(dateLabel);
-
-		datePanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		datePanel.setAutoscrolls(true);
-		datePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));		
+		
 		datePanel.setBackground(new Color(0x231F20));
-		dateLabel.setPreferredSize(new Dimension(350, 30));
-		dateLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-		dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		dateLabel.setForeground(Color.WHITE);
+		datePanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		datePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));				
+		datePanel.setMaximumSize(new Dimension(450, 40));
+		datePanel.setPreferredSize(new Dimension(350, 30));
+		
+		dateLabel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		dateLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+		dateLabel.setForeground(Color.WHITE);
+		dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		dateLabel.setHorizontalTextPosition(SwingConstants.CENTER);		
+		dateLabel.setPreferredSize(new Dimension(350, 30));
+		dateLabel.setVerticalAlignment(SwingConstants.TOP);
 	}
 
 	//initializes display box within a scroll pane
 	private void initializeDisplayBoxInScrollPane() {
 		displayBox = new JTextPane();
-		displayBox.setMaximumSize(new Dimension(350, 350));
 		scrollPane = new JScrollPane(displayBox);
-		scrollPane.setMaximumSize(new Dimension(370, 450));
-
+		
 		displayBox.setBackground(new Color(0x231F20));
 		displayBox.setBorder(null);
 		displayBox.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		displayBox.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		displayBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		displayBox.setMargin(new Insets(50, 50, 50, 50));
-
+		displayBox.setMaximumSize(new Dimension(450, 350));
+		
 		scrollPane.setBorder(null);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.setPreferredSize(new Dimension(330, 440));
-		scrollPane.setWheelScrollingEnabled(false);	
+		scrollPane.setMaximumSize(new Dimension(425, 500));
+		scrollPane.setPreferredSize(new Dimension(425, 470));
 	}
 
 	//initializes input text box within a panel
@@ -232,14 +238,15 @@ public class SapphireManagerGUI {
 
 		inputBoxPanel.setBackground(Color.WHITE);
 		inputBoxPanel.setBorder(null);
-		inputBoxPanel.setPreferredSize(new Dimension(400, 25));
+		inputBoxPanel.setMaximumSize(new Dimension(450, 35));
+		inputBoxPanel.setPreferredSize(new Dimension(400, 30));
 
 		inputBox.requestFocus();
 		inputBox.setBackground(SystemColor.window);
 		inputBox.setBorder(null);
 		inputBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		inputBox.setHorizontalAlignment(SwingConstants.LEFT);
-		inputBox.setPreferredSize(new Dimension(380, 25));
+		inputBox.setPreferredSize(new Dimension(425, 20));
 	}
 
 	//initializes helpo label within a panel
@@ -250,11 +257,13 @@ public class SapphireManagerGUI {
 		helpoPanel.add(helpo);
 
 		helpoPanel.setBackground(Color.WHITE);
-		helpoPanel.setPreferredSize(new Dimension(380, 30));
-
-		helpo.setHorizontalAlignment(SwingConstants.LEFT);
-		helpo.setPreferredSize(new Dimension(380, 30));
+		helpoPanel.setMaximumSize(new Dimension(450, 35));
+		helpoPanel.setPreferredSize(new Dimension(450, 35));
+		
 		helpo.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+		helpo.setHorizontalAlignment(SwingConstants.LEFT);
+		helpo.setPreferredSize(new Dimension(425, 30));
+		
 		displayToHelpo(MESSAGE_HELP);
 	}
 
@@ -265,9 +274,17 @@ public class SapphireManagerGUI {
 		logoPanel.add(logoLabel);
 
 		logoPanel.setBackground(new Color(0x231F20));
+		logoPanel.setMaximumSize(new Dimension(450, 50));
+		logoPanel.setPreferredSize(new Dimension(380, 40));
 		ImageIcon icon = new ImageIcon(getClass().getResource("img/logo-trans.png"));
 		logoLabel.setIcon(icon);
-
+	}
+	
+	//initializes the timer
+	private static void initializeTimer() {
+		systemFeedbackStatus = true;
+		timer = new Timer(4000, timeListener);
+		timer.start();
 	}
 
 	//sets up the frame in Box Layout with components in the following order
@@ -278,7 +295,7 @@ public class SapphireManagerGUI {
 		guiFrame.getContentPane().add(datePanel, Component.CENTER_ALIGNMENT);
 		guiFrame.getContentPane().add(scrollPane, Component.CENTER_ALIGNMENT);
 		guiFrame.getContentPane().add(helpoPanel, Component.CENTER_ALIGNMENT);
-		guiFrame.getContentPane().add(inputBoxPanel);
+		guiFrame.getContentPane().add(inputBoxPanel, Component.CENTER_ALIGNMENT);
 	}
 
 	//Listener for input box
@@ -289,8 +306,6 @@ public class SapphireManagerGUI {
 				//updateScrollBar();
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 					if(!inputBox.getText().trim().equals("")) {
-						clearDisplayBox();
-
 						String userCommand = readCommandFromUser();
 						Result result = myExecutor.doUserOperation(userCommand);
 						printResults(result);
@@ -320,7 +335,9 @@ public class SapphireManagerGUI {
 					scrollPane.getVerticalScrollBar().setValue(0);
 				} else if(e.getKeyCode() == KeyEvent.VK_END) {
 					scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+				} else {
 				}
+				System.out.println("LOLOL");
 			}
 
 			@Override
@@ -361,28 +378,30 @@ public class SapphireManagerGUI {
 		});
 	}
 
-	//Listener for Helpo
-	private void helpoListener() {
-		timer = new Timer(5000, new ActionListener() {
-			@Override
+	private void timerListener() {
+		timeListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(systemFeedbackStatus == true) {
-					timer.stop();
+				timer.stop();
+				systemFeedbackStatus = false;
+				if(!timer.isRunning()) {
 					displayToHelpo(MESSAGE_HELP);
-					systemFeedbackStatus = false;
-					//inputBox.setText("");
+					displayWelcomeMessage();
 				}
 			}
-		});
+		};
+	}
 
+	//Listener for Helpo
+	private void helpoListener() {
 		inputBox.addCaretListener(new CaretListener() {
 			@Override
 			public void caretUpdate(CaretEvent arg0) {
 				String userInput = inputBox.getText().toLowerCase().trim();
 				if(userInput.equalsIgnoreCase("")) {
-					if(inputBox.getText().trim().equals("")) {
+					if(inputBox.getText().trim().equals("") && !systemFeedbackStatus) {
 						displayToHelpo(MESSAGE_HELP);
 					} else {
+						systemFeedbackStatus = false;
 						displayToHelpo(helpo.getText());
 					}
 				} else if(userInput.startsWith("a")) { //add
@@ -407,10 +426,7 @@ public class SapphireManagerGUI {
 					displayToHelpo(helpoU(userInput));
 				} else {
 					displayToHelpo("Wrong command entered!");
-					systemFeedbackStatus = true;
-					timer.start();
 				}
-				timer.stop(); //stop the timer 
 			}
 		});
 	}
@@ -445,10 +461,34 @@ public class SapphireManagerGUI {
 	private static void displaySystemMessage2(String message) {
 		appendToDisplayBox(message, new Color(0xff6c55), "Trebuchet MS", 14);
 	}
+	
+	private static void displayOverdueTasks(String message) {
+		appendToDisplayBox(message, Color.RED, "Trebuchet MS", 14);
+	}
+	
+	private static void displayTodayTasks(String message) {
+		appendToDisplayBox(message, Color.YELLOW, "Trebuchet MS", 14);
+	}
+	
+	private static void displayThisWeekTasks(String message) {
+		appendToDisplayBox(message, new Color(0xCCFFF), "Trebuchet MS", 14);
+	}
+	
+	private static void displayNextWeekTasks(String message) {
+		appendToDisplayBox(message, Color.MAGENTA, "Trebuchet MS", 14);
+	}
+	
+	private static void displayMemos(String message) {
+		appendToDisplayBox(message, Color.PINK, "Trebuchet MS", 14);
+	}
+	
+	private static void displayDoneTasks(String message) {
+		appendToDisplayBox(message, Color.GRAY, "Trebuchet MS", 14);
+	}
 
 	//displays highlighted message
 	private static void displayHighlightMessage(String message) {
-		appendToDisplayBox(message, Color.CYAN, "Trebuchet MS", 14);
+		appendToDisplayBox(message, new Color(0x00FF00), "Trebuchet MS", 14);
 	}
 
 	//displays to helpo label
@@ -475,7 +515,6 @@ public class SapphireManagerGUI {
 		aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
 		//aset = sc.addAttribute(aset, StyleConstants.Background, new Color(0xffffff));
 
-		System.out.println(displayBox);
 		//int length = displayBox.getDocument().getLength();
 		//System.out.println("Length: "+length);
 		//displayBox.setCaretPosition(length);
@@ -490,80 +529,55 @@ public class SapphireManagerGUI {
 
 	//displays available commands and keyboard shortcuts
 	private void displayHelp() {
-		displaySystemMessage("Available Commands"+MESSAGE_NL);
+		displaySystemMessage("Commands:"+MESSAGE_NL);
 		displaySystemMessage(MESSAGE_SPLIT_LINE);
-		displaySystemMessage("1. To add a new task:"+MESSAGE_NL);
+		displaySystemMessage("1) To add a new task:"+MESSAGE_NL);
 		displaySystemMessage("   add|create|new [Task Name] /[*Options]"+MESSAGE_NL);
 		displaySystemMessage("   eg. add task /on [Date^]"+MESSAGE_NL);
-		displaySystemMessage2("2. To delete a task:"+MESSAGE_NL);
+		displaySystemMessage2("2) To delete a task:"+MESSAGE_NL);
 		displaySystemMessage2("   del|delete|remove [Task Number(#)]"+MESSAGE_NL);
 		displaySystemMessage2("   eg. del 1"+MESSAGE_NL);
-		displaySystemMessage("3. To edit task:"+MESSAGE_NL);
+		displaySystemMessage("3) To edit task:"+MESSAGE_NL);
 		displaySystemMessage("   edit|update [Task Number(#)] /[*Options]"+MESSAGE_NL);
 		displaySystemMessage("   eg. edit 1 /on [Date^]"+MESSAGE_NL);
-		displaySystemMessage2("4. To display task list:"+MESSAGE_NL);
+		displaySystemMessage2("4) To display task list:"+MESSAGE_NL);
 		displaySystemMessage2("   display|show overdue|today|done|undone|memos|all"+MESSAGE_NL);
 		displaySystemMessage2("   eg. display all"+MESSAGE_NL);
-		displaySystemMessage("5. To undo the last action"+MESSAGE_NL);
+		displaySystemMessage("5) To undo the last action"+MESSAGE_NL);
 		displaySystemMessage("   (only applicable to add, edit, delete commands):"+MESSAGE_NL);
 		displaySystemMessage("   undo"+MESSAGE_NL);
-		displaySystemMessage2("6. To search for a task:"+MESSAGE_NL);
+		displaySystemMessage2("6) To search for a task:"+MESSAGE_NL);
 		displaySystemMessage2("   find|search [Task Name or Date^]"+MESSAGE_NL);
 		displaySystemMessage2("   eg. find task"+MESSAGE_NL);
-		displaySystemMessage("7a. To clear entire DONE tasks:"+MESSAGE_NL);
+		displaySystemMessage("7a) To clear entire DONE tasks:"+MESSAGE_NL);
 		displaySystemMessage("    clear"+MESSAGE_NL);
-		displaySystemMessage("7b. To clear entire task list:"+MESSAGE_NL);
+		displaySystemMessage("7b) To clear entire task list:"+MESSAGE_NL);
 		displaySystemMessage("    clear all"+MESSAGE_NL);
-		displaySystemMessage2("8. To exit the program:"+MESSAGE_NL);
+		displaySystemMessage2("8) To exit the program:"+MESSAGE_NL);
 		displaySystemMessage2("   exit|quit or 'Esc'-button"+MESSAGE_NL);	
 		displaySystemMessage(MESSAGE_NL);
 		displaySystemMessage("Options:"+MESSAGE_NL);
 		displaySystemMessage(MESSAGE_SPLIT_LINE);
-		displaySystemMessage("a. To insert date: /on [Date^]"+MESSAGE_NL);
-		displaySystemMessage2("b. To insert time duration: /from [Time~] to [Time~]"+MESSAGE_NL);
-		displaySystemMessage("c. To insert a deadline time: /at [Time~] or /by [Time~]"+MESSAGE_NL);
-		displaySystemMessage2("d. To insert a location: /loc [Name of Location]"+MESSAGE_NL);
-		displaySystemMessage("e. To mark a task as done: /mark done or /mark undone"+MESSAGE_NL);
-		displaySystemMessage2("f. To remove options (Edit Command only): /rm date|time|loc"+MESSAGE_NL);
+		displaySystemMessage("a) To insert date: /on [Date^]"+MESSAGE_NL);
+		displaySystemMessage2("b) To insert time duration: /from [Time~] to [Time~]"+MESSAGE_NL);
+		displaySystemMessage("c) To insert a deadline time: /at [Time~] or /by [Time~]"+MESSAGE_NL);
+		displaySystemMessage2("d) To insert a location: /loc [Name of Location]"+MESSAGE_NL);
+		displaySystemMessage("e) To mark a task as done: /mark done or /mark undone"+MESSAGE_NL);
+		displaySystemMessage2("f) To remove options (Edit Command only): /rm date|time|loc"+MESSAGE_NL);
 		displaySystemMessage(MESSAGE_NL);
 		displaySystemMessage("Legends:"+MESSAGE_NL);
 		displaySystemMessage(MESSAGE_SPLIT_LINE);
 		displaySystemMessage("^: Date - 6-digit [DDMMYY], eg. 010114, 311214"+MESSAGE_NL);
 		displaySystemMessage("~: Time - 4-digit [HHMM], 24-hours, eg. 1200, 2359"+MESSAGE_NL);
-
-		/*
-		displaySystemMessage("Available Commands"+MESSAGE_NL);
+		displaySystemMessage(MESSAGE_NL);
+		displaySystemMessage("Keyboard Shortcuts:"+MESSAGE_NL);
 		displaySystemMessage(MESSAGE_SPLIT_LINE);
-		displaySystemMessage("1. add|create|new [task name] /[options]"+MESSAGE_NL);
-		displaySystemMessage("2. del(ete)|remove [task number(#)]"+MESSAGE_NL);
-		displaySystemMessage("3. edit|update [task number(#)] [edits-options]"+MESSAGE_NL);
-		displaySystemMessage("4. display|show [past|today|future]"+MESSAGE_NL);
-		displaySystemMessage("5. undo"+MESSAGE_NL);
-		displaySystemMessage("6. find|search [task name|date]"+MESSAGE_NL);
-		displaySystemMessage("7a. clear (remove entire done tasks)"+MESSAGE_NL);
-		displaySystemMessage("7b. clear all (remove entire task list)"+MESSAGE_NL);
-		displaySystemMessage("8. exit|quit"+MESSAGE_NL);
-		displaySystemMessage(MESSAGE_SPLIT_LINE);
-		displaySystemMessage("- Options:"+MESSAGE_NL);
-		displaySystemMessage("   Date: '/on [date]'"+MESSAGE_NL);
-		displaySystemMessage("   Time: '/from [time] to [time]' or \n             '/at|/by [time]'"+MESSAGE_NL);
-		displaySystemMessage("   Location: '/loc [location name]'"+MESSAGE_NL);
-		displaySystemMessage("   Mark as done: '/mark [done|undone]'"+MESSAGE_NL);
-		displaySystemMessage("   Remove options (in editing): '/rm [date|time|loc]'"+MESSAGE_NL);
-		//displaySystemText("   Category: '/c [one-word-name]'");
-		//displaySystemText("   Reminder: '/r [time]'");
-		displaySystemMessage("   *Time: 4-digit 24 hours [1159]: 11.59am; [2359]: 11.59pm"+MESSAGE_NL);
-		displaySystemMessage("   *Date: 6-digit [DDMMYYYY]"+MESSAGE_NL);
-		displaySystemMessage(MESSAGE_SPLIT_LINE);
-		displaySystemMessage("Keyboard Shortcuts"+MESSAGE_NL);
-		displaySystemMessage(MESSAGE_SPLIT_LINE);
-		displaySystemMessage("ESC: Exit Program"+MESSAGE_NL);
-		displaySystemMessage("F1: Available Commands"+MESSAGE_NL);
-		displaySystemMessage("F2: Minimize Program"+MESSAGE_NL);
-		displaySystemMessage("F5: Clear Screen"+MESSAGE_NL);
-		displaySystemMessage("Up/Down Arrow, Page Up/Page Down: Scrolling"+MESSAGE_NL);
-		displaySystemMessage("HOME/END: Scroll to Top/Bottom"+MESSAGE_NL);
-		 */
+		displaySystemMessage("a) ESC: Exit Program"+MESSAGE_NL);
+		displaySystemMessage("b) F1: Help List"+MESSAGE_NL);
+		displaySystemMessage("c) F2: Minimize Program"+MESSAGE_NL);
+		displaySystemMessage("d) F5: Clear Screen"+MESSAGE_NL);
+		displaySystemMessage("e) Up/Down Arrow, Page Up/Down: Scroll Display Box"+MESSAGE_NL);
+		displaySystemMessage("f) Home/End: Scroll to Top and Bottom of Display Box"+MESSAGE_NL);
 	}
 
 	//Helpo - Keywords that starts with 'C' - Create/Clear
@@ -883,36 +897,159 @@ public class SapphireManagerGUI {
 
 		//system feedback
 		displayToHelpo(result.getSystemFeedback());
-		systemFeedbackStatus = true;
-		timer.start();
 
-		displaySystemMessage("Tasks List:"+MESSAGE_NL);
-		displaySystemMessage(MESSAGE_SPLIT_LINE);
+		if(result.getSystemFeedback().equals(MESSAGE_INVALID_COMMAND)) {
+			initializeTimer();
+		} else {
+			initializeTimer();
+			clearDisplayBox();
 
-		int numOfHeadings = headings.size();
-		for (int i = 0; i < numOfHeadings; i++) {
-			String heading = headings.poll();
-			//heading
-			displaySystemMessage(heading);
-			headings.offer(heading);
+			int numOfHeadings = headings.size();
+			for (int i = 0; i < numOfHeadings; i++) {
+				String heading = headings.poll();
+				//heading
+				if(heading.contains("Overdue")) {
+					displayOverdueTasks(heading);
+					headings.offer(heading);
 
-			Queue<String> bodyOfThisHeading = body.poll();
+					Queue<String> bodyOfThisHeading = body.poll();
 
-			int numOfTasks = bodyOfThisHeading.size();
-			for (int j = 0; j < numOfTasks ; j++) {
-				String task = bodyOfThisHeading.poll();
-				if (i == highlightIndexI && j == highlightIndexJ) {
-					//highlighted task
-					displayHighlightMessage(task);
+					int numOfTasks = bodyOfThisHeading.size();
+					for (int j = 0; j < numOfTasks ; j++) {
+						String task = bodyOfThisHeading.poll();
+						if (i == highlightIndexI && j == highlightIndexJ) {
+							//highlighted task
+							displayHighlightMessage(task);
+						}
+						else {
+							//task
+							displayOverdueTasks(task);
+						}
+						bodyOfThisHeading.offer(task);
+					}
+					displaySystemMessage(MESSAGE_NL);
+				} else if(heading.contains("Today")) {
+					displayTodayTasks(heading);
+					headings.offer(heading);
+
+					Queue<String> bodyOfThisHeading = body.poll();
+
+					int numOfTasks = bodyOfThisHeading.size();
+					for (int j = 0; j < numOfTasks ; j++) {
+						String task = bodyOfThisHeading.poll();
+						if (i == highlightIndexI && j == highlightIndexJ) {
+							//highlighted task
+							displayHighlightMessage(task);
+						}
+						else {
+							//task
+							displayTodayTasks(task);
+						}
+						bodyOfThisHeading.offer(task);
+					}
+					displaySystemMessage(MESSAGE_NL);
+				} else if(heading.contains("This")) {
+					displayThisWeekTasks(heading);
+					headings.offer(heading);
+
+					Queue<String> bodyOfThisHeading = body.poll();
+
+					int numOfTasks = bodyOfThisHeading.size();
+					for (int j = 0; j < numOfTasks ; j++) {
+						String task = bodyOfThisHeading.poll();
+						if (i == highlightIndexI && j == highlightIndexJ) {
+							//highlighted task
+							displayHighlightMessage(task);
+						}
+						else {
+							//task
+							displayThisWeekTasks(task);
+						}
+						bodyOfThisHeading.offer(task);
+					}
+					displaySystemMessage(MESSAGE_NL);
+				} else if(heading.contains("More")) {
+					displayNextWeekTasks(heading);
+					headings.offer(heading);
+
+					Queue<String> bodyOfThisHeading = body.poll();
+
+					int numOfTasks = bodyOfThisHeading.size();
+					for (int j = 0; j < numOfTasks ; j++) {
+						String task = bodyOfThisHeading.poll();
+						if (i == highlightIndexI && j == highlightIndexJ) {
+							//highlighted task
+							displayHighlightMessage(task);
+						}
+						else {
+							//task
+							displayNextWeekTasks(task);
+						}
+						bodyOfThisHeading.offer(task);
+					}
+					displaySystemMessage(MESSAGE_NL);
+				} else if(heading.contains("Memo")) {
+					displayMemos(heading);
+					headings.offer(heading);
+
+					Queue<String> bodyOfThisHeading = body.poll();
+
+					int numOfTasks = bodyOfThisHeading.size();
+					for (int j = 0; j < numOfTasks ; j++) {
+						String task = bodyOfThisHeading.poll();
+						if (i == highlightIndexI && j == highlightIndexJ) {
+							//highlighted task
+							displayHighlightMessage(task);
+						}
+						else {
+							//task
+							displayMemos(task);
+						}
+						bodyOfThisHeading.offer(task);
+					}
+					displaySystemMessage(MESSAGE_NL);
+				} else if(heading.contains("Completed")) {
+					displayDoneTasks(heading);
+					headings.offer(heading);
+
+					Queue<String> bodyOfThisHeading = body.poll();
+
+					int numOfTasks = bodyOfThisHeading.size();
+					for (int j = 0; j < numOfTasks ; j++) {
+						String task = bodyOfThisHeading.poll();
+						if (i == highlightIndexI && j == highlightIndexJ) {
+							//highlighted task
+							displayHighlightMessage(task);
+						}
+						else {
+							//task
+							displayDoneTasks(task);
+						}
+						bodyOfThisHeading.offer(task);
+					}
+					displaySystemMessage(MESSAGE_NL);
+				} else {
+					displaySystemMessage(heading);
+					headings.offer(heading);
+
+					Queue<String> bodyOfThisHeading = body.poll();
+
+					int numOfTasks = bodyOfThisHeading.size();
+					for (int j = 0; j < numOfTasks ; j++) {
+						String task = bodyOfThisHeading.poll();
+						if (i == highlightIndexI && j == highlightIndexJ) {
+							//highlighted task
+							displayHighlightMessage(task);
+						}
+						else {
+							//task
+							displaySystemMessage(task);
+						}
+						bodyOfThisHeading.offer(task);
+					}
+					displaySystemMessage(MESSAGE_NL);
 				}
-				else {
-					//task
-					displaySystemMessage(task);
-				}
-				bodyOfThisHeading.offer(task);
 			}
-			displaySystemMessage(MESSAGE_NL);
 		}
 	}
-
 }
