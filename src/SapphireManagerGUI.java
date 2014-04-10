@@ -10,7 +10,6 @@ import java.awt.ComponentOrientation;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -30,7 +29,6 @@ import java.awt.Toolkit;
 import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 //JAVAX-SWING LIBRARIES
 import javax.swing.BoxLayout;
@@ -454,41 +452,41 @@ public class SapphireManagerGUI {
 
 	//displays system message
 	private static void displaySystemMessage(String message) {
-		appendToDisplayBox(message, new Color(0xff6c00), "Trebuchet MS", 14);
+		appendToDisplayBox(message, new Color(0xff6c00), "Trebuchet MS", 14, false);
 	}
 
 	//displays system message
 	private static void displaySystemMessage2(String message) {
-		appendToDisplayBox(message, new Color(0xff6c55), "Trebuchet MS", 14);
+		appendToDisplayBox(message, new Color(0xff6c55), "Trebuchet MS", 14, false);
 	}
 	
 	private static void displayOverdueTasks(String message) {
-		appendToDisplayBox(message, Color.RED, "Trebuchet MS", 14);
+		appendToDisplayBox(message, Color.RED, "Trebuchet MS", 14, false);
 	}
 	
 	private static void displayTodayTasks(String message) {
-		appendToDisplayBox(message, Color.YELLOW, "Trebuchet MS", 14);
+		appendToDisplayBox(message, Color.YELLOW, "Trebuchet MS", 14, false);
 	}
 	
 	private static void displayThisWeekTasks(String message) {
-		appendToDisplayBox(message, new Color(0xCCFFF), "Trebuchet MS", 14);
+		appendToDisplayBox(message, new Color(0xCCFFF), "Trebuchet MS", 14, false);
 	}
 	
 	private static void displayNextWeekTasks(String message) {
-		appendToDisplayBox(message, Color.MAGENTA, "Trebuchet MS", 14);
+		appendToDisplayBox(message, Color.MAGENTA, "Trebuchet MS", 14, false);
 	}
 	
 	private static void displayMemos(String message) {
-		appendToDisplayBox(message, Color.PINK, "Trebuchet MS", 14);
+		appendToDisplayBox(message, Color.PINK, "Trebuchet MS", 14, false);
 	}
 	
 	private static void displayDoneTasks(String message) {
-		appendToDisplayBox(message, Color.GRAY, "Trebuchet MS", 14);
+		appendToDisplayBox(message, Color.GRAY, "Trebuchet MS", 14, false);
 	}
 
 	//displays highlighted message
 	private static void displayHighlightMessage(String message) {
-		appendToDisplayBox(message, new Color(0x00FF00), "Trebuchet MS", 14);
+		appendToDisplayBox(message, new Color(0x00FF00), "Trebuchet MS", 14, true);
 	}
 
 	//displays to helpo label
@@ -506,13 +504,15 @@ public class SapphireManagerGUI {
 	}
 
 	//displays the latest messages
-	private static void appendToDisplayBox(String message, Color color, String fontName, int fontSize) {
+	private static void appendToDisplayBox(String message, Color color, String fontName, int fontSize, boolean isBold) {
 		StyleContext sc = StyleContext.getDefaultStyleContext();
 		AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,  StyleConstants.Foreground, color);
 
 		aset = sc.addAttribute(aset, StyleConstants.FontSize, fontSize);
 		aset = sc.addAttribute(aset,  StyleConstants.FontFamily,  fontName);
 		aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+		aset = sc.addAttribute(aset, StyleConstants.Bold, isBold);
+		//StyleConstants.setBold((MutableAttributeSet) aset, true);
 		//aset = sc.addAttribute(aset, StyleConstants.Background, new Color(0xffffff));
 
 		//int length = displayBox.getDocument().getLength();
