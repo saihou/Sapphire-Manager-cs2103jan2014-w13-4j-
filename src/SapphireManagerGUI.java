@@ -495,7 +495,7 @@ public class SapphireManagerGUI {
 	}
 
 	private static void displayToDateLabel() {
-		dateLabel.setText("Today's Date: "+getTodayDate());
+		dateLabel.setText("TODAY'S DATE: "+getTodayDate());
 	}
 
 	//displays welcome message
@@ -509,11 +509,9 @@ public class SapphireManagerGUI {
 		AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,  StyleConstants.Foreground, color);
 
 		aset = sc.addAttribute(aset, StyleConstants.FontSize, fontSize);
-		aset = sc.addAttribute(aset,  StyleConstants.FontFamily,  fontName);
+		aset = sc.addAttribute(aset, StyleConstants.FontFamily,  fontName);
 		aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
 		aset = sc.addAttribute(aset, StyleConstants.Bold, isBold);
-		//StyleConstants.setBold((MutableAttributeSet) aset, true);
-		//aset = sc.addAttribute(aset, StyleConstants.Background, new Color(0xffffff));
 
 		//int length = displayBox.getDocument().getLength();
 		//System.out.println("Length: "+length);
