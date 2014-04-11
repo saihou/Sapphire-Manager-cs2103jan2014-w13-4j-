@@ -10,7 +10,7 @@ public class CommandExecutor {
 	protected ArrayList<Task> currentTaskList;
 	protected ActionHistory<Command> history;
 	
-	private final String MESSAGE_INVALID_COMMAND = "No such command! Press F1 for help.";
+	private final String MESSAGE_INVALID_COMMAND = "ERROR: No such command! Press F1 for help.";
 	
 	/**
 	 * @author Sai Hou
@@ -130,7 +130,7 @@ public class CommandExecutor {
 					systemFeedback = result.getSystemFeedback();
 					result = displayTaskListWithHighlightAfterUndoCommand(systemFeedback, lastCommand);
 				} else {
-					result = displayTaskListAfterCommand("Nothing to undo!");
+					result = displayTaskListAfterCommand("ERROR: Nothing to undo!");
 				}
 				break;
 				
@@ -195,7 +195,7 @@ public class CommandExecutor {
 	}
 	
 	private String getOperation(String userCommand) {
-		return getFirstWord(userCommand);
+		return getFirstWord(userCommand).toLowerCase();
 	}
 	
 	private String getFirstWord(String str) {

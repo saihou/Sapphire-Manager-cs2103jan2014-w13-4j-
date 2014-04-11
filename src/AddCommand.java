@@ -31,7 +31,7 @@ public class AddCommand extends Command {
 			systemFeedback = "Successfully added \"" + currentTask.getName() + "\".";
 		}
 		else {
-			systemFeedback = "Unable to add \"" + currentTask.getName() + "\".";
+			systemFeedback = "ERROR: Unable to add \"" + currentTask.getName() + "\".";
 		}
 	}
 	
@@ -60,7 +60,7 @@ public class AddCommand extends Command {
 		isModificationSuccessful = modifyTask(taskToBeModified, taskDetails);
 		
 		if (!isModificationSuccessful) {
-			systemFeedback = "Entering a timestamp without a date doesn't make sense!";
+			systemFeedback = "ERROR: Entering a timestamp without a date doesn't make sense!";
 		}
 		else {
 			systemFeedback = "parsing success";
@@ -149,7 +149,7 @@ public class AddCommand extends Command {
 			systemFeedback = "Undo previous addition: Successfully deleted \""+ currentTask.getName() + "\"";
 		}
 		else {
-			systemFeedback = "Cannot undo!";
+			systemFeedback = "ERROR: Cannot undo!";
 		}
 		result.setSystemFeedback(systemFeedback);
 	}
