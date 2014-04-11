@@ -21,7 +21,7 @@ public class DeleteCommand extends Command {
 	    if (currentTaskList != null) {
 		    proceedWithDeleteOnlyIfValidChoice(userChoice);
 	    } else {
-	    	systemFeedback = "No list displayed at the moment!";
+	    	systemFeedback = "ERROR: No list displayed at the moment!";
 	    }
 	    result.setSystemFeedback(systemFeedback);
 	}
@@ -31,7 +31,7 @@ public class DeleteCommand extends Command {
 		if (isValidChoice) {
 			delete(userChoice);
 		} else {
-			systemFeedback = "Invalid task number!";
+			systemFeedback = "ERROR: Invalid task number!";
 		}
 	}
 
@@ -63,7 +63,7 @@ public class DeleteCommand extends Command {
 			systemFeedback = "Undo previous deletion: Successfully added \""+ currentTask.getName() + "\"";
 		}
 		else {
-			systemFeedback = "Cannot undo!";
+			systemFeedback = "ERROR: Cannot undo!";
 		}
 		result.setSystemFeedback(systemFeedback);
 	}

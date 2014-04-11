@@ -63,12 +63,12 @@ public class CommandParser {
 		assert numberOfKeywordsPresent >= 0;
 		
 		if (numberOfKeywordsPresent > 1 ) {
-			displayType = "Invalid number of keywords!!";
+			displayType = "ERROR: Invalid number of keywords!!";
 			return displayType;
 		}
 		
 		if (numberOfKeywordsPresent < 1) {
-			displayType = "Invalid keyword(s) entered!";
+			displayType = "ERROR: Invalid keyword(s) entered!";
 			return displayType;
 		}
 		
@@ -123,7 +123,7 @@ public class CommandParser {
 			//default
 			clearType = "done";
 		} else {
-			clearType = "Invalid keyword(s) entered!";
+			clearType = "ERROR: Invalid keyword(s) entered!";
 		}
 		return clearType;
 	}
@@ -145,25 +145,23 @@ public class CommandParser {
 		boolean [] fieldsToRemove = new boolean[4];
 		int countInvalidKeywords = 0;
 		
-		if (userCommand.contains("/rm")) {
-			String[] arrayOfKeywords = prepareArrayOfKeywords(userCommand);
-			
-			for (String keyword : arrayOfKeywords) {
-				switch (keyword) {
-				case "loc" : 
-					fieldsToRemove[0] = true;
-					break;
-				case "time" :
-					fieldsToRemove[1] = true;
-					break;
-				case "date" :
-					fieldsToRemove[2] = true;
-					break;
-				default :
-					countInvalidKeywords++;
-					//not a removal keyword
-					break;
-				}
+		String[] arrayOfKeywords = prepareArrayOfKeywords(userCommand);
+
+		for (String keyword : arrayOfKeywords) {
+			switch (keyword) {
+			case "loc" : 
+				fieldsToRemove[1] = true;
+				break;
+			case "time" :
+				fieldsToRemove[2] = true;
+				break;
+			case "date" :
+				fieldsToRemove[3] = true;
+				break;
+			default :
+				countInvalidKeywords++;
+				//not a removal keyword
+				break;
 			}
 		}
 		
@@ -231,24 +229,24 @@ public class CommandParser {
 				return;
 			
 			switch (getFirstWord(temp[i])) {
-			case "from":
-				extractDuration(temp[i]);
-				break;
-			case "by":
-				//fall through
-			case "at":
-				extractDeadline(temp[i]);
-				break;
-			case "on":
-				extractDate(temp[i]);
-				break;
-			case "mark":
-				extractStatus(temp[i]);
-				break;
-			case "loc":
-				extractLocation(temp[i]);
-				break;
-			}
+				case "from":
+					extractDuration(temp[i]);
+					break;
+				case "by":
+					//fall through
+				case "at":
+					extractDeadline(temp[i]);
+					break;
+				case "on":
+					extractDate(temp[i]);
+					break;
+				case "mark":
+					extractStatus(temp[i]);
+					break;
+				case "loc":
+					extractLocation(temp[i]);
+					break;
+				}
 		}
 	}
 
@@ -285,31 +283,31 @@ public class CommandParser {
 			taskDetails[2] = getFirstWord(inputFragment);
 			//if (!ValidationCheck.isValidTime(taskDetails[2])) {
 			if (!ValidationCheck.isValidDuration(taskDetails[1], taskDetails[2])) {
-				invalidFeedBack = "Input duration is not valid.";
+				invalidFeedBack = "ERROR: Input duration is not valid.";
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
-			invalidFeedBack = "Input starting time without ending time.";
+			invalidFeedBack = "ERROR: Input starting time without ending time.";
 		}
 	}
 
 	private void extractDeadline(String inputFragment) {
 		taskDetails[1] = getFirstWord(inputFragment.substring(2));
 		if (!ValidationCheck.isValidTime(taskDetails[1])) {
-			invalidFeedBack = "Input deadline time is not valid.";
+			invalidFeedBack = "ERROR: Input deadline time is not valid.";
 		}
 	}
 
 	private void extractDate(String inputFragment) {
 		taskDetails[3] = getFirstWord(inputFragment.substring(2));
 		if (!ValidationCheck.isValidDate(taskDetails[3])) {
-			invalidFeedBack = "Input date is not valid";
+			invalidFeedBack = "ERROR: Input date is not valid";
 		}
 	}
 
 	private void extractStatus(String inputFragment) {
 		taskDetails[4] = getFirstWord(inputFragment.substring(4));
 		if (!ValidationCheck.isValidStatus(taskDetails[4])) {
-			invalidFeedBack = "Input status is not valid";
+			invalidFeedBack = "ERROR: Input status is not valid";
 		}
 	}
 
@@ -322,7 +320,7 @@ public class CommandParser {
 	 */
 	private boolean isSuppliedInputEmpty(String input) {
 		if (input.trim().equals("")) {
-			invalidFeedBack = "Empty input!";
+			invalidFeedBack = "ERROR: Empty input!";
 			return true;
 		}
 		return false;

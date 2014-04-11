@@ -5,10 +5,9 @@ import java.text.ParseException;
 /**
  * ValidationCheck
  * This static class will check for errors from user input
- * @author Sai Hou
- *
  */
 
+//@author Sai Hou
 public class ValidationCheck {
 	
 	public static boolean isValidDate(String input) {
@@ -41,9 +40,8 @@ public class ValidationCheck {
 		return isValid;
 	}
 	
-	/**
-	 * @author Cai Di
-	 */
+	
+	//@author Cai Di
 	private static boolean validateStatus(String status) {
 		if (status.compareTo("done") == 0 || status.compareTo("undone") == 0) {
 			return true;
@@ -52,9 +50,7 @@ public class ValidationCheck {
 		}
 	}
 	
-	/**
-	 * @author Sai Hou
-	 */
+	//@author Sai Hou
 	private static boolean validateChoice(String input, int sizeOfList) {
 		try {
 			int choiceEntered = Integer.parseInt(input);

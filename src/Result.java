@@ -27,9 +27,36 @@ public class Result {
 		success = false;
 	}
 	
+	public Result(int indexI, int indexJ, String feedback, boolean success) {
+		headings = new ArrayDeque<String>();
+		body = new ArrayDeque<Queue<String>>();
+		currentHeading = new ArrayDeque<String>();
+		highlightIndexI = indexI;
+		highlightIndexJ = indexJ;
+		systemFeedback = feedback;
+		this.success = success;
+	}
+	
 	public Result(String sysFeedback) {
 		this();
 		systemFeedback = sysFeedback;
+	}
+	
+	public boolean equals(Result r) {
+		boolean isEqual = true;
+		if (highlightIndexI != r.getHighlightIndexI()) {
+			isEqual = false;
+		}
+		if (highlightIndexJ != r.getHighlightIndexJ()) {
+			isEqual = false;
+		}
+		if (success != r.isSuccessful()) {
+			isEqual = false;
+		}
+		if (systemFeedback.equals(r.getSystemFeedback())) {
+			isEqual = false;
+		}
+		return isEqual;
 	}
 	
 	public void pushNewHeadingText(String heading) {
@@ -109,5 +136,30 @@ public class Result {
 				bodyOfThisHeading.offer(task);
 			}
 		}
+	}
+	
+	public String getResult() {
+		StringBuilder sb = new StringBuilder();
+		
+		int numOfHeadings = headings.size();
+		for (int i = 0; i < numOfHeadings; i++) {
+			String heading = headings.poll();
+			sb.append(heading);
+			headings.offer(heading);
+			
+			Queue<String> bodyOfThisHeading = body.poll();
+			
+			int numOfTasks = bodyOfThisHeading.size();
+			for (int j = 0; j < numOfTasks ; j++) {
+				
+				if (i == highlightIndexI && j == highlightIndexJ) {
+					sb.append("-HIGHLIGHT ME!-");
+				}
+				String task = bodyOfThisHeading.poll();
+				sb.append(task);
+				bodyOfThisHeading.offer(task);
+			}
+		}
+		return sb.toString();
 	}
 }
