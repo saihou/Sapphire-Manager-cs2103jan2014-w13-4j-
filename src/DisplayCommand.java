@@ -10,7 +10,7 @@ public class DisplayCommand extends Command {
 	
 	protected Task taskToHighlight;
 	
-	private final static String MESSAGE_INVALID_COMMAND = "Invalid command entered. Please try again.";
+	private final static String MESSAGE_INVALID_COMMAND = "ERROR: Invalid command entered. Please try again.";
 	
 	private final static String HEADING_OVERDUE = "Overdue Tasks:\n";
 	private final static String HEADING_TODAY = "Today's Tasks:\n"; 

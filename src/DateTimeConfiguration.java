@@ -96,4 +96,17 @@ public class DateTimeConfiguration {
 	public String getTimeForDisplay(String time) {
 		return time.substring(0,2) + ':' + time.substring(2);
 	}
+	
+	public String getDayForDisplay(String date) {
+		String dayInWeek = "unable to get day";
+		SimpleDateFormat dayFormat = new SimpleDateFormat("ddMMyy");  
+		try {
+			Date day = dayFormat.parse(date);
+			dayFormat.applyPattern( "EEEE" ); 
+			dayInWeek = dayFormat.format(day); 
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return dayInWeek;
+	}
 }
