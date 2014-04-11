@@ -38,9 +38,9 @@ public class ClearCommand extends Command {
 		}
 		
 		if (isSuccessful) {
-			systemFeedback = "Successfully cleared all done tasks";
+			systemFeedback = "Successfully cleared all done tasks.";
 		} else {
-			systemFeedback = "Couldn't clear tasks.";
+			systemFeedback = "ERROR: Couldn't clear tasks.";
 		}
 		
 	}
@@ -51,7 +51,7 @@ public class ClearCommand extends Command {
 		if (isSuccessful) {
 			systemFeedback = "Successfully cleared all tasks.";
 		} else {
-			systemFeedback = "Couldn't clear tasks.";
+			systemFeedback = "ERROR: Couldn't clear tasks.";
 		}
 	}
 	

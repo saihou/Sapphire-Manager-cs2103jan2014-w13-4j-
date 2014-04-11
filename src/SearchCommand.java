@@ -4,7 +4,7 @@ import java.util.Collections;
 
 public class SearchCommand extends DisplayCommand {
 	
-	private final static String MESSAGE_NO_SEARCH_RESULTS = "No records found!";
+	private final static String MESSAGE_NO_SEARCH_RESULTS = "ERROR: No records found!";
 	
 	public SearchCommand(ArrayList<Task> current) {
 		super();

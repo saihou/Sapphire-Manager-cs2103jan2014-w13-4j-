@@ -21,7 +21,7 @@ public class EditCommand extends AddCommand {
 		if (currentTaskList != null) {
 			proceedWithEditOnlyIfValidChoice(userCommand, userChoice);
 		} else {
-			systemFeedback = "No list displayed at the moment!";
+			systemFeedback = "ERROR: No list displayed at the moment!";
 		}
 		result.setSystemFeedback(systemFeedback);
 	}
@@ -32,7 +32,7 @@ public class EditCommand extends AddCommand {
 		if (isValidChoice) {
 			proceedWithEdit(userCommand, userChoice);
 		} else {
-			systemFeedback = "Invalid task number!";
+			systemFeedback = "ERROR: Invalid task number!";
 		}
 	}
 
@@ -54,42 +54,47 @@ public class EditCommand extends AddCommand {
 			//do nothing; parsing error message is already contained in systemFeedback
 		}
 	}
+	
 	private String parseRemovalKeywordsAndModifyTask(String userCommand) {
 		String feedback = "";
-		int countNumberOfEdits = 0;
-		boolean [] fieldsToRemove = parser.extractFieldsToRemove(userCommand);
-		
-		if (fieldsToRemove[0]) {
-			feedback = "Error: Invalid keyword(s)!";
-			return feedback;
-		}
-		
-		if (fieldsToRemove[1]) {
-			countNumberOfEdits++;
-			editedTask.setLocation(null);
-		}
-		
-		if (fieldsToRemove[2]) {
-			countNumberOfEdits++;
-			editedTask.setStartTime(null);
-			editedTask.setEndTime(null);
-		}
-		
-		if (fieldsToRemove[3]) {
-			countNumberOfEdits++;
-			//can only remove date if there is no time
-			if (editedTask.getStartTime() == null && editedTask.getEndTime() == null) {
-				editedTask.setDate(null);
-			} else {
-				feedback = "Error: Cannot remove date without removing time!";
+		if (userCommand.contains("/rm")) {
+			int countNumberOfEdits = 0;
+			boolean [] fieldsToRemove = parser.extractFieldsToRemove(userCommand);
+			
+			if (fieldsToRemove[0]) {
+				feedback = "ERROR: Invalid keyword(s)!";
 				return feedback;
 			}
-		}
-		
-		if (countNumberOfEdits == 0) {
-			feedback = "Error: Nothing to remove!";
+			
+			if (fieldsToRemove[1]) {
+				countNumberOfEdits++;
+				editedTask.setLocation(null);
+			}
+			
+			if (fieldsToRemove[2]) {
+				countNumberOfEdits++;
+				editedTask.setStartTime(null);
+				editedTask.setEndTime(null);
+			}
+			
+			if (fieldsToRemove[3]) {
+				countNumberOfEdits++;
+				//can only remove date if there is no time
+				if (editedTask.getStartTime() == null && editedTask.getEndTime() == null) {
+					editedTask.setDate(null);
+				} else {
+					feedback = "ERROR: Cannot remove date without removing time!";
+					return feedback;
+				}
+			}
+			
+			if (countNumberOfEdits == 0) {
+				feedback = "ERROR: Nothing to remove!";
+			} else {
+				setTaskType(editedTask);
+				feedback = "parsing success";
+			}
 		} else {
-			setTaskType(editedTask);
 			feedback = "parsing success";
 		}
 		return feedback;
@@ -111,7 +116,7 @@ public class EditCommand extends AddCommand {
 			result.setSuccess(true);
 			systemFeedback = "Successfully made changes to \"" + editedTask.getName() +"\".";
 		} else {
-			systemFeedback = "Unable to edit";
+			systemFeedback = "ERROR: Unable to edit";
 		}
 	}
 	
@@ -123,7 +128,7 @@ public class EditCommand extends AddCommand {
 			systemFeedback = "Undo previous update: Successfully reverted \""+ currentTask.getName() + "\"";
 		}
 		else {
-			systemFeedback = "Cannot undo!";
+			systemFeedback = "ERROR: Cannot undo!";
 		}
 		result.setSystemFeedback(systemFeedback);
 	}
