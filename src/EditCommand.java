@@ -11,10 +11,8 @@ public class EditCommand extends AddCommand {
 	}
 	
 	//constructor used by junit test for initialisation
-	public EditCommand(ArrayList<Task> current, ArrayList<Task> all) {
+	public EditCommand() {
 		super();
-		currentTaskList = current;
-		allTasks = all;
 	}
 	
 	@Override
@@ -43,7 +41,7 @@ public class EditCommand extends AddCommand {
 
 	private void proceedWithEdit(String userCommand, String userChoice) {
 		String userModifications = prepareUserModifications(userCommand, userChoice);
-		systemFeedback = parseAndModifyTask(userModifications, editedTask);
+		systemFeedback = parseAndModifyTask(userModifications, editedTask, "edit");
 		
 		//if parsing is successful
 		if (systemFeedback.equals("parsing success")) {
@@ -136,7 +134,7 @@ public class EditCommand extends AddCommand {
 			result.setSuccess(true);
 			systemFeedback = "Successfully made changes to \"" + editedTask.getName() +"\".";
 		} else {
-			systemFeedback = "ERROR: Unable to edit";
+			systemFeedback = "ERROR: Unable to edit.";
 		}
 	}
 	
