@@ -306,6 +306,11 @@ public class CommandParser {
 		
 		boolean fromExist = false;
 		boolean atExist = false;
+		int numOfFrom = 0,
+			numOfAt   = 0,
+			numOfOn   = 0,
+			numOfMark = 0,
+			numOfLoc  = 0;
 		
 		for (int i = 1; i < temp.length; i++) {
 			// exit method if input is not valid
@@ -318,26 +323,51 @@ public class CommandParser {
 				case "from":
 					isCommand = true;
 					fromExist = true;
+					numOfFrom++;
 					extractDuration(temp[i]);
+					if(numOfFrom > 1){
+						invalidFeedBack = "ERROR: More than one command /from is detected.";
+						return;
+					}
 					break;
 				case "by":
 					//fall through
 				case "at":
 					isCommand = true;
 					atExist = true;
+					numOfAt++;
 					extractDeadline(temp[i]);
+					if(numOfAt > 1){
+						invalidFeedBack = "ERROR: More than one command /at is detected.";
+						return;
+					}
 					break;
 				case "on":
 					isCommand = true;
+					numOfOn++;
 					extractDate(temp[i]);
+					if(numOfOn > 1){
+						invalidFeedBack = "ERROR: More than one command /on is detected.";
+						return;
+					}
 					break;
 				case "mark":
 					isCommand = true;
+					numOfMark++;
 					extractStatus(temp[i]);
+					if(numOfMark > 1){
+						invalidFeedBack = "ERROR: More than one command /mark is detected.";
+						return;
+					}
 					break;
 				case "loc":
 					isCommand = true;
+					numOfLoc++;
 					extractLocation(temp[i]);
+					if(numOfLoc > 1){
+						invalidFeedBack = "ERROR: More than one command /loc is detected.";
+						return;
+					}
 					break;
 				}
 			
@@ -346,6 +376,7 @@ public class CommandParser {
 				return;
 			}
 		}
+		
 		if(fromExist == true && atExist == true){
 			invalidFeedBack = "ERROR: Command /from and /at are mutually exclusive.";
 			return;
