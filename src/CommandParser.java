@@ -197,7 +197,7 @@ public class CommandParser {
 	 * [5] = task location
 	 */
 
-	public void extractTaskDetails(String input) {
+	public void extractTaskDetailsForEdit(String input) {
 		taskDetails = new String[6];
 		invalidFeedBack = null;
 
@@ -211,6 +211,7 @@ public class CommandParser {
 		}
 		
 		input = extractName(input);
+		
 		
 		if(input.indexOf("/") == -1){
 			return;
@@ -262,6 +263,86 @@ public class CommandParser {
 				invalidFeedBack = "ERROR: Input Command is not valid.";
 				return;
 			}
+		}
+	}
+	public void extractTaskDetails(String input) {
+		taskDetails = new String[6];
+		invalidFeedBack = null;
+
+		//default value is null
+		for (int i = 0; i < taskDetails.length; i++) {
+			taskDetails[i] = null;
+		}
+
+		if (isSuppliedInputEmpty(input)) {
+			return;
+		}
+		
+		input = extractName(input);
+		if(taskDetails[0].compareTo("") == 0){
+			invalidFeedBack = "ERROR: No task name.";
+			return;
+		}
+		
+		if(input.indexOf("/") == -1){
+			return;
+		}
+		
+		String[] temp = input.split("/");
+		
+		if(temp.length == 0){
+			invalidFeedBack = "ERROR: Command keyword is missing.";
+			return;
+		}
+		
+		boolean fromExist = false;
+		boolean atExist = false;
+		
+		for (int i = 1; i < temp.length; i++) {
+			// exit method if input is not valid
+			if (invalidFeedBack != null)
+				return;
+			
+			
+			boolean isCommand = false;
+			
+			switch (getFirstWord(temp[i])) {
+				case "from":
+					isCommand = true;
+					fromExist = true;
+					extractDuration(temp[i]);
+					break;
+				case "by":
+					//fall through
+				case "at":
+					isCommand = true;
+					atExist = true;
+					extractDeadline(temp[i]);
+					break;
+				case "on":
+					isCommand = true;
+					extractDate(temp[i]);
+					break;
+				case "mark":
+					isCommand = true;
+					extractStatus(temp[i]);
+					break;
+				case "loc":
+					isCommand = true;
+					extractLocation(temp[i]);
+					break;
+				case "rm":
+					isCommand = true;
+				}
+			
+			if(isCommand == false){
+				invalidFeedBack = "ERROR: Input Command is not valid.";
+				return;
+			}
+		}
+		if(fromExist == true && atExist == true){
+			invalidFeedBack = "ERROR: Command /from and /at are mutually exclusive";
+			return;
 		}
 	}
 
