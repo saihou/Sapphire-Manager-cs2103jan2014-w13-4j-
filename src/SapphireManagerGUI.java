@@ -108,6 +108,7 @@ public class SapphireManagerGUI {
 
 	//NECESSARY DECLARATIONS
 	private static boolean systemFeedbackStatus;
+	private static boolean isErrorMsg = false;
 	private static CommandExecutor myExecutor;
 	private static SapphireManagerGUI guiWindow;
 	private static ActionListener timeListener;
@@ -121,7 +122,7 @@ public class SapphireManagerGUI {
 	private JPanel inputBoxPanel;
 	private JPanel logoPanel;
 	private static JScrollPane scrollPane;
-	private Toolkit toolkit;
+	private Dimension toolkit;
 	private static JLabel dateLabel;
 	private static JLabel helpo;
 	private static JTextField inputBox;
@@ -163,7 +164,7 @@ public class SapphireManagerGUI {
 		initializeDisplayBoxInScrollPane();
 		initializeHelpoInPanel();
 		initializeInputBoxInPanel();
-		initializeTimer();
+		startTimer();
 		contentPaneDisplay();	
 	}
 	
@@ -189,9 +190,9 @@ public class SapphireManagerGUI {
 		guiFrame.setResizable(false);
 		guiFrame.setTitle("Sapphire Manager");	
 		//sets the initial display position of the program
-		toolkit = Toolkit.getDefaultToolkit();
-		int x = toolkit.getScreenSize().width-guiFrame.getWidth();
-		int y = toolkit.getScreenSize().height-guiFrame.getHeight()-40;
+		toolkit = Toolkit.getDefaultToolkit().getScreenSize();
+		int x = (int)((toolkit.getWidth() - guiFrame.getWidth()) /2);
+		int y = (int)((toolkit.getHeight() - guiFrame.getHeight()) /2);
 		guiFrame.setLocation(x, y);
 	}
 	
@@ -291,10 +292,17 @@ public class SapphireManagerGUI {
 	
 	//@author A0097706U
 	//initializes the timer
-	private static void initializeTimer() {
+	private static void startTimer() {
 		systemFeedbackStatus = true;
-		timer = new Timer(4000, timeListener);
-		timer.start();
+		timer = new Timer(5000, timeListener);
+		if(timer.isRunning()) {
+			System.out.println("Start timer");
+			timer.start();
+		} else {
+			System.out.println("Restart timer");
+			timer.restart();
+		}
+		System.out.println("4) Timer is running?" +timer.isRunning());
 	}
 	
 	//@author A0097706U
@@ -395,9 +403,12 @@ public class SapphireManagerGUI {
 	private void timerListener() {
 		timeListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				System.out.println("1) Timer is running? "+timer.isRunning());
 				timer.stop();
+				System.out.println("2) Timer is running? "+timer.isRunning());
 				systemFeedbackStatus = false;
 				if(!timer.isRunning()) {
+					System.out.println("3) Timer is running? "+timer.isRunning());
 					displayToHelpo(MESSAGE_HELP);
 					displayWelcomeMessage();
 				}
@@ -412,11 +423,10 @@ public class SapphireManagerGUI {
 			@Override
 			public void caretUpdate(CaretEvent arg0) {
 				String userInput = inputBox.getText().toLowerCase().trim();
-				if(userInput.equalsIgnoreCase("")) {
+				if(userInput.equals("")) {
 					if(inputBox.getText().trim().equals("") && !systemFeedbackStatus) {
 						displayToHelpo(MESSAGE_HELP);
 					} else {
-						systemFeedbackStatus = false;
 						displayToHelpo(helpo.getText());
 					}
 				} else if(userInput.startsWith("a")) { //add
@@ -440,7 +450,8 @@ public class SapphireManagerGUI {
 				} else if(userInput.startsWith("u")) { //update or undo
 					displayToHelpo(helpoU(userInput));
 				} else {
-					displayToHelpo("Wrong command entered!");
+					displayToHelpo(MESSAGE_INVALID_COMMAND);
+					startTimer();
 				}
 			}
 		});
@@ -633,7 +644,7 @@ public class SapphireManagerGUI {
 		} else if(userInput.startsWith("cl")) {
 			return helpoClear(userInput);
 		} else {
-			return MESSAGE_HELP;
+			return MESSAGE_INVALID_COMMAND;
 		}
 	}
 
@@ -647,7 +658,7 @@ public class SapphireManagerGUI {
 		} else if(userInput.startsWith("de")) {
 			return helpoDelete(userInput);
 		} else {
-			return MESSAGE_HELP;
+			return MESSAGE_INVALID_COMMAND;
 		}
 	}
 
@@ -661,7 +672,7 @@ public class SapphireManagerGUI {
 		} else if(userInput.startsWith("ex")) {
 			return helpoExit(userInput);
 		} else {
-			return MESSAGE_HELP;
+			return MESSAGE_INVALID_COMMAND;
 		}
 	}
 
@@ -675,7 +686,7 @@ public class SapphireManagerGUI {
 		} else if(userInput.startsWith("sh")) {
 			return helpoDisplay(userInput);
 		} else {
-			return MESSAGE_HELP;
+			return MESSAGE_INVALID_COMMAND;
 		}
 	}
 
@@ -689,7 +700,7 @@ public class SapphireManagerGUI {
 		} else if(userInput.startsWith("un")) {
 			return helpoUndo(userInput);
 		} else {
-			return MESSAGE_HELP;
+			return MESSAGE_INVALID_COMMAND;
 		}
 	}
 
@@ -715,7 +726,7 @@ public class SapphireManagerGUI {
 			if(splited[0].equals(HELPO_ACTIONS_ADD) || splited[0].equals(HELPO_ACTIONS_CREATE) || splited[0].equals(HELPO_ACTIONS_NEW)) {
 				entered = splited[0];
 			} else {
-				return MESSAGE_HELP;
+				return MESSAGE_INVALID_COMMAND;
 			}
 		}
 		if(userInput.contains(" /")) {
@@ -730,7 +741,7 @@ public class SapphireManagerGUI {
 		if(userInput.equals("c") || userInput.equals("cl") || userInput.equals("cle") || userInput.equals("clea") || userInput.startsWith("clear")) {
 			return HELPO_ACTIONS_CLEAR+" ("+HELPO_OPTIONS_CLEAR_ALL+"-clear everything (no confirmation))";
 		}
-		return MESSAGE_HELP;
+		return MESSAGE_INVALID_COMMAND;
 	}
 
 	//@author A0097706U
@@ -755,7 +766,7 @@ public class SapphireManagerGUI {
 			if(splited[0].equals(HELPO_ACTIONS_DEL) || splited[0].equals(HELPO_ACTIONS_DELETE) || splited[0].equals(HELPO_ACTIONS_REMOVE)) {
 				entered = splited[0];
 			} else {
-				return MESSAGE_HELP;
+				return MESSAGE_INVALID_COMMAND;
 			}
 		}
 		return entered+" "+HELPO_FORMAT_TASK_NO;
@@ -782,7 +793,7 @@ public class SapphireManagerGUI {
 			if(splited[0].equals(HELPO_ACTIONS_DISPLAY) || splited[0].equals(HELPO_ACTIONS_SHOW)) {
 				entered = splited[0];
 			} else {
-				return MESSAGE_HELP;
+				return MESSAGE_INVALID_COMMAND;
 			}
 		}
 		return entered+" "+HELPO_FORMAT_DISPLAY;
@@ -808,7 +819,7 @@ public class SapphireManagerGUI {
 			if(splited[0].equals(HELPO_ACTIONS_EDIT) || splited[0].equals(HELPO_ACTIONS_UPDATE)) {
 				entered = splited[0];
 			} else {
-				return MESSAGE_HELP;
+				return MESSAGE_INVALID_COMMAND;
 			}
 		}
 		if(userInput.contains(" /")) {
@@ -835,7 +846,7 @@ public class SapphireManagerGUI {
 			if(splited[0].equals(HELPO_ACTIONS_EXIT) || splited[0].equals(HELPO_ACTIONS_QUIT)) {
 				entered = splited[0];
 			} else {
-				return MESSAGE_HELP;
+				return MESSAGE_INVALID_COMMAND;
 			}
 		}
 		return entered;
@@ -848,7 +859,7 @@ public class SapphireManagerGUI {
 			Pattern p = Pattern.compile(action+"(.+?)[/\\/w]");
 			Matcher m = p.matcher(userInput);
 
-			if(m.find() && m.group(1).trim().equals("")) {
+			if(m.find() && m.group(1).trim().equals("") && action.equals("add")) {
 				return "Please enter a task name";
 			} else {
 				Pattern pOn = Pattern.compile("(/on)( )([0-9]{6})");
@@ -923,7 +934,8 @@ public class SapphireManagerGUI {
 			if(splited[0].equals("find") || splited[0].equals("search")) {
 				entered = splited[0];
 			} else {
-				return MESSAGE_HELP;
+				startTimer();
+				return MESSAGE_INVALID_COMMAND;
 			}
 		}
 		return entered+" "+HELPO_FORMAT_SEARCH;
@@ -935,7 +947,8 @@ public class SapphireManagerGUI {
 		if(userInput.equals("u") || userInput.equals("un") || userInput.equals("und") || userInput.startsWith("undo")) {
 			return HELPO_ACTIONS_UNDO;
 		}
-		return MESSAGE_HELP;
+		startTimer();
+		return MESSAGE_INVALID_COMMAND;
 	}
 
 	//@author A0097706U
@@ -959,9 +972,8 @@ public class SapphireManagerGUI {
 		displayToHelpo(result.getSystemFeedback());
 
 		if(result.getSystemFeedback().equals(MESSAGE_INVALID_COMMAND) || result.getSystemFeedback().contains("ERROR")) {
-			initializeTimer();
+			startTimer();
 		} else {
-			initializeTimer();
 			clearDisplayBox();
 
 			int numOfHeadings = headings.size();
