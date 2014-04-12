@@ -230,6 +230,12 @@ public class CommandParser {
 		
 		boolean fromExist = false;
 		boolean atExist = false;
+		int numOfFrom = 0,
+				numOfAt   = 0,
+				numOfOn   = 0,
+				numOfMark = 0,
+				numOfLoc  = 0,
+				numOfRm   = 0;
 		
 		for (int i = 1; i < temp.length; i++) {
 			// exit method if input is not valid
@@ -242,6 +248,12 @@ public class CommandParser {
 				case "from":
 					isCommand = true;
 					fromExist = true;
+					numOfFrom++;
+					// more than one command /from is detected
+					if(numOfFrom > 1){
+						invalidFeedBack = "ERROR: More than one command /from is detected.";
+						return;
+					}
 					extractDuration(temp[i]);
 					break;
 				case "by":
@@ -249,21 +261,52 @@ public class CommandParser {
 				case "at":
 					isCommand = true;
 					atExist = true;
+					numOfAt++;
+					// more than one command /at is detected
+					if(numOfAt > 1){
+						invalidFeedBack = "ERROR: More than one command /at is detected.";
+						return;
+					}
 					extractDeadline(temp[i]);
 					break;
 				case "on":
 					isCommand = true;
+					numOfOn++;
+					// more than one command /on is detected
+					if(numOfOn > 1){
+						invalidFeedBack = "ERROR: More than one command /on is detected.";
+						return;
+					}
 					extractDate(temp[i]);
 					break;
 				case "mark":
 					isCommand = true;
+					numOfMark++;
+					// more than one command /mark is detected
+					if(numOfMark > 1){
+						invalidFeedBack = "ERROR: More than one command /mark is detected.";
+						return;
+					}
 					extractStatus(temp[i]);
 					break;
 				case "loc":
 					isCommand = true;
+					numOfLoc++;
+					// more than one command /loc is detected
+					if(numOfLoc > 1){
+						invalidFeedBack = "ERROR: More than one command /loc is detected.";
+						return;
+					}
 					extractLocation(temp[i]);
+					numOfLoc++;
 					break;
 				case "rm":
+					numOfRm++;
+					// more than one command /rm is detected
+					if(numOfRm > 1){
+						invalidFeedBack = "ERROR: More than one command /rm is detected.";
+						return;
+					}
 					isCommand = true;
 				}
 			
@@ -272,10 +315,12 @@ public class CommandParser {
 				return;
 			}
 		}
+		
 		if(fromExist == true && atExist == true){
 			invalidFeedBack = "ERROR: Command /from and /at are mutually exclusive.";
 			return;
 		}
+		
 	}
 	/*
 	 * input with a "/" but no command keyword is not valid
