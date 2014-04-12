@@ -5,6 +5,7 @@ public class DeleteCommand extends Command {
 	
 	public CommandParser parser = null;
 	
+	//constructor used by junit test for initialisation
 	public DeleteCommand() {
 		super();
 	}

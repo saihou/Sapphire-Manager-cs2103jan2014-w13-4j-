@@ -11,6 +11,11 @@ public class SearchCommand extends DisplayCommand {
 		currentTaskList = current;
 	}
 	
+	//constructor used by junit test for initialisation
+	public SearchCommand() {
+		super();
+	}
+	
 	/**
 	 * @author Cai Di
 	 */
