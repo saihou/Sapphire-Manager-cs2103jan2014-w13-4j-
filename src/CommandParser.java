@@ -14,11 +14,11 @@ public class CommandParser {
 		return userInput.trim().split("\\s+")[0];
 	}
 	
+	//@author Sai Hou
 	/**
 	 * @param userCommand
 	 * @return displayType, "all", "undone", "done" or "today"
 	 */
-	 //@author Sai Hou
 	public String parseDisplayType(String userCommand) {
 		String displayType = "";
 		

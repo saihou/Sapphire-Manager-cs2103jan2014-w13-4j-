@@ -50,7 +50,7 @@ public class CommandParserTest {
 	
 	private void userInputWithDurationAndDeadline(CommandParser parser){
 		parser.extractTaskDetailsForAdd("task /from 1010 to 2020 /at 1010");
-		assertEquals("Error Message", "ERROR: Command /from and /at are mutually exclusive", parser.invalidFeedBack);
+		assertEquals("Error Message", "ERROR: Command /from and /at are mutually exclusive.", parser.invalidFeedBack);
 	}
 	
 	private void userInputWithInvalidCommand(CommandParser parser){
