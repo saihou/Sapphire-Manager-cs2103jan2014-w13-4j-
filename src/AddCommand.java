@@ -12,7 +12,7 @@ public class AddCommand extends Command {
 		userCommand = userCommand.trim();
 		currentTask = new Task();
 		
-		systemFeedback = parseAndModifyTask(userCommand, currentTask);
+		systemFeedback = parseAndModifyTask(userCommand, currentTask, "add");
 		
 		//if parsing is successful
 		if (systemFeedback.equals("parsing success")) {
@@ -35,12 +35,12 @@ public class AddCommand extends Command {
 		}
 	}
 	
-	protected String parseAndModifyTask(String userCommand, Task taskToBeModified) {
+	protected String parseAndModifyTask(String userCommand, Task taskToBeModified, String caller) {
 		String systemFeedback;
 		boolean isParsable = true;
 		String [] taskDetails;
 		
-		taskDetails = parseUserCommand(userCommand);
+		taskDetails = parseUserCommand(userCommand, caller);
 		isParsable = checkParsability(isParsable);
 		
 		if (!isParsable) {
@@ -81,9 +81,14 @@ public class AddCommand extends Command {
 		return isParsable;
 	}
 
-	private String[] parseUserCommand(String userCommand) {
+	private String[] parseUserCommand(String userCommand, String caller) {
 		String[] taskDetails;
-		parser.extractTaskDetails(userCommand);
+		
+		if (caller.equals("add")) {
+			parser.extractTaskDetailsForAdd(userCommand);
+		} else {
+			parser.extractTaskDetailsForEdit(userCommand);
+		}
 		
 		taskDetails = parser.taskDetails;
 		return taskDetails;

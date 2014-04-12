@@ -40,7 +40,11 @@ public class ValidationCheck {
 		return isValid;
 	}
 	
-	
+	public static boolean isValidLocation(String loc) {
+		boolean isValid = validateLocation(loc);
+		return isValid;
+	}
+
 	//@author Cai Di
 	private static boolean validateStatus(String status) {
 		if (status.compareTo("done") == 0 || status.compareTo("undone") == 0) {
@@ -124,6 +128,7 @@ public class ValidationCheck {
 		}
 		return true;
 	}
+	
 	private static boolean validateDuration(String from, String to) {
 		try {
 			int start = Integer.parseInt(from);
@@ -133,5 +138,21 @@ public class ValidationCheck {
 		} catch (NumberFormatException e) {
 			return false;
 		}
+	}
+	
+	private static boolean validateLocation(String loc) {
+		boolean isValid = false;
+		
+		if (loc.trim().length() == 0) {
+			return isValid;
+		}
+		
+		char firstChar = loc.charAt(0);
+		if (firstChar >= 'A' && firstChar <= 'z') {
+			isValid = true;
+		} else {
+			isValid = false;
+		}
+		return isValid;
 	}
 }

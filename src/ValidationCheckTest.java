@@ -16,7 +16,17 @@ public class ValidationCheckTest {
 		assertOperation();
 		assertDuration();
 		assertStatus();
+		assertLocation();
 	}
+	
+	private void assertLocation() {
+		assertTrue("valid location", ValidationCheck.isValidLocation("Holland V"));
+		assertTrue("valid location", ValidationCheck.isValidLocation("Z123"));
+		assertTrue("valid location", ValidationCheck.isValidLocation("a#$#$"));
+		assertFalse("invalid location", ValidationCheck.isValidLocation("/rmma"));
+		assertFalse("invalid location", ValidationCheck.isValidLocation("*#@%"));
+	}
+	
 	private void assertDuration() {
 		assertTrue("random valid duration", ValidationCheck.isValidDuration("1000", "1001"));
 		

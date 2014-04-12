@@ -224,77 +224,6 @@ public class CommandParser {
 			return;
 		}
 		
-		for (int i = 1; i < temp.length; i++) {
-			// exit method if input is not valid
-			if (invalidFeedBack != null)
-				return;
-			
-			
-			boolean isCommand = false;
-			
-			switch (getFirstWord(temp[i])) {
-				case "from":
-					isCommand = true;
-					extractDuration(temp[i]);
-					break;
-				case "by":
-					//fall through
-				case "at":
-					isCommand = true;
-					extractDeadline(temp[i]);
-					break;
-				case "on":
-					isCommand = true;
-					extractDate(temp[i]);
-					break;
-				case "mark":
-					isCommand = true;
-					extractStatus(temp[i]);
-					break;
-				case "loc":
-					isCommand = true;
-					extractLocation(temp[i]);
-					break;
-				case "rm":
-					isCommand = true;
-				}
-			
-			if(isCommand == false){
-				invalidFeedBack = "ERROR: Input Command is not valid.";
-				return;
-			}
-		}
-	}
-	public void extractTaskDetails(String input) {
-		taskDetails = new String[6];
-		invalidFeedBack = null;
-
-		//default value is null
-		for (int i = 0; i < taskDetails.length; i++) {
-			taskDetails[i] = null;
-		}
-
-		if (isSuppliedInputEmpty(input)) {
-			return;
-		}
-		
-		input = extractName(input);
-		if(taskDetails[0].compareTo("") == 0){
-			invalidFeedBack = "ERROR: No task name.";
-			return;
-		}
-		
-		if(input.indexOf("/") == -1){
-			return;
-		}
-		
-		String[] temp = input.split("/");
-		
-		if(temp.length == 0){
-			invalidFeedBack = "ERROR: Command keyword is missing.";
-			return;
-		}
-		
 		boolean fromExist = false;
 		boolean atExist = false;
 		
@@ -302,7 +231,6 @@ public class CommandParser {
 			// exit method if input is not valid
 			if (invalidFeedBack != null)
 				return;
-			
 			
 			boolean isCommand = false;
 			
@@ -335,13 +263,91 @@ public class CommandParser {
 					isCommand = true;
 				}
 			
+			if(isCommand == false) {
+				invalidFeedBack = "ERROR: Input Command is not valid.";
+				return;
+			}
+		}
+		if(fromExist == true && atExist == true){
+			invalidFeedBack = "ERROR: Command /from and /at are mutually exclusive.";
+			return;
+		}
+	}
+	public void extractTaskDetailsForAdd(String input) {
+		taskDetails = new String[6];
+		invalidFeedBack = null;
+
+		//default value is null
+		for (int i = 0; i < taskDetails.length; i++) {
+			taskDetails[i] = null;
+		}
+
+		if (isSuppliedInputEmpty(input)) {
+			return;
+		}
+		
+		input = extractName(input);
+		
+		if(taskDetails[0] == null) {
+			invalidFeedBack = "ERROR: No task name.";
+			return;
+		}
+		
+		if(input.indexOf("/") == -1){
+			return;
+		}
+		
+		String[] temp = input.split("/");
+		
+		if(temp.length == 0){
+			invalidFeedBack = "ERROR: Command keyword is missing.";
+			return;
+		}
+		
+		boolean fromExist = false;
+		boolean atExist = false;
+		
+		for (int i = 1; i < temp.length; i++) {
+			// exit method if input is not valid
+			if (invalidFeedBack != null)
+				return;
+			
+			boolean isCommand = false;
+			
+			switch (getFirstWord(temp[i])) {
+				case "from":
+					isCommand = true;
+					fromExist = true;
+					extractDuration(temp[i]);
+					break;
+				case "by":
+					//fall through
+				case "at":
+					isCommand = true;
+					atExist = true;
+					extractDeadline(temp[i]);
+					break;
+				case "on":
+					isCommand = true;
+					extractDate(temp[i]);
+					break;
+				case "mark":
+					isCommand = true;
+					extractStatus(temp[i]);
+					break;
+				case "loc":
+					isCommand = true;
+					extractLocation(temp[i]);
+					break;
+				}
+			
 			if(isCommand == false){
 				invalidFeedBack = "ERROR: Input Command is not valid.";
 				return;
 			}
 		}
 		if(fromExist == true && atExist == true){
-			invalidFeedBack = "ERROR: Command /from and /at are mutually exclusive";
+			invalidFeedBack = "ERROR: Command /from and /at are mutually exclusive.";
 			return;
 		}
 	}
@@ -416,7 +422,13 @@ public class CommandParser {
 	}
 
 	private void extractLocation(String inputFragment) {
-		taskDetails[5] = inputFragment.substring(3).trim();
+		inputFragment = inputFragment.substring(3).trim();
+		
+		if (ValidationCheck.isValidLocation(inputFragment)) {
+			taskDetails[5] = inputFragment;
+		} else {
+			invalidFeedBack = "ERROR: Location must start with a letter.";
+		}
 	}
 	
 	

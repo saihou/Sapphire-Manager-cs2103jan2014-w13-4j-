@@ -19,6 +19,7 @@ public class ClearCommand extends Command {
 		} else if (clearType.equals("done")){
 			clearDone();
 		} else {
+			//if parsing fails, error message will be stored in clearType
 			systemFeedback = clearType;
 		}
 		result.setSystemFeedback(systemFeedback);
@@ -48,6 +49,7 @@ public class ClearCommand extends Command {
 	
 	private void clearAll() {
 		boolean isSuccessful = taskStorage.clear();
+		//boolean isSuccessful = true;
 		
 		if (isSuccessful) {
 			systemFeedback = "Successfully cleared all tasks.";
