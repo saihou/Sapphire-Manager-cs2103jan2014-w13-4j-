@@ -78,6 +78,7 @@ public class CommandExecutor {
 				Command edit = new EditCommand(currentTaskList);
 				edit.execute(userCommand);
 				systemFeedback = edit.getSystemFeedback();
+				System.out.println("EDIT SYSTEM FEEDBACK: " + systemFeedback);
 				result = edit.getResult();
 				success = result.isSuccessful();
 				if (success) {
@@ -96,6 +97,7 @@ public class CommandExecutor {
 				delete.execute(userCommand);
 				result = delete.getResult();
 				systemFeedback = delete.getSystemFeedback();
+				System.out.println("DELETE SYSTEM FEEDBACK: " + systemFeedback);
 				success = result.isSuccessful();
 				if (success) {
 					history.push(delete);
