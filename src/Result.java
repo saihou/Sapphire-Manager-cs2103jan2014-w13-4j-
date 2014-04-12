@@ -1,4 +1,5 @@
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Queue;
 
 
@@ -27,9 +28,10 @@ public class Result {
 		success = false;
 	}
 	
-	public Result(int indexI, int indexJ, String feedback, boolean success) {
-		headings = new ArrayDeque<String>();
-		body = new ArrayDeque<Queue<String>>();
+	public Result(int indexI, int indexJ, String feedback, ArrayDeque<String> headings, 
+			ArrayDeque<Queue<String>> body, boolean success) {
+		this.headings = headings;
+		this.body = body;
 		currentHeading = new ArrayDeque<String>();
 		highlightIndexI = indexI;
 		highlightIndexJ = indexJ;
@@ -42,21 +44,55 @@ public class Result {
 		systemFeedback = sysFeedback;
 	}
 	
-	public boolean equals(Result r) {
-		boolean isEqual = true;
-		if (highlightIndexI != r.getHighlightIndexI()) {
-			isEqual = false;
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof Result)) {
+			return false;
+		} else {
+			Result r = (Result)object;
+			boolean isEqual = true;
+			
+			System.out.println(highlightIndexI + " " +  r.getHighlightIndexI());
+			if (highlightIndexI != r.getHighlightIndexI()) {
+				isEqual = false;
+			}
+			
+			System.out.println(highlightIndexJ + " " +  r.getHighlightIndexJ());
+			if (highlightIndexJ != r.getHighlightIndexJ()) {
+				isEqual = false;
+			}
+			
+			System.out.println(systemFeedback);
+			System.out.println(r.getSystemFeedback());
+			if (!systemFeedback.equals(r.getSystemFeedback())) {
+				isEqual = false;
+			}
+			
+			System.out.println("Checking results headings");
+			if (!Arrays.equals(headings.toArray(), r.getHeadings().toArray())) {
+				isEqual = false;
+			}
+			
+			System.out.println("Checking results body");
+			if (body.size() != r.getBody().size()) {
+				isEqual = false;
+			}
+			
+			System.out.println(this.body);
+			System.out.println(r.getBody());
+			
+			for (int i = 0 ; i < body.size() ; i++) {
+				Queue<String> thisBodySegment = body.poll();
+				Queue<String> otherBodySegment = r.getBody().poll();
+				
+				if (!Arrays.equals(thisBodySegment.toArray(), otherBodySegment.toArray())) {
+					isEqual = false;
+				}
+			}
+			
+			System.out.println("Results are equal: " + isEqual);
+			return isEqual;
 		}
-		if (highlightIndexJ != r.getHighlightIndexJ()) {
-			isEqual = false;
-		}
-		if (success != r.isSuccessful()) {
-			isEqual = false;
-		}
-		if (systemFeedback.equals(r.getSystemFeedback())) {
-			isEqual = false;
-		}
-		return isEqual;
 	}
 	
 	public void pushNewHeadingText(String heading) {
@@ -161,5 +197,10 @@ public class Result {
 			}
 		}
 		return sb.toString();
+	}
+	
+	public void setHighlightIndices(int i, int j) {
+		highlightIndexI = i;
+		highlightIndexJ = j;
 	}
 }

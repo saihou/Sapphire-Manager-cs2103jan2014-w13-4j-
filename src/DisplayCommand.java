@@ -14,7 +14,7 @@ public class DisplayCommand extends Command {
 	
 	private final static String HEADING_OVERDUE = "Overdue Tasks:\n";
 	private final static String HEADING_TODAY = "Today's Tasks:\n"; 
-	private final static String HEADING_THIS_WEEK = "Tasks Occurring/Due Within This Week:\n";
+	private final static String HEADING_THIS_WEEK = "Tasks Occurring/Due Within 7 Days:\n";
 	private final static String HEADING_AFTER_A_WEEK = "Tasks Occurring/Due More Than A Week Later:\n";
 	private final static String HEADING_MEMO = "Memos:\n";
 	private final static String HEADING_COMPLETED = "Completed Tasks:\n";
@@ -33,6 +33,8 @@ public class DisplayCommand extends Command {
 	private final static String FEEDBACK_DISPLAY_UNDONE = "Displaying uncompleted tasks.";
 	private final static String FEEDBACK_DISPLAY_ALL = "Displaying all tasks.";
 
+	private final static String TASK_NUMBER_SPACING = "   ";
+	
 	public DisplayCommand() {
 		super();
 		dateTimeConfig = new DateTimeConfiguration();
@@ -82,29 +84,29 @@ public class DisplayCommand extends Command {
 		currentTaskList = getTasksBasedOnCompletion(allTasks, isDone);
 
 		switch (displayType) {
-		case "all" : 
-			//Append completed tasks at the end of list
-			isDone = true;
-			ArrayList<Task> completedTasks = getTasksBasedOnCompletion(allTasks, isDone);
-			currentTaskList.addAll(completedTasks);
-			break;
-		case "overdue" :
-			currentTaskList = getOverdue(currentTaskList);
-			break;
-		case "memos" :
-			currentTaskList = getMemos(currentTaskList);
-			break;
-		case "today" :
-			currentTaskList = getTodaysTasks();
-			break;
-		case "undone" :
-			break;
-		case "done" :
-			isDone = true;
-			currentTaskList = getTasksBasedOnCompletion(allTasks, isDone);
-			break;
-		default :
-			throw new IllegalArgumentException(MESSAGE_INVALID_COMMAND);
+			case "all" : 
+				//Append completed tasks at the end of list
+				isDone = true;
+				ArrayList<Task> completedTasks = getTasksBasedOnCompletion(allTasks, isDone);
+				currentTaskList.addAll(completedTasks);
+				break;
+			case "overdue" :
+				currentTaskList = getOverdue(currentTaskList);
+				break;
+			case "memos" :
+				currentTaskList = getMemos(currentTaskList);
+				break;
+			case "today" :
+				currentTaskList = getTodaysTasks();
+				break;
+			case "undone" :
+				break;
+			case "done" :
+				isDone = true;
+				currentTaskList = getTasksBasedOnCompletion(allTasks, isDone);
+				break;
+			default :
+				throw new IllegalArgumentException(MESSAGE_INVALID_COMMAND);
 		}
 		return true;
 	}
@@ -295,7 +297,7 @@ public class DisplayCommand extends Command {
 	}
 	
 	private String formDisplayTextOfOneTask(int count, Task t) {
-		return "   " + count + ". " + t.getAllTaskDetails();
+		return TASK_NUMBER_SPACING + count + ". " + t.getAllTaskDetails();
 	}
 	
 	private boolean isMemo(Task t) {

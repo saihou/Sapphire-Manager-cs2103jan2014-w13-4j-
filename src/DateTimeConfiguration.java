@@ -18,7 +18,7 @@ public class DateTimeConfiguration {
 	 */
 	public DateTimeConfiguration() {
 		systemDateFormat = new SimpleDateFormat("ddMMyy");
-		displayDateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+		displayDateFormat = new SimpleDateFormat("dd-MMM-yyyy <EEE>");
 	}
 	
 	public String getTodaysDate() {
@@ -97,7 +97,7 @@ public class DateTimeConfiguration {
 		return time.substring(0,2) + ':' + time.substring(2);
 	}
 	
-	public String getDayForDisplay(String date) {
+	/*public String getDayForDisplay(String date) {
 		String dayInWeek = "unable to get day";
 		SimpleDateFormat dayFormat = new SimpleDateFormat("ddMMyy");  
 		try {
@@ -108,5 +108,5 @@ public class DateTimeConfiguration {
 			e.printStackTrace();
 		}
 		return dayInWeek;
-	}
+	}*/
 }

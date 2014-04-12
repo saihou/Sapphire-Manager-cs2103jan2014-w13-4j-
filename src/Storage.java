@@ -227,13 +227,10 @@ public class Storage {
 	//clear and re-initialize file
 	private boolean clearFile() {
 		try {
+			file.delete();
 			file = new File(FILE_NAME);
-			if(file.delete()) {	
-				initializeFile();
-				return true;
-			} else {
-				return false;
-			}
+			initializeFile();
+			return true;
 		} catch (Exception ex) {
 			displayPopUpMsg(FILE_CLEARING_ERROR);
 			return false;
