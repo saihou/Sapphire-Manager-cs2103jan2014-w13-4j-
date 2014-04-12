@@ -60,7 +60,7 @@ public class DeleteCommand extends Command {
 		System.out.println("Add: "+ allTasks.add(currentTask));
 		
 		if (taskStorage.writeTaskListToFile()) {
-			systemFeedback = "Undo previous deletion: Successfully added \""+ currentTask.getName() + "\"";
+			systemFeedback = "Undo previous deletion: Successfully added \""+ currentTask.getName() + "\".";
 		}
 		else {
 			systemFeedback = "ERROR: Cannot undo!";

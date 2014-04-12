@@ -143,7 +143,7 @@ public class EditCommand extends AddCommand {
 		boolean success = addFirstTaskAndDeleteSecondTask(currentTask, editedTask);
 		
 		if (success) {
-			systemFeedback = "Undo previous update: Successfully reverted \""+ currentTask.getName() + "\"";
+			systemFeedback = "Undo previous update: Successfully reverted \""+ currentTask.getName() + "\".";
 		}
 		else {
 			systemFeedback = "ERROR: Cannot undo!";

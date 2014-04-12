@@ -3,7 +3,7 @@ class Task implements Comparable<Task> {
 	private DateTimeConfiguration dateTimeConfig;
 	boolean isDone;
 	
-	private final static String spacing = "      ";
+	private final static String SPACING = "      ";
 	
 	public Task() {
 		dateTimeConfig = new DateTimeConfiguration();
@@ -100,25 +100,24 @@ class Task implements Comparable<Task> {
 	 * Returns a String that contains all task details in order for display Command :
 	 * Task name which all tasks must have, followed by time and then optional details.
 	 */
-	private String getTaskDetails(boolean haveDate) {
+		private String getTaskDetails(boolean haveDate) {
 		String taskDetails = this.name + '\n';
 		assert taskDetails != null;
 		
 		if (haveDate && !this.type.equals("noSetTiming")) {
-			taskDetails += spacing + dateTimeConfig.getDateForDisplay(this.date) 
-					+ " <" + dateTimeConfig.getDayForDisplay(this.date) + ">" + '\n';
+			taskDetails += SPACING + dateTimeConfig.getDateForDisplay(this.date) + '\n';
 		}
 		
 		if (this.type.equals("setDuration")) {
-			taskDetails += spacing + "From " + dateTimeConfig.getTimeForDisplay(this.startTime) +
+			taskDetails += SPACING + "From " + dateTimeConfig.getTimeForDisplay(this.startTime) +
 							" to " + dateTimeConfig.getTimeForDisplay(this.endTime) + '\n';
 		} else if (this.type.equals("targetedTime")){
-			taskDetails += spacing + "At/By " + 
+			taskDetails += SPACING + "At/By " + 
 							dateTimeConfig.getTimeForDisplay(this.startTime) + '\n';
 		}
 		
 		if (getLocation() != null) {
-			taskDetails += spacing + this.location + '\n';
+			taskDetails += SPACING + this.location + '\n';
 		}
 		
 		return taskDetails;

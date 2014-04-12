@@ -150,7 +150,7 @@ public class AddCommand extends Command {
 		allTasks.remove(currentTask);
 		
 		if (taskStorage.writeTaskListToFile()) {
-			systemFeedback = "Undo previous addition: Successfully deleted \""+ currentTask.getName() + "\"";
+			systemFeedback = "Undo previous addition: Successfully deleted \""+ currentTask.getName() + "\".";
 		}
 		else {
 			systemFeedback = "ERROR: Cannot undo!";

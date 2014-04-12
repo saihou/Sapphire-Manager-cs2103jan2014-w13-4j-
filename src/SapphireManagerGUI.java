@@ -956,8 +956,7 @@ public class SapphireManagerGUI {
 	private static String getTodayDate() {
 		DateTimeConfiguration dTC = new DateTimeConfiguration();
 		System.out.println(dTC.getTodaysDate());
-		return dTC.getDateForDisplay(dTC.getTodaysDate()) + 
-				" <" + dTC.getDayForDisplay(dTC.getTodaysDate()) + ">";
+		return dTC.getDateForDisplay(dTC.getTodaysDate());
 	}
 
 	//@author A0097706U
