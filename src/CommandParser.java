@@ -13,6 +13,7 @@ public class CommandParser {
 	public String getFirstWord(String userInput) {
 		return userInput.trim().split("\\s+")[0];
 	}
+	
 	/**
 	 * @param userCommand
 	 * @return displayType, "all", "undone", "done" or "today"
@@ -184,6 +185,7 @@ public class CommandParser {
 	}
 
 	//@author Cai Di
+	 
 	protected String invalidFeedBack;
 	protected String[] taskDetails;
 
@@ -196,7 +198,9 @@ public class CommandParser {
 	 * [4] = task done/undone 
 	 * [5] = task location
 	 */
-
+	
+	// extract task details and assigned to taskDetails[][] 
+	// Any invalid input detected will be reflected in invalidFeedBack String
 	public void extractTaskDetailsForEdit(String input) {
 		taskDetails = new String[6];
 		invalidFeedBack = null;
@@ -273,6 +277,13 @@ public class CommandParser {
 			return;
 		}
 	}
+	/*
+	 * input with a "/" but no command keyword is not valid
+	 * input with multiple "/" e.g. "///" is not allowed
+	 * input with empty task name is not allowed
+	 * input commands must be mutually exclusive to themselves
+	 * input commands "/at" and "/from" cannot be existed at the same time
+	 */
 	public void extractTaskDetailsForAdd(String input) {
 		taskDetails = new String[6];
 		invalidFeedBack = null;
@@ -286,19 +297,23 @@ public class CommandParser {
 			return;
 		}
 		
+		// extract task name
 		input = extractName(input);
 		
+		// if there is no task name, input is not valid
 		if(taskDetails[0] == null) {
 			invalidFeedBack = "ERROR: No task name.";
 			return;
 		}
 		
+		// if there is no "/" after task name, return
 		if(input.indexOf("/") == -1){
 			return;
 		}
 		
 		String[] temp = input.split("/");
 		
+		// if input string is "////" input command is not valid
 		if(temp.length == 0){
 			invalidFeedBack = "ERROR: Command keyword is missing.";
 			return;
@@ -371,18 +386,21 @@ public class CommandParser {
 					break;
 				}
 			
+			// if any segment is not start with a command isCommand == false
 			if(isCommand == false){
 				invalidFeedBack = "ERROR: Input Command is not valid.";
 				return;
 			}
 		}
 		
+		// if command /from and /at was keyed in at the same time 
 		if(fromExist == true && atExist == true){
 			invalidFeedBack = "ERROR: Command /from and /at are mutually exclusive.";
 			return;
 		}
 	}
 
+	// extract task name
 	private String extractName(String userInput) {
 		int indexOfFirstSlash = userInput.trim().indexOf("/");
 
@@ -406,6 +424,8 @@ public class CommandParser {
 		return userInput;
 	}
 	
+	// extract task duration
+	
 	private void extractDuration(String inputFragment) {
 		taskDetails[1] = getFirstWord(inputFragment.substring(4));
 		//if (!ValidationCheck.isValidTime(taskDetails[1]))
@@ -422,6 +442,8 @@ public class CommandParser {
 			invalidFeedBack = "ERROR: Input starting time without ending time.";
 		}
 	}
+	
+	// extract task deadline
 
 	private void extractDeadline(String inputFragment) {
 		taskDetails[1] = getFirstWord(inputFragment.substring(2));
@@ -433,6 +455,8 @@ public class CommandParser {
 			invalidFeedBack = "ERROR: Input ending time without starting time.";
 		}
 	}
+	
+	// extract task date
 
 	private void extractDate(String inputFragment) {
 		taskDetails[3] = getFirstWord(inputFragment.substring(2));
@@ -444,6 +468,8 @@ public class CommandParser {
 			invalidFeedBack = "ERROR: Input ending time without starting time.";
 		}
 	}
+	
+	// extract task status 
 
 	private void extractStatus(String inputFragment) {
 		taskDetails[4] = getFirstWord(inputFragment.substring(4));
@@ -451,6 +477,8 @@ public class CommandParser {
 			invalidFeedBack = "ERROR: Input status is not valid.";
 		}
 	}
+	
+	// extract task location
 
 	private void extractLocation(String inputFragment) {
 		inputFragment = inputFragment.substring(3).trim();
