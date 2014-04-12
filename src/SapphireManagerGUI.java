@@ -1,5 +1,4 @@
 /**
- * @author Teck Sheng (Dex)
  * This GUI class handles the input and output to and from user and system
  */
 
@@ -30,6 +29,7 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 //JAVAX-SWING LIBRARIES
 import javax.swing.BoxLayout;
 import javax.swing.event.CaretListener;
@@ -53,6 +53,7 @@ import java.awt.FlowLayout;
 
 //SapphireManagerGUI CLASS
 public class SapphireManagerGUI {
+	//@author A0097706U
 	//SYSTEM MESSAGES
 	private final static String MESSAGE_HELP = "Enter F1 for a list of commands.";
 	private final static String MESSAGE_NL = "\n";
@@ -125,7 +126,8 @@ public class SapphireManagerGUI {
 	private static JLabel helpo;
 	private static JTextField inputBox;
 	private static JTextPane displayBox;
-
+	
+	//@author A0097706U
 	//MAIN METHOD
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -144,13 +146,15 @@ public class SapphireManagerGUI {
 			}
 		});
 	}
-
+	
+	//@author A0097706U
 	//initializes and opens everything needed for the entire program 
 	public SapphireManagerGUI() {	
 		initialize();
 		start();
 	}
 
+	//@author A0097706U
 	//initialize and open the program in the following order
 	private void initialize() {		
 		initializeSapphireManager();
@@ -162,7 +166,8 @@ public class SapphireManagerGUI {
 		initializeTimer();
 		contentPaneDisplay();	
 	}
-
+	
+	//@author A0097706U
 	//displays messages and start listeners
 	private void start() {
 		displayWelcomeMessage();
@@ -172,8 +177,9 @@ public class SapphireManagerGUI {
 		helpoListener();		
 		timerListener();
 	}
-
-	//build the main frame for GUI 
+	
+	//@author A0097706U
+	//build the main frame for GUI
 	private void initializeSapphireManager() {
 		guiFrame = new JFrame();
 		guiFrame.setBounds(100, 100, 450, 700);
@@ -188,19 +194,20 @@ public class SapphireManagerGUI {
 		int y = toolkit.getScreenSize().height-guiFrame.getHeight()-40;
 		guiFrame.setLocation(x, y);
 	}
-
+	
+	//@author A0097706U
 	//initializes date label within a panel
 	private void initializeDateLabelInPanel() {
 		dateLabel = new JLabel();
 		datePanel = new JPanel();
 		datePanel.add(dateLabel);
-		
+
 		datePanel.setBackground(new Color(0x231F20));
 		datePanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		datePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));				
 		datePanel.setMaximumSize(new Dimension(450, 40));
 		datePanel.setPreferredSize(new Dimension(350, 30));
-		
+
 		dateLabel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		dateLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
 		dateLabel.setForeground(Color.WHITE);
@@ -210,24 +217,26 @@ public class SapphireManagerGUI {
 		dateLabel.setVerticalAlignment(SwingConstants.TOP);
 	}
 
+	//@author A0097706U
 	//initializes display box within a scroll pane
 	private void initializeDisplayBoxInScrollPane() {
 		displayBox = new JTextPane();
 		scrollPane = new JScrollPane(displayBox);
-		
+
 		displayBox.setBackground(new Color(0x231F20));
 		displayBox.setBorder(null);
 		displayBox.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		displayBox.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		displayBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		displayBox.setMaximumSize(new Dimension(450, 350));
-		
+
 		scrollPane.setBorder(null);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setMaximumSize(new Dimension(425, 500));
 		scrollPane.setPreferredSize(new Dimension(425, 470));
 	}
 
+	//@author A0097706U
 	//initializes input text box within a panel
 	private void initializeInputBoxInPanel() {	
 		inputBox = new JTextField();
@@ -247,6 +256,7 @@ public class SapphireManagerGUI {
 		inputBox.setPreferredSize(new Dimension(425, 20));
 	}
 
+	//@author A0097706U
 	//initializes helpo label within a panel
 	private void initializeHelpoInPanel() {
 		systemFeedbackStatus = false;
@@ -257,14 +267,15 @@ public class SapphireManagerGUI {
 		helpoPanel.setBackground(Color.WHITE);
 		helpoPanel.setMaximumSize(new Dimension(450, 35));
 		helpoPanel.setPreferredSize(new Dimension(450, 35));
-		
+
 		helpo.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		helpo.setHorizontalAlignment(SwingConstants.LEFT);
 		helpo.setPreferredSize(new Dimension(425, 30));
-		
+
 		displayToHelpo(MESSAGE_HELP);
 	}
 
+	//@author A0097706U
 	//initializes logo image within a panel
 	private void initializeLogoInPanel() {
 		logoLabel = new JLabel("");
@@ -278,13 +289,15 @@ public class SapphireManagerGUI {
 		logoLabel.setIcon(icon);
 	}
 	
+	//@author A0097706U
 	//initializes the timer
 	private static void initializeTimer() {
 		systemFeedbackStatus = true;
 		timer = new Timer(4000, timeListener);
 		timer.start();
 	}
-
+	
+	//@author A0097706U
 	//sets up the frame in Box Layout with components in the following order
 	//***ordering is important!
 	private void contentPaneDisplay() {
@@ -295,7 +308,8 @@ public class SapphireManagerGUI {
 		guiFrame.getContentPane().add(helpoPanel, Component.CENTER_ALIGNMENT);
 		guiFrame.getContentPane().add(inputBoxPanel, Component.CENTER_ALIGNMENT);
 	}
-
+	
+	//@author A0097706U
 	//Listener for input box
 	private void inputBoxListener() {
 		inputBox.addKeyListener(new KeyAdapter() {			
@@ -335,7 +349,6 @@ public class SapphireManagerGUI {
 					scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
 				} else {
 				}
-				System.out.println("LOLOL");
 			}
 
 			@Override
@@ -348,7 +361,8 @@ public class SapphireManagerGUI {
 			}
 		});
 	}
-
+	
+	//@author A0097706U
 	//Listener for GUI Frame
 	private void guiFrameListener() {
 		guiFrame.addFocusListener(new FocusAdapter() {
@@ -365,7 +379,8 @@ public class SapphireManagerGUI {
 			}
 		});
 	}
-
+	
+	//@author A0097706U
 	//Listener for display box
 	private void displayBoxListener() {
 		displayBox.addMouseListener(new MouseAdapter() {
@@ -375,7 +390,8 @@ public class SapphireManagerGUI {
 			}
 		});
 	}
-
+	
+	//@author A0097706U
 	private void timerListener() {
 		timeListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -388,7 +404,8 @@ public class SapphireManagerGUI {
 			}
 		};
 	}
-
+	
+	//@author A0097706U
 	//Listener for Helpo
 	private void helpoListener() {
 		inputBox.addCaretListener(new CaretListener() {
@@ -428,6 +445,8 @@ public class SapphireManagerGUI {
 			}
 		});
 	}
+	
+	//@author A0097706U-unused
 	/*
 	//Pushes scroll bar to display the latest
 	private void updateScrollBar() {
@@ -436,6 +455,8 @@ public class SapphireManagerGUI {
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);  
 	}
 	 */
+	
+	//@author A0097706U
 	//read user's input
 	private String readUserInput() {
 		String userInput = null;
@@ -444,65 +465,86 @@ public class SapphireManagerGUI {
 		}
 		return userInput;
 	}
-
+	
+	//@author A0097706U
 	//read user's command
 	private String readCommandFromUser() {
 		return readUserInput();
 	}
-
+	
+	//@author A0097706U
 	//displays system message
 	private static void displaySystemMessage(String message) {
 		appendToDisplayBox(message, new Color(0xff6c00), "Trebuchet MS", 14, false);
 	}
-
+	
+	//@author A0097706U
 	//displays system message
 	private static void displaySystemMessage2(String message) {
 		appendToDisplayBox(message, new Color(0xff6c55), "Trebuchet MS", 14, false);
 	}
 	
+	//@author A0097706U
+	//displays overdue tasks in the selected color
 	private static void displayOverdueTasks(String message) {
 		appendToDisplayBox(message, Color.RED, "Trebuchet MS", 14, false);
 	}
-	
+
+	//@author A0097706U
+	//displays today's tasks in the selected color
 	private static void displayTodayTasks(String message) {
-		appendToDisplayBox(message, Color.YELLOW, "Trebuchet MS", 14, false);
-	}
-	
-	private static void displayThisWeekTasks(String message) {
-		appendToDisplayBox(message, new Color(0xCCFFF), "Trebuchet MS", 14, false);
-	}
-	
-	private static void displayNextWeekTasks(String message) {
-		appendToDisplayBox(message, Color.MAGENTA, "Trebuchet MS", 14, false);
-	}
-	
-	private static void displayMemos(String message) {
-		appendToDisplayBox(message, Color.PINK, "Trebuchet MS", 14, false);
-	}
-	
-	private static void displayDoneTasks(String message) {
-		appendToDisplayBox(message, Color.GRAY, "Trebuchet MS", 14, false);
+		appendToDisplayBox(message, new Color(0xff6c00), "Trebuchet MS", 14, false);
 	}
 
-	//displays highlighted message
+	//@author A0097706U
+	//displays this week's tasks in the selected color
+	private static void displayThisWeekTasks(String message) {
+		appendToDisplayBox(message, new Color(0xfd8c38), "Trebuchet MS", 14, false);
+	}
+	
+	//@author A0097706U 
+	//displays next week's tasks in the selected color
+	private static void displayNextWeekTasks(String message) {
+		appendToDisplayBox(message, new Color(0xfba76c), "Trebuchet MS", 14, false);
+	}
+
+	//@author A0097706U
+	//displays memos in the selected color
+	private static void displayMemos(String message) {
+		appendToDisplayBox(message, new Color(0xf9bc90), "Trebuchet MS", 14, false);
+	}
+
+	//@author A0097706U
+	//displays completed tasks in the selected color
+	private static void displayDoneTasks(String message) {
+		appendToDisplayBox(message, new Color(0xf9d1b6), "Trebuchet MS", 14, false);
+	}
+
+	//@author A0097706U
+	//displays highlighted message in the selected color
 	private static void displayHighlightMessage(String message) {
 		appendToDisplayBox(message, new Color(0x00FF00), "Trebuchet MS", 14, true);
 	}
 
+	//@author A0097706U
 	//displays to helpo label
 	private static void displayToHelpo(String message) {
 		helpo.setText(message);
 	}
-
+	
+	//@author A0097706U
+	//displays today's date
 	private static void displayToDateLabel() {
 		dateLabel.setText("TODAY'S DATE: "+getTodayDate());
 	}
 
+	//@author A0097706U
 	//displays welcome message
 	private void displayWelcomeMessage() {
 		displayToDateLabel();
 	}
 
+	//@author A0097706U
 	//displays the latest messages
 	private static void appendToDisplayBox(String message, Color color, String fontName, int fontSize, boolean isBold) {
 		StyleContext sc = StyleContext.getDefaultStyleContext();
@@ -515,23 +557,26 @@ public class SapphireManagerGUI {
 
 		//int length = displayBox.getDocument().getLength();
 		//System.out.println("Length: "+length);
-		//displayBox.setCaretPosition(length);
+		//displayBox.setCaretPosition(0);
 		displayBox.setCharacterAttributes(aset, false);
 		displayBox.replaceSelection(message);
 	}
 
+	//@author A0097706U
 	//clears the display box
 	private static void clearDisplayBox() {
 		displayBox.setText("");
 	}
 
+	//@author A0097706U
 	//displays available commands and keyboard shortcuts
 	private void displayHelp() {
 		displaySystemMessage("Commands:"+MESSAGE_NL);
 		displaySystemMessage(MESSAGE_SPLIT_LINE);
 		displaySystemMessage("1) To add a new task:"+MESSAGE_NL);
+		displaySystemMessage(String.format("%60s", "add|create|new [Task Name] /[*Options]"+MESSAGE_NL).replace(' ', ' '));
 		displaySystemMessage("   add|create|new [Task Name] /[*Options]"+MESSAGE_NL);
-		displaySystemMessage("   eg. add task /on [Date^]"+MESSAGE_NL);
+		displaySystemMessage(String.format("%60s", "eg. add task /on [Date^]"+MESSAGE_NL).replace(' ', ' '));
 		displaySystemMessage2("2) To delete a task:"+MESSAGE_NL);
 		displaySystemMessage2("   del|delete|remove [Task Number(#)]"+MESSAGE_NL);
 		displaySystemMessage2("   eg. del 1"+MESSAGE_NL);
@@ -578,6 +623,7 @@ public class SapphireManagerGUI {
 		displaySystemMessage("f) Home/End: Scroll to Top and Bottom of Display Box"+MESSAGE_NL);
 	}
 
+	//@author A0097706U
 	//Helpo - Keywords that starts with 'C' - Create/Clear
 	private String helpoC(String userInput) {
 		if(userInput.equals("c")) {
@@ -591,6 +637,7 @@ public class SapphireManagerGUI {
 		}
 	}
 
+	//@author A0097706U
 	//Helpo - Keywords that starts with 'D' - Del(ete)/Display
 	private String helpoD(String userInput) {
 		if(userInput.equals("d")) {
@@ -604,6 +651,7 @@ public class SapphireManagerGUI {
 		}
 	}
 
+	//@author A0097706U
 	//Helpo - Keywords that starts with 'E' - Edit/Exit
 	private String helpoE(String userInput) {
 		if(userInput.equals("e")) {
@@ -617,6 +665,7 @@ public class SapphireManagerGUI {
 		}
 	}
 
+	//@author A0097706U
 	//Helpo - Keywords that starts with 'S' - Search/Show
 	private String helpoS(String userInput) {
 		if(userInput.equals("s")) {
@@ -630,6 +679,7 @@ public class SapphireManagerGUI {
 		}
 	}
 
+	//@author A0097706U
 	//Helpo - Keywords that starts with 'U' - Update/Undo
 	private String helpoU(String userInput) {
 		if(userInput.equals("u")) {
@@ -643,6 +693,7 @@ public class SapphireManagerGUI {
 		}
 	}
 
+	//@author A0097706U
 	//Helpo - Add/Create/New
 	private String helpoAdd(String userInput) {
 		String entered = "";
@@ -673,6 +724,7 @@ public class SapphireManagerGUI {
 		return entered+" "+HELPO_FORMAT_TASK_NAME+" "+HELPO_OPTIONS;
 	}
 
+	//@author A0097706U
 	//Helpo - Clear
 	private String helpoClear(String userInput) {
 		if(userInput.equals("c") || userInput.equals("cl") || userInput.equals("cle") || userInput.equals("clea") || userInput.startsWith("clear")) {
@@ -681,6 +733,7 @@ public class SapphireManagerGUI {
 		return MESSAGE_HELP;
 	}
 
+	//@author A0097706U
 	//Helpo - Del(ete)/Remove
 	private String helpoDelete(String userInput) {
 		String entered = "";
@@ -708,6 +761,7 @@ public class SapphireManagerGUI {
 		return entered+" "+HELPO_FORMAT_TASK_NO;
 	}
 
+	//@author A0097706U
 	//Helpo - Display/Show
 	private String helpoDisplay(String userInput) {
 		String entered = "";
@@ -734,6 +788,7 @@ public class SapphireManagerGUI {
 		return entered+" "+HELPO_FORMAT_DISPLAY;
 	}
 
+	//@author A0097706U
 	//Helpo - Edit
 	private String helpoEdit(String userInput) {
 		String entered = "";
@@ -762,6 +817,7 @@ public class SapphireManagerGUI {
 		return entered+" "+HELPO_FORMAT_TASK_NO+" "+HELPO_FORMAT_EDIT;
 	}
 
+	//@author A0097706U
 	//Helpo - Edit/Quit
 	private String helpoExit(String userInput) {
 		String entered = "";
@@ -785,6 +841,7 @@ public class SapphireManagerGUI {
 		return entered;
 	}
 
+	//@author A0097706U
 	//Helpo - Options
 	private String helpoOptions(String action, String userInput) {
 		if(action.equals(HELPO_ACTIONS_ADD) || action.equals(HELPO_ACTIONS_CREATE) || action.equals(HELPO_ACTIONS_NEW) || action.equals(HELPO_ACTIONS_EDIT) || action.equals(HELPO_ACTIONS_UPDATE)) {
@@ -846,6 +903,7 @@ public class SapphireManagerGUI {
 		return helpo.getText();
 	}
 
+	//@author A0097706U
 	//Helpo - Find/Search
 	private String helpoSearch(String userInput) {
 		String entered = "";
@@ -871,6 +929,7 @@ public class SapphireManagerGUI {
 		return entered+" "+HELPO_FORMAT_SEARCH;
 	}
 
+	//@author A0097706U
 	//Helpo - Undo
 	private String helpoUndo(String userInput) {
 		if(userInput.equals("u") || userInput.equals("un") || userInput.equals("und") || userInput.startsWith("undo")) {
@@ -879,6 +938,7 @@ public class SapphireManagerGUI {
 		return MESSAGE_HELP;
 	}
 
+	//@author A0097706U
 	//Get Today's Date
 	private static String getTodayDate() {
 		DateTimeConfiguration dTC = new DateTimeConfiguration();
@@ -886,6 +946,7 @@ public class SapphireManagerGUI {
 		return dTC.getDateForDisplay(dTC.getTodaysDate());
 	}
 
+	//@author A0097706U
 	//Printing of Tasks
 	private static void printResults(Result result) {
 		Queue<String> headings = result.getHeadings();
@@ -896,7 +957,7 @@ public class SapphireManagerGUI {
 		//system feedback
 		displayToHelpo(result.getSystemFeedback());
 
-		if(result.getSystemFeedback().equals(MESSAGE_INVALID_COMMAND)) {
+		if(result.getSystemFeedback().equals(MESSAGE_INVALID_COMMAND) || result.getSystemFeedback().contains("ERROR")) {
 			initializeTimer();
 		} else {
 			initializeTimer();
