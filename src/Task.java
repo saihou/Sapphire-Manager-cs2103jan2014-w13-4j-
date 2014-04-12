@@ -106,7 +106,7 @@ class Task implements Comparable<Task> {
 		
 		if (haveDate && !this.type.equals("noSetTiming")) {
 			taskDetails += spacing + dateTimeConfig.getDateForDisplay(this.date) 
-					+ " " + dateTimeConfig.getDayForDisplay(this.date) + "" + '\n';
+					+ " <" + dateTimeConfig.getDayForDisplay(this.date) + ">" + '\n';
 		}
 		
 		if (this.type.equals("setDuration")) {

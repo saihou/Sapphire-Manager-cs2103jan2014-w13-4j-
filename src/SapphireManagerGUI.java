@@ -885,7 +885,8 @@ public class SapphireManagerGUI {
 	private static String getTodayDate() {
 		DateTimeConfiguration dTC = new DateTimeConfiguration();
 		System.out.println(dTC.getTodaysDate());
-		return dTC.getDateForDisplay(dTC.getTodaysDate());
+		return dTC.getDateForDisplay(dTC.getTodaysDate()) + 
+				" <" + dTC.getDayForDisplay(dTC.getTodaysDate()) + ">";
 	}
 
 	//Printing of Tasks

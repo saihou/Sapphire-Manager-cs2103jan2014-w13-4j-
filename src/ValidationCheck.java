@@ -90,8 +90,11 @@ public class ValidationCheck {
 			}
 	}
 	
-	private static boolean validateDate(String date) 
-	{
+	private static boolean validateDate(String date) {
+		if (date.length() != 6) {
+			return false;
+		}
+		
 		String DATE_FORMAT = "ddMMyy";
         try {
             DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -104,11 +107,11 @@ public class ValidationCheck {
 	}
 	
 	private static boolean validateTime(String input) {
+		if (input.length() != 4) {
+			return false;
+		}
 		
-		try {
-			if (input.length() != 4) {
-				return false;
-			}
+		try {	
 			int time = Integer.parseInt(input);
 			int mins = time % 100;
 			int hours = time / 100;

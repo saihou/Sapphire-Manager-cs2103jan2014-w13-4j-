@@ -38,6 +38,7 @@ public class ClearCommand extends Command {
 		}
 		
 		if (isSuccessful) {
+			taskStorage.writeTaskListToFile();
 			systemFeedback = "Successfully cleared all done tasks.";
 		} else {
 			systemFeedback = "ERROR: Couldn't clear tasks.";

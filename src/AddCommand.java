@@ -45,8 +45,7 @@ public class AddCommand extends Command {
 		
 		if (!isParsable) {
 			systemFeedback = parser.invalidFeedBack;
-		}
-		else {
+		} else {
 			systemFeedback = proceedToTaskModification(taskToBeModified, taskDetails);
 		}
 		
