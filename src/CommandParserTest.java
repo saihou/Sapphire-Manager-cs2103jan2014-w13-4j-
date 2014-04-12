@@ -2,7 +2,10 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-
+/**
+ * @author Cai Di
+ *
+ */
 public class CommandParserTest {
 
 	@Test
