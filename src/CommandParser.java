@@ -223,10 +223,17 @@ public class CommandParser {
 		
 		String[] temp = input.split("/");
 		
+		if(temp.length == 0){
+			invalidFeedBack = "ERROR: Command keyword is missing.";
+			return;
+		}
+		
 		for (int i = 1; i < temp.length; i++) {
 			// exit method if input is not valid
 			if (invalidFeedBack != null)
 				return;
+			
+			
 			boolean isCommand = false;
 			
 			switch (getFirstWord(temp[i])) {
