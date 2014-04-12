@@ -14,13 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.Calendar;
 import java.util.Queue;
-import java.util.ArrayList;
-
-
-
-
-
-
 
 import org.junit.Test;
 
@@ -52,8 +45,8 @@ public class CommandExecutorTest {
 		assertDoUndoEditOperation(exec);
 		assertDoUndoAddOperation(exec);
 		
-		//assertDoClearOperation(exec);
-		//assertDoAddOperationsForAllHeadings(exec);
+		assertDoClearOperation(exec);
+		assertDoAddOperationsForAllHeadings(exec);
 	}
 	
 	private void assertDoClearOperation(CommandExecutor exec) {
@@ -207,6 +200,7 @@ public class CommandExecutorTest {
 		assertDoAddTodayOperation(exec);
 		assertDoAddThisWeekOperation(exec);
 		assertDoAddNextWeekOperation(exec);
+		assertDoAddMemoOperation(exec);
 	}
 	
 	private void addOverdueBodySegment(ArrayDeque<Queue<String>> bodyAll){
@@ -237,6 +231,13 @@ public class CommandExecutorTest {
 		Queue<String> bodySegment = new ArrayDeque<String>();
 		bodySegment.offer(TASK_NUMBER_SPACING + "4. A task for the next week\n" + 
 						DETAILS_SPACING + displayDateFormat.format(date.getTime()) + "\n");
+		bodyAll.offer(bodySegment);
+	}
+	
+	private void addMemosBodySegment(ArrayDeque<Queue<String>> bodyAll) {
+		Queue<String> bodySegment = new ArrayDeque<String>();
+		bodySegment.offer(TASK_NUMBER_SPACING + "1. A memo\n");
+		bodySegment.offer(TASK_NUMBER_SPACING + "2. A second memo\n");
 		bodyAll.offer(bodySegment);
 	}
 	
@@ -310,5 +311,29 @@ public class CommandExecutorTest {
 		assertEquals("Do Add Task In The Next Week Operation", expectedResults, actualResults);
 	}
 	
-	
+	private void assertDoAddMemoOperation(CommandExecutor exec) {
+		Calendar todaysDate = Calendar.getInstance();
+		
+		String feedback = "Successfully added \"A second memo\".";
+		
+		ArrayDeque<String> headings = new ArrayDeque<String>(); 
+		headings.offer("Overdue Tasks:\n");
+		headings.offer("Today's Tasks:\n");
+		headings.offer("Tasks Occurring/Due Within 7 Days:\n");
+		headings.offer("Tasks Occurring/Due More Than A Week Later:\n");
+		headings.offer("Memos:\n");
+		
+		ArrayDeque<Queue<String>> bodyAll = new ArrayDeque<Queue<String>>();
+		addOverdueBodySegment(bodyAll);
+		addTodayBodySegment(bodyAll, (Calendar)todaysDate.clone());
+		addThisWeekBodySegment(bodyAll, (Calendar)todaysDate.clone());
+		addNextWeekBodySegment(bodyAll, (Calendar)todaysDate.clone());
+		addMemosBodySegment(bodyAll);
+		
+		Result expectedResults = new Result(4, 1, feedback, headings, bodyAll, true);
+		exec.doUserOperation("add a memo");
+		Result actualResults = exec.doUserOperation("add a second memo");
+		
+		assertEquals("Do Add A Second Memo Operation", expectedResults, actualResults);
+	}
 }

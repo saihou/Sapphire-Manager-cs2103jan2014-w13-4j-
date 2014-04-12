@@ -23,15 +23,15 @@ public class DateTimeConfigurationTest {
 	
 	private void assertDateForDisplay(DateTimeConfiguration dateTimeConfig) {
 		assertEquals("Date for Display should be dd-mmm-yyyy", 
-				"23-May-2014", dateTimeConfig.getDateForDisplay("230514"));
-		assertNotEquals("Date for Display different dates test", 
-				"23-May-2014", dateTimeConfig.getDateForDisplay("121212"));
+				"23-May-2014 <Fri>", dateTimeConfig.getDateForDisplay("230514"));
+		assertNotEquals("False test: Date for Display different dates test", 
+				"23-May-2014 <Fri>", dateTimeConfig.getDateForDisplay("121212"));
 	}
 	
 	private void assertTimeForDisplay(DateTimeConfiguration dateTimeConfig) {
 		assertEquals("Time for Display should be hh:mm", 
 				"00:00", dateTimeConfig.getTimeForDisplay("0000"));
-		assertNotEquals("Time for Display different times test",
+		assertNotEquals("False test: Time for Display different times test",
 				"00:00", dateTimeConfig.getTimeForDisplay("1111"));
 	}
 	
@@ -40,19 +40,26 @@ public class DateTimeConfigurationTest {
 				true, dateTimeConfig.isPastOrToday("010114", "020114"));
 		assertEquals("Date is same as today",
 				true, dateTimeConfig.isPastOrToday("010114", "010114"));
-		assertEquals("Date is not in the past", 
+		assertEquals("Past/Today test: Date is not in the past/today", 
 				false, dateTimeConfig.isPastOrToday("020114", "010114"));
 	}
 	
 	private void assertIsThisWeekButNotToday(DateTimeConfiguration dateTimeConfig) {
-		
+		assertEquals("Date is this week but not today", 
+				true, dateTimeConfig.isThisWeekButNotToday("180414", "120414"));
+		assertEquals("This week/not today test: Date is in the future",
+				false, dateTimeConfig.isThisWeekButNotToday("190414", "120414"));
+		assertEquals("This week/not today test: Date is in the past",
+				false, dateTimeConfig.isThisWeekButNotToday("010414", "120414"));
 	}
 	
 	private void assertIsAfterAWeek(DateTimeConfiguration dateTimeConfig) {
 		assertEquals("Date is immediately after a week", 
 				true, dateTimeConfig.isAfterAWeek("080114", "010114"));
-		assertEquals("Date is on the 7th day after today", 
+		assertEquals("Is after a week test: Date is on the 7th day after today", 
 				false, dateTimeConfig.isAfterAWeek("070114", "010114"));
+		assertEquals("Is after a week test: Date is in the past", 
+				false, dateTimeConfig.isAfterAWeek("010114", "050414"));
 	}
 	
 	private void assertReverseDate(DateTimeConfiguration dateTimeConfig) {
