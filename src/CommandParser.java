@@ -223,30 +223,41 @@ public class CommandParser {
 		
 		String[] temp = input.split("/");
 		
-		for (int i = 0; i < temp.length; i++) {
+		for (int i = 1; i < temp.length; i++) {
 			// exit method if input is not valid
 			if (invalidFeedBack != null)
 				return;
+			boolean isCommand = false;
 			
 			switch (getFirstWord(temp[i])) {
 				case "from":
+					isCommand = true;
 					extractDuration(temp[i]);
 					break;
 				case "by":
 					//fall through
 				case "at":
+					isCommand = true;
 					extractDeadline(temp[i]);
 					break;
 				case "on":
+					isCommand = true;
 					extractDate(temp[i]);
 					break;
 				case "mark":
+					isCommand = true;
 					extractStatus(temp[i]);
 					break;
 				case "loc":
+					isCommand = true;
 					extractLocation(temp[i]);
 					break;
 				}
+			
+			if(isCommand == false){
+				invalidFeedBack = "ERROR: Input Command is not valid";
+				return;
+			}
 		}
 	}
 
@@ -295,12 +306,20 @@ public class CommandParser {
 		if (!ValidationCheck.isValidTime(taskDetails[1])) {
 			invalidFeedBack = "ERROR: Input deadline time is not valid.";
 		}
+		
+		if(inputFragment.indexOf("to") != -1){
+			invalidFeedBack = "ERROR: Input command to without from";
+		}
 	}
 
 	private void extractDate(String inputFragment) {
 		taskDetails[3] = getFirstWord(inputFragment.substring(2));
 		if (!ValidationCheck.isValidDate(taskDetails[3])) {
 			invalidFeedBack = "ERROR: Input date is not valid";
+		}
+		
+		if(inputFragment.indexOf("to") != -1){
+			invalidFeedBack = "ERROR: Input command to without from";
 		}
 	}
 
