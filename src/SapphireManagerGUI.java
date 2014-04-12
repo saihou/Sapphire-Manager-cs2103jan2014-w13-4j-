@@ -107,7 +107,6 @@ public class SapphireManagerGUI {
 	private final static String HELPO_FORMAT_TIME = "<-- time in HHMM (24-hours) format";
 
 	//NECESSARY DECLARATIONS
-	private static boolean systemFeedbackStatus;
 	private static boolean isErrorMsg = false;
 	private static CommandExecutor myExecutor;
 	private static SapphireManagerGUI guiWindow;
@@ -139,6 +138,7 @@ public class SapphireManagerGUI {
 
 					Result result = myExecutor.doUserOperation("display today");
 					printResults(result);
+					startTimer();
 
 					guiWindow.guiFrame.setVisible(true);
 				} catch (Exception e) {
@@ -260,7 +260,6 @@ public class SapphireManagerGUI {
 	//@author A0097706U
 	//initializes helpo label within a panel
 	private void initializeHelpoInPanel() {
-		systemFeedbackStatus = false;
 		helpo = new JLabel();
 		helpoPanel = new JPanel();
 		helpoPanel.add(helpo);
@@ -293,7 +292,6 @@ public class SapphireManagerGUI {
 	//@author A0097706U
 	//initializes the timer
 	private static void startTimer() {
-		systemFeedbackStatus = true;
 		timer = new Timer(5000, timeListener);
 		if(timer.isRunning()) {
 			System.out.println("Start timer");
@@ -331,6 +329,7 @@ public class SapphireManagerGUI {
 						printResults(result);
 
 						if(helpo.getText().trim().equals("")) {
+							startTimer();
 							displayToHelpo(MESSAGE_HELP);
 						}
 						inputBox.setText("");
@@ -406,7 +405,6 @@ public class SapphireManagerGUI {
 				System.out.println("1) Timer is running? "+timer.isRunning());
 				timer.stop();
 				System.out.println("2) Timer is running? "+timer.isRunning());
-				systemFeedbackStatus = false;
 				if(!timer.isRunning()) {
 					System.out.println("3) Timer is running? "+timer.isRunning());
 					displayToHelpo(MESSAGE_HELP);
@@ -422,32 +420,45 @@ public class SapphireManagerGUI {
 		inputBox.addCaretListener(new CaretListener() {
 			@Override
 			public void caretUpdate(CaretEvent arg0) {
+				timer.stop();
+				System.out.println("LOLOL: "+timer.isRunning());
 				String userInput = inputBox.getText().toLowerCase().trim();
 				if(userInput.equals("")) {
-					if(inputBox.getText().trim().equals("") && !systemFeedbackStatus) {
-						displayToHelpo(MESSAGE_HELP);
+					if(inputBox.getText().trim().equals("")) {
+						startTimer();
+						//displayToHelpo(MESSAGE_HELP);
 					} else {
 						displayToHelpo(helpo.getText());
 					}
 				} else if(userInput.startsWith("a")) { //add
+					timer.stop();
 					displayToHelpo(helpoAdd(userInput));
 				} else if(userInput.startsWith("c")) { //create or clear
+					timer.stop();
 					displayToHelpo(helpoC(userInput));
 				} else if(userInput.startsWith("d")) { //del or delete or display
+					timer.stop();
 					displayToHelpo(helpoD(userInput));
 				} else if(userInput.startsWith("e")) { //edit or exit
+					timer.stop();
 					displayToHelpo(helpoE(userInput));
 				} else if(userInput.startsWith("f")) { //find
+					timer.stop();
 					displayToHelpo(helpoSearch(userInput));
 				} else if(userInput.startsWith("n")) { //new
+					timer.stop();
 					displayToHelpo(helpoAdd(userInput));
 				} else if(userInput.startsWith("q")) { //quit
+					timer.stop();
 					displayToHelpo(helpoExit(userInput));
 				} else if(userInput.startsWith("r")) { //remove
+					timer.stop();
 					displayToHelpo(helpoDelete(userInput));
 				} else if(userInput.startsWith("s")) { //search or show
+					timer.stop();
 					displayToHelpo(helpoS(userInput));
 				} else if(userInput.startsWith("u")) { //update or undo
+					timer.stop();
 					displayToHelpo(helpoU(userInput));
 				} else {
 					displayToHelpo(MESSAGE_INVALID_COMMAND);
@@ -644,6 +655,7 @@ public class SapphireManagerGUI {
 		} else if(userInput.startsWith("cl")) {
 			return helpoClear(userInput);
 		} else {
+			startTimer();
 			return MESSAGE_INVALID_COMMAND;
 		}
 	}
@@ -658,6 +670,7 @@ public class SapphireManagerGUI {
 		} else if(userInput.startsWith("de")) {
 			return helpoDelete(userInput);
 		} else {
+			startTimer();
 			return MESSAGE_INVALID_COMMAND;
 		}
 	}
@@ -672,6 +685,7 @@ public class SapphireManagerGUI {
 		} else if(userInput.startsWith("ex")) {
 			return helpoExit(userInput);
 		} else {
+			startTimer();
 			return MESSAGE_INVALID_COMMAND;
 		}
 	}
@@ -686,6 +700,7 @@ public class SapphireManagerGUI {
 		} else if(userInput.startsWith("sh")) {
 			return helpoDisplay(userInput);
 		} else {
+			startTimer();
 			return MESSAGE_INVALID_COMMAND;
 		}
 	}
@@ -700,6 +715,7 @@ public class SapphireManagerGUI {
 		} else if(userInput.startsWith("un")) {
 			return helpoUndo(userInput);
 		} else {
+			startTimer();
 			return MESSAGE_INVALID_COMMAND;
 		}
 	}
@@ -711,21 +727,22 @@ public class SapphireManagerGUI {
 		switch(userInput) {
 		case "a":
 		case "ad":
-		case "add": entered = HELPO_ACTIONS_ADD; break;
+		case "add": timer.stop(); entered = HELPO_ACTIONS_ADD; break;
 		case "n":
 		case "ne":
-		case "new": entered = HELPO_ACTIONS_NEW; break;
+		case "new": timer.stop(); entered = HELPO_ACTIONS_NEW; break;
 		case "c":
 		case "cr":
 		case "cre":
 		case "crea":
 		case "creat":
-		case "create": entered = HELPO_ACTIONS_CREATE; break;
+		case "create": timer.stop(); entered = HELPO_ACTIONS_CREATE; break;
 		default: 
 			String[] splited = userInput.split(" ");
 			if(splited[0].equals(HELPO_ACTIONS_ADD) || splited[0].equals(HELPO_ACTIONS_CREATE) || splited[0].equals(HELPO_ACTIONS_NEW)) {
 				entered = splited[0];
 			} else {
+				startTimer();
 				return MESSAGE_INVALID_COMMAND;
 			}
 		}
@@ -741,6 +758,7 @@ public class SapphireManagerGUI {
 		if(userInput.equals("c") || userInput.equals("cl") || userInput.equals("cle") || userInput.equals("clea") || userInput.startsWith("clear")) {
 			return HELPO_ACTIONS_CLEAR+" ("+HELPO_OPTIONS_CLEAR_ALL+"-clear everything (no confirmation))";
 		}
+		startTimer();
 		return MESSAGE_INVALID_COMMAND;
 	}
 
@@ -751,21 +769,22 @@ public class SapphireManagerGUI {
 		switch(userInput) {
 		case "d":
 		case "de":
-		case "del": entered = HELPO_ACTIONS_DEL; break;
+		case "del": timer.stop(); entered = HELPO_ACTIONS_DEL; break;
 		case "dele": 
 		case "delet":
-		case "delete": entered = HELPO_ACTIONS_DELETE; break; 
+		case "delete": timer.stop(); entered = HELPO_ACTIONS_DELETE; break; 
 		case "r":
 		case "re":
 		case "rem":
 		case "remo":
 		case "remov":
-		case "remove": entered = HELPO_ACTIONS_REMOVE; break;
+		case "remove": timer.stop(); entered = HELPO_ACTIONS_REMOVE; break;
 		default: 
 			String[] splited = userInput.split(" ");
 			if(splited[0].equals(HELPO_ACTIONS_DEL) || splited[0].equals(HELPO_ACTIONS_DELETE) || splited[0].equals(HELPO_ACTIONS_REMOVE)) {
 				entered = splited[0];
 			} else {
+				startTimer();
 				return MESSAGE_INVALID_COMMAND;
 			}
 		}
@@ -783,16 +802,17 @@ public class SapphireManagerGUI {
 		case "disp": 
 		case "displ":
 		case "displa":
-		case "display": entered = HELPO_ACTIONS_DISPLAY; break; 
+		case "display": timer.stop(); entered = HELPO_ACTIONS_DISPLAY; break; 
 		case "s":
 		case "sh":
 		case "sho":
-		case "show": entered = HELPO_ACTIONS_SHOW; break;
+		case "show": timer.stop(); entered = HELPO_ACTIONS_SHOW; break;
 		default: 
 			String[] splited = userInput.split(" ");
 			if(splited[0].equals(HELPO_ACTIONS_DISPLAY) || splited[0].equals(HELPO_ACTIONS_SHOW)) {
 				entered = splited[0];
 			} else {
+				startTimer();
 				return MESSAGE_INVALID_COMMAND;
 			}
 		}
@@ -807,18 +827,19 @@ public class SapphireManagerGUI {
 		case "e":
 		case "ed":
 		case "edi":
-		case "edit": entered = HELPO_ACTIONS_EDIT; break;
+		case "edit": timer.stop(); entered = HELPO_ACTIONS_EDIT; break;
 		case "u":
 		case "up":
 		case "upd":
 		case "upda":
 		case "updat":
-		case "update": entered = HELPO_ACTIONS_UPDATE; break;
+		case "update": timer.stop(); entered = HELPO_ACTIONS_UPDATE; break;
 		default: 
 			String[] splited = userInput.split(" ");
 			if(splited[0].equals(HELPO_ACTIONS_EDIT) || splited[0].equals(HELPO_ACTIONS_UPDATE)) {
 				entered = splited[0];
 			} else {
+				startTimer();
 				return MESSAGE_INVALID_COMMAND;
 			}
 		}
@@ -836,16 +857,17 @@ public class SapphireManagerGUI {
 		case "e":
 		case "ex":
 		case "exi":
-		case "exit": entered = HELPO_ACTIONS_EXIT; break; 
+		case "exit": timer.stop(); entered = HELPO_ACTIONS_EXIT; break; 
 		case "q":
 		case "qu":
 		case "qui":  
-		case "quit": entered = HELPO_ACTIONS_QUIT; break;
+		case "quit": timer.stop(); entered = HELPO_ACTIONS_QUIT; break;
 		default: 
 			String[] splited = userInput.split(" ");
 			if(splited[0].equals(HELPO_ACTIONS_EXIT) || splited[0].equals(HELPO_ACTIONS_QUIT)) {
 				entered = splited[0];
 			} else {
+				startTimer();
 				return MESSAGE_INVALID_COMMAND;
 			}
 		}
@@ -919,16 +941,16 @@ public class SapphireManagerGUI {
 	private String helpoSearch(String userInput) {
 		String entered = "";
 		switch(userInput) {
-		case "f":
-		case "fi":
-		case "fin":
-		case "find": entered = HELPO_ACTIONS_FIND; break;
-		case "s":
-		case "se":
-		case "sea":
-		case "sear":
-		case "searc":
-		case "search": entered = HELPO_ACTIONS_SEARCH; break;
+		case "f": 
+		case "fi": 
+		case "fin": 
+		case "find": timer.stop(); entered = HELPO_ACTIONS_FIND; break;
+		case "s": 
+		case "se": 
+		case "sea": 
+		case "sear": 
+		case "searc": 
+		case "search": timer.stop(); entered = HELPO_ACTIONS_SEARCH; break;
 		default: 
 			String[] splited = userInput.split(" ");
 			if(splited[0].equals("find") || splited[0].equals("search")) {
@@ -969,6 +991,7 @@ public class SapphireManagerGUI {
 
 		//system feedback
 		displayToHelpo(result.getSystemFeedback());
+		System.out.println(result.getSystemFeedback());
 
 		if(result.getSystemFeedback().equals(MESSAGE_INVALID_COMMAND) || result.getSystemFeedback().contains("ERROR")) {
 			startTimer();
