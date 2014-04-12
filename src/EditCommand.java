@@ -4,12 +4,17 @@ import java.util.ArrayList;
 public class EditCommand extends AddCommand {
 	
 	Task editedTask;
-	ArrayList<Task> state;
 	
 	public EditCommand(ArrayList<Task> current) {
 		super();
-		state = new ArrayList<Task>(allTasks);
 		currentTaskList = current;
+	}
+	
+	//constructor used by junit test for initialisation
+	public EditCommand(ArrayList<Task> current, ArrayList<Task> all) {
+		super();
+		currentTaskList = current;
+		allTasks = all;
 	}
 	
 	@Override
@@ -66,6 +71,11 @@ public class EditCommand extends AddCommand {
 				return feedback;
 			}
 			
+			if (isRemovingSomethingAlreadyNull(fieldsToRemove)) {
+				feedback = "ERROR: Cannot remove something not present!";
+				return feedback;
+			}
+			
 			if (fieldsToRemove[1]) {
 				countNumberOfEdits++;
 				editedTask.setLocation(null);
@@ -99,6 +109,16 @@ public class EditCommand extends AddCommand {
 		}
 		return feedback;
 	}
+	
+	private boolean isRemovingSomethingAlreadyNull(boolean[] fieldsToRemove) {
+		if ( (fieldsToRemove[1] && editedTask.getLocation() == null) ||
+			(fieldsToRemove[2] && editedTask.getStartTime() == null) ||
+			(fieldsToRemove[3] && editedTask.getDate() == null) ) {
+			return true;
+		}
+		return false;
+	}
+	
 	private String prepareUserModifications(String userCommand,
 			String userChoice) {
 		int choice = convertToInteger(userChoice);

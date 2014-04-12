@@ -5,9 +5,6 @@
  */
 
 public class CommandParser {
-	
-	// get instance of gui @Dex
-
 	// constructor
 	public CommandParser(){
 	}
@@ -19,8 +16,8 @@ public class CommandParser {
 	/**
 	 * @param userCommand
 	 * @return displayType, "all", "undone", "done" or "today"
-	 * @author Sai Hou
 	 */
+	 //@author Sai Hou
 	public String parseDisplayType(String userCommand) {
 		String displayType = "";
 		
@@ -186,9 +183,7 @@ public class CommandParser {
 		}
 	}
 
-	/**
-	 * @author Cai Di
-	 */
+	//@author Cai Di
 	protected String invalidFeedBack;
 	protected String[] taskDetails;
 
@@ -259,10 +254,12 @@ public class CommandParser {
 					isCommand = true;
 					extractLocation(temp[i]);
 					break;
+				case "rm":
+					isCommand = true;
 				}
 			
 			if(isCommand == false){
-				invalidFeedBack = "ERROR: Input Command is not valid";
+				invalidFeedBack = "ERROR: Input Command is not valid.";
 				return;
 			}
 		}
@@ -315,25 +312,25 @@ public class CommandParser {
 		}
 		
 		if(inputFragment.indexOf("to") != -1){
-			invalidFeedBack = "ERROR: Input command to without from";
+			invalidFeedBack = "ERROR: Input ending time without starting time.";
 		}
 	}
 
 	private void extractDate(String inputFragment) {
 		taskDetails[3] = getFirstWord(inputFragment.substring(2));
 		if (!ValidationCheck.isValidDate(taskDetails[3])) {
-			invalidFeedBack = "ERROR: Input date is not valid";
+			invalidFeedBack = "ERROR: Input date is not valid.";
 		}
 		
 		if(inputFragment.indexOf("to") != -1){
-			invalidFeedBack = "ERROR: Input command to without from";
+			invalidFeedBack = "ERROR: Input ending time without starting time.";
 		}
 	}
 
 	private void extractStatus(String inputFragment) {
 		taskDetails[4] = getFirstWord(inputFragment.substring(4));
 		if (!ValidationCheck.isValidStatus(taskDetails[4])) {
-			invalidFeedBack = "ERROR: Input status is not valid";
+			invalidFeedBack = "ERROR: Input status is not valid.";
 		}
 	}
 
@@ -341,9 +338,8 @@ public class CommandParser {
 		taskDetails[5] = inputFragment.substring(3).trim();
 	}
 	
-	/**
-	 * @author Sai Hou
-	 */
+	
+	//@author Sai Hou
 	private boolean isSuppliedInputEmpty(String input) {
 		if (input.trim().equals("")) {
 			invalidFeedBack = "ERROR: Empty input!";

@@ -102,7 +102,7 @@ public class DateTimeConfiguration {
 		SimpleDateFormat dayFormat = new SimpleDateFormat("ddMMyy");  
 		try {
 			Date day = dayFormat.parse(date);
-			dayFormat.applyPattern( "EEEE" ); 
+			dayFormat.applyPattern( "EEE" ); 
 			dayInWeek = dayFormat.format(day); 
 		} catch (ParseException e) {
 			e.printStackTrace();

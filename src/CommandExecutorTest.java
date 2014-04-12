@@ -10,6 +10,8 @@
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.Test;
 
 public class CommandExecutorTest {
@@ -29,26 +31,113 @@ public class CommandExecutorTest {
 	public void unitTestForIndividualCommands() {
 		testClearCommand();
 		testAddCommand();
-		//testEditCommand();
+		testEditCommand();
 		//testDeleteCommand();
+		//testDisplayCommand();
+		//testSearchCommand();
 	}
 	
 	private void testClearCommand() {
 		assertClearAll();
 		assertClearDone();
-		assertClearInvalidKeyword();
+		assertClearInvalid();
 	}
 	
 	private void testAddCommand() {
+		clearAll();
 		assertAddMemo();
 		assertAddFullday();
 		assertAddDeadline();
 		assertAddDuration();
-		assertAddInvalidKeyword();
+		assertAddInvalid();
+	}
+	
+	private void testEditCommand() {
+		clearAll();
+		assertEditName();
+		assertEditLoc();
+		assertEditDate();
+		assertEditDeadline();
+		assertEditDuration();
+		assertEditInvalid();
+	}
+
+	private Command initEdit() {
+		Task editMe = new Task();
+		editMe.setName("name");
+		ArrayList<Task> al = new ArrayList<Task>();
+		al.add(editMe);
+		return new EditCommand(al, al);
+	}
+	
+	private void assertEditName() {
+		Command edit = initEdit();
+		edit.execute("1 new name");
+		Result r = edit.getResult();
+		assertEquals("change name", "Successfully made changes to \"New name\".", r.getSystemFeedback());
+	}
+	
+	private void assertEditLoc() {
+		Command edit = initEdit();
+		edit.execute("1 /loc new location");
+		Result r = edit.getResult();
+		assertEquals("change name", "Successfully made changes to \"Name\".", r.getSystemFeedback());
+	}
+	
+	private void assertEditDate() {
+		Command edit = initEdit();
+		edit.execute("1 /on 100114");
+		Result r = edit.getResult();
+		assertEquals("change name", "Successfully made changes to \"Name\".", r.getSystemFeedback());
+	}
+	
+	private void assertEditDeadline() {
+		Command edit = initEdit();
+		edit.execute("1 /on 100114 /at 1000");
+		Result r = edit.getResult();
+		assertEquals("change name", "Successfully made changes to \"Name\".", r.getSystemFeedback());
+	}
+	
+	private void assertEditDuration() {
+		Command edit = initEdit();
+		edit.execute("1 /on 100114 /from 1000 to 1001");
+		Result r = edit.getResult();
+		assertEquals("change name", "Successfully made changes to \"Name\".", r.getSystemFeedback());
+	}
+	
+	private void assertEditInvalid() {
+		Command edit = initEdit();
+		Result r;
+		
+		//empty string e.g. "     "
+		edit.execute("     ");
+		r = edit.getResult();
+		assertEquals("ERROR: Invalid task number!", r.getSystemFeedback());
+		
+		//empty keyword
+		//edit.execute("1   /  ");
+		//r = edit.getResult();
+		//assertEquals("ERROR: Empty keyword!", r.getSystemFeedback());
+		
+		//invalid keyword
+		//edit.execute("1   /abc");
+		//r = edit.getResult();
+		//assertEquals("ERROR: Invalid task number!", r.getSystemFeedback());
+				
+		//invalid task number
+		edit.execute("2   ");
+		r = edit.getResult();
+		assertEquals("ERROR: Invalid task number!", r.getSystemFeedback());
+		
+		//invalid date
+		edit.execute("1   /on abc");
+		r = edit.getResult();
+		assertEquals("ERROR: Input date is not valid.", r.getSystemFeedback());
+		
+		
 	}
 	
 	private void assertAddMemo() {
-		clearAll();
 		Command add = new AddCommand();
 		add.execute("memo");
 		Result r = add.getResult();
@@ -67,57 +156,114 @@ public class CommandExecutorTest {
 		Result r;
 		
 		//use "at" keyword
-		add.execute("deadline /on 040414 /at 1000");
+		add.execute("deadline /on 110414 /at 1000");
 		r = add.getResult();
 		assertEquals("add deadline", "Successfully added \"Deadline\".", r.getSystemFeedback());
 		
 		//use "by" keyword
-		add.execute("deadline2 /on 100414 /by 1300");
+		add.execute("deadline2 /on 160414 /by 1300");
 		r = add.getResult();
 		assertEquals("add deadline", "Successfully added \"Deadline2\".", r.getSystemFeedback());
 	}
 	
 	private void assertAddDuration() {
 		Command add = new AddCommand();
-		add.execute("duration /on 040414 /from 1000 to 1200");
+		add.execute("duration /on 040614 /from 1000 to 1200");
 		Result r = add.getResult();
 		assertEquals("add duration", "Successfully added \"Duration\".", r.getSystemFeedback());
 	}
 	
-	private void assertAddInvalidKeyword() {
+	private void assertAddInvalid() {
 		Command add = new AddCommand();
 		Result r;
 		
-		/*
+		//empty string e.g. "     "
+		add.execute("   ");
+		r = add.getResult();
+		assertEquals("user never enter task name", 
+				"ERROR: Empty input!", r.getSystemFeedback());
+		
+		//invalid keyword
 		add.execute("invalid keyword /something");
 		r = add.getResult();
-		assertEquals("give invalid keyword", "ERROR: Invalid keyword(s) specified.", r.getSystemFeedback());
+		assertEquals("user gives invalid keyword", "ERROR: Input Command is not valid.", r.getSystemFeedback());
 		
+		//empty keyword
 		add.execute("empty keyword /      ");
 		r = add.getResult();
-		assertEquals("give empty keyword", "Successfully added \"\".", r.getSystemFeedback());
-		*/
+		assertEquals("user gives empty keyword", "ERROR: Command keyword is missing.", r.getSystemFeedback());
 		
-		add.execute("invalid time /on 040414 /from abcd to 1200");
+		//spam special characters
+		add.execute("spam special characters keyword ///////");
+		r = add.getResult();
+		assertEquals("user gives empty keyword", "ERROR: Command keyword is missing.", r.getSystemFeedback());
+
+		
+		//deadine without date
+		add.execute("time without date /at 0010");
+		r = add.getResult();
+		assertEquals("user enters deadline without date", 
+				"ERROR: Entering a timestamp without a date doesn't make sense!", r.getSystemFeedback());
+		
+		//duration without date
+		add.execute("time without date /from 0010 to 0011");
+		r = add.getResult();
+		assertEquals("user enters duration without date", 
+				"ERROR: Entering a timestamp without a date doesn't make sense!", r.getSystemFeedback());
+	
+		//invalid duration
+		add.execute("invalid time /on 040414 /from abcd to -7889");
 		r = add.getResult();
 		assertEquals("user enters invalid duration", 
 				"ERROR: Input duration is not valid.", r.getSystemFeedback());
 		
+		//invalid deadine
 		add.execute("invalid time /on 040414 /at -656");
 		r = add.getResult();
 		assertEquals("user enters invalid deadline", 
 				"ERROR: Input deadline time is not valid.", r.getSystemFeedback());
 	
+		//got start time but no end time
 		add.execute("invalid time /on 040414 /from 1009");
 		r = add.getResult();
 		assertEquals("user enters start time but no end time", 
 				"ERROR: Input starting time without ending time.", r.getSystemFeedback());
 		
+		//got end time but no start time
+		add.execute("invalid time /on 040414 to 2359");
+		r = add.getResult();
+		assertEquals("user enters end time but no start time", 
+				"ERROR: Input ending time without starting time.", r.getSystemFeedback());
+		
+		//same start and end time
 		add.execute("invalid time /on 040414 /from 2359 to 2359");
 		r = add.getResult();
 		assertEquals("user enters same start time and end time", 
 				"ERROR: Input duration is not valid.", r.getSystemFeedback());
 		
+		//5 digits for time
+		add.execute("5 digits time /on 040414 /by 00000");
+		r = add.getResult();
+		assertEquals("user enters 5 digits for time", 
+				"ERROR: Input deadline time is not valid.", r.getSystemFeedback());
+		
+		//7 digits for time
+		add.execute("7 digits date /on 0104151 /by 0000");
+		r = add.getResult();
+		assertEquals("user enters 7 digits for date", 
+				"ERROR: Input date is not valid.", r.getSystemFeedback());
+		
+		//extra spaces between date
+		add.execute("space btw date /on 10 1 1 1 1 /by 0000");
+		r = add.getResult();
+		assertEquals("user enters spaces between date", 
+				"ERROR: Input date is not valid.", r.getSystemFeedback());
+		
+		//extra spaces between time
+		add.execute("space btw time /on 101111 /by 0 0 0 0");
+		r = add.getResult();
+		assertEquals("user enters spaces between time", 
+				"ERROR: Input deadline time is not valid.", r.getSystemFeedback());
 	}
 	
 	private void assertClearAll() {
@@ -152,7 +298,7 @@ public class CommandExecutorTest {
 				r.getSystemFeedback());
 	}
 	
-	private void assertClearInvalidKeyword() {
+	private void assertClearInvalid() {
 		Command clear = new ClearCommand();
 		clear.execute("invalid stuff here");
 		Result r = clear.getResult();
