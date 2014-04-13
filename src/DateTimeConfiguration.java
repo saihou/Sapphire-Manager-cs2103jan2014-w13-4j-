@@ -1,24 +1,20 @@
+//@author A0101252A
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Si Rui
- *
- */
 public class DateTimeConfiguration {
+	private static final String DISPLAY_DATE_FORMAT = "dd-MMM-yyyy <EEE>";
+	private static final String SYSTEM_DATE_FORMAT = "ddMMyy";
 	
 	private SimpleDateFormat systemDateFormat;
 	private SimpleDateFormat displayDateFormat;
 	
-	/**
-	 * 
-	 */
 	public DateTimeConfiguration() {
-		systemDateFormat = new SimpleDateFormat("ddMMyy");
-		displayDateFormat = new SimpleDateFormat("dd-MMM-yyyy <EEE>");
+		systemDateFormat = new SimpleDateFormat(SYSTEM_DATE_FORMAT);
+		displayDateFormat = new SimpleDateFormat(DISPLAY_DATE_FORMAT);
 	}
 	
 	public String getTodaysDate() {
@@ -80,7 +76,6 @@ public class DateTimeConfiguration {
 	}
 
 	/* 
-	 * @author Si Rui
 	 * Reverse specified date String from DDMMYY to YYMMDD format to directly compare values  
 	 * using pre-defined compareTo function in Java String class.
 	 */
@@ -96,17 +91,4 @@ public class DateTimeConfiguration {
 	public String getTimeForDisplay(String time) {
 		return time.substring(0,2) + ':' + time.substring(2);
 	}
-	
-	/*public String getDayForDisplay(String date) {
-		String dayInWeek = "unable to get day";
-		SimpleDateFormat dayFormat = new SimpleDateFormat("ddMMyy");  
-		try {
-			Date day = dayFormat.parse(date);
-			dayFormat.applyPattern( "EEE" ); 
-			dayInWeek = dayFormat.format(day); 
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		return dayInWeek;
-	}*/
 }

@@ -1,8 +1,11 @@
+//@author A0097812X
 import java.util.ArrayList;
 
-
+/*
+* Description: This class provides the searching methods 
+* and will return the results in the form of an ArrayList.
+*/
 public class Search {
-	
 	ArrayList<Task> searchList;
 	
 	public Search(ArrayList<Task> searchList) {
@@ -35,9 +38,7 @@ public class Search {
 		return matchedTasks;
 	}
 	
-	/**
-	 * @author Si Rui
-	 */
+	//@author A0101252A
 	protected ArrayList<Task> searchByDate(String date) {
 		ArrayList<Task> matchedTasks = new ArrayList<Task>();
 

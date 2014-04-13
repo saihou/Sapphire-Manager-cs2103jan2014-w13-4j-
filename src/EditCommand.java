@@ -1,7 +1,31 @@
+//@author A0097812X
 import java.util.ArrayList;
 
-
+/*
+ *Command pattern: This is one of the Concrete Commands.
+ * 
+ *Description: This class will handle the edit operation.
+ */
 public class EditCommand extends AddCommand {
+	
+	private static final int INDICATOR_INVALID = 0;
+	private static final int INDICATOR_LOCATION = 1;
+	private static final int INDICATOR_TIME = 2;
+	private static final int INDICATOR_DATE = 3;
+	
+	private static final String ERROR_CANNOT_UNDO = "ERROR: Cannot undo!";
+	private static final String ERROR_UNABLE_TO_EDIT = "ERROR: Unable to edit.";
+	private static final String ERROR_KEYWORD = "ERROR: Invalid keyword(s)!";
+	private static final String ERROR_NO_LIST = "ERROR: No list displayed at the moment!";
+	private static final String ERROR_TASK_NUMBER = "ERROR: Invalid task number!";
+	private static final String ERROR_REMOVE_NOT_PRESENT = "ERROR: Cannot remove something not present!";
+	private static final String ERROR_REMOVE_DATE_WO_TIME = "ERROR: Cannot remove date without removing time!";
+	private static final String ERROR_NOTHING_TO_REMOVE = "ERROR: Nothing to remove!";
+	
+	private static final String SUCCESS_UNDO = "Undo previous update: Successfully reverted \"%s\".";
+	private static final String SUCCESS_EDIT = "Successfully made changes to \"%s\".";
+	
+	private static final String PLACEHOLDER_PARSE_SUCCESS = "parsing success";
 	
 	Task editedTask;
 	
@@ -24,7 +48,7 @@ public class EditCommand extends AddCommand {
 		if (currentTaskList != null) {
 			proceedWithEditOnlyIfValidChoice(userCommand, userChoice);
 		} else {
-			systemFeedback = "ERROR: No list displayed at the moment!";
+			systemFeedback = ERROR_NO_LIST;
 		}
 		result.setSystemFeedback(systemFeedback);
 	}
@@ -35,7 +59,7 @@ public class EditCommand extends AddCommand {
 		if (isValidChoice) {
 			proceedWithEdit(userCommand, userChoice);
 		} else {
-			systemFeedback = "ERROR: Invalid task number!";
+			systemFeedback = ERROR_TASK_NUMBER;
 		}
 	}
 
@@ -44,10 +68,11 @@ public class EditCommand extends AddCommand {
 		systemFeedback = parseAndModifyTask(userModifications, editedTask, "edit");
 		
 		//if parsing is successful
-		if (systemFeedback.equals("parsing success")) {
+		if (systemFeedback.equals(PLACEHOLDER_PARSE_SUCCESS)) {
 			systemFeedback = parseRemovalKeywordsAndModifyTask(userCommand);
 			
-			if (systemFeedback.equals("parsing success")) {
+			//if parsing is successful
+			if (systemFeedback.equals(PLACEHOLDER_PARSE_SUCCESS)) {
 				edit();
 			}
 			else {
@@ -64,54 +89,54 @@ public class EditCommand extends AddCommand {
 			int countNumberOfEdits = 0;
 			boolean [] fieldsToRemove = parser.extractFieldsToRemove(userCommand);
 			
-			if (fieldsToRemove[0]) {
-				feedback = "ERROR: Invalid keyword(s)!";
+			if (fieldsToRemove[INDICATOR_INVALID]) {
+				feedback = ERROR_KEYWORD;
 				return feedback;
 			}
 			
 			if (isRemovingSomethingAlreadyNull(fieldsToRemove)) {
-				feedback = "ERROR: Cannot remove something not present!";
+				feedback = ERROR_REMOVE_NOT_PRESENT;
 				return feedback;
 			}
 			
-			if (fieldsToRemove[1]) {
+			if (fieldsToRemove[INDICATOR_LOCATION]) {
 				countNumberOfEdits++;
 				editedTask.setLocation(null);
 			}
 			
-			if (fieldsToRemove[2]) {
+			if (fieldsToRemove[INDICATOR_TIME]) {
 				countNumberOfEdits++;
 				editedTask.setStartTime(null);
 				editedTask.setEndTime(null);
 			}
 			
-			if (fieldsToRemove[3]) {
+			if (fieldsToRemove[INDICATOR_DATE]) {
 				countNumberOfEdits++;
 				//can only remove date if there is no time
 				if (editedTask.getStartTime() == null && editedTask.getEndTime() == null) {
 					editedTask.setDate(null);
 				} else {
-					feedback = "ERROR: Cannot remove date without removing time!";
+					feedback = ERROR_REMOVE_DATE_WO_TIME;
 					return feedback;
 				}
 			}
 			
 			if (countNumberOfEdits == 0) {
-				feedback = "ERROR: Nothing to remove!";
+				feedback = ERROR_NOTHING_TO_REMOVE;
 			} else {
 				setTaskType(editedTask);
-				feedback = "parsing success";
+				feedback = PLACEHOLDER_PARSE_SUCCESS;
 			}
 		} else {
-			feedback = "parsing success";
+			feedback = PLACEHOLDER_PARSE_SUCCESS;
 		}
 		return feedback;
 	}
 	
 	private boolean isRemovingSomethingAlreadyNull(boolean[] fieldsToRemove) {
-		if ( (fieldsToRemove[1] && editedTask.getLocation() == null) ||
-			(fieldsToRemove[2] && editedTask.getStartTime() == null) ||
-			(fieldsToRemove[3] && editedTask.getDate() == null) ) {
+		if ( (fieldsToRemove[INDICATOR_LOCATION] && editedTask.getLocation() == null) ||
+			(fieldsToRemove[INDICATOR_TIME] && editedTask.getStartTime() == null) ||
+			(fieldsToRemove[INDICATOR_DATE] && editedTask.getDate() == null) ) {
 			return true;
 		}
 		return false;
@@ -132,9 +157,9 @@ public class EditCommand extends AddCommand {
 		
 		if (success) {
 			result.setSuccess(true);
-			systemFeedback = "Successfully made changes to \"" + editedTask.getName() +"\".";
+			systemFeedback = formatString(SUCCESS_EDIT, editedTask.getName());
 		} else {
-			systemFeedback = "ERROR: Unable to edit.";
+			systemFeedback = ERROR_UNABLE_TO_EDIT;
 		}
 	}
 	
@@ -143,10 +168,10 @@ public class EditCommand extends AddCommand {
 		boolean success = addFirstTaskAndDeleteSecondTask(currentTask, editedTask);
 		
 		if (success) {
-			systemFeedback = "Undo previous update: Successfully reverted \""+ currentTask.getName() + "\".";
+			systemFeedback = formatString(SUCCESS_UNDO, currentTask.getName());
 		}
 		else {
-			systemFeedback = "ERROR: Cannot undo!";
+			systemFeedback = ERROR_CANNOT_UNDO;
 		}
 		result.setSystemFeedback(systemFeedback);
 	}
@@ -176,5 +201,9 @@ public class EditCommand extends AddCommand {
 	
 	public Task getEditedTask() {
 		return editedTask;
+	}
+	
+	private String formatString(String message, String arg) {
+		return String.format(message, arg);
 	}
 }

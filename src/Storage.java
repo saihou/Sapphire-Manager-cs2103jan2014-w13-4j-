@@ -14,6 +14,8 @@ import java.io.FileWriter;
 //JAVAX-SWING LIBRARIES
 import javax.swing.JOptionPane;
 
+ * Command pattern: This is one of the "Receiver" classes.
+ * 
 public class Storage {
 	//@author A0097706U
 	//default file name - cannot change

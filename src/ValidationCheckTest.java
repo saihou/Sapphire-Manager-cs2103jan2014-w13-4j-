@@ -1,9 +1,9 @@
+//@author A0097812X
 import static org.junit.Assert.*;
-
 import org.junit.Test;
 
-/** 
- * @author Sai Hou
+/*
+ * Description: This is a unit test for ValidationCheck.java.
  */
 
 public class ValidationCheckTest {
@@ -17,6 +17,16 @@ public class ValidationCheckTest {
 		assertDuration();
 		assertStatus();
 		assertLocation();
+		assertType();
+	}
+	
+	private void assertType() {
+		assertTrue("valid", ValidationCheck.isValidType("setDuration"));
+		assertTrue("valid", ValidationCheck.isValidType("noSetTiming"));
+		assertTrue("valid", ValidationCheck.isValidType("fullDay"));
+		assertTrue("valid", ValidationCheck.isValidType("targetedTime"));
+		assertFalse("invalid", ValidationCheck.isValidType("abccc"));
+		assertFalse("invalid", ValidationCheck.isValidType("#$#$^$1211"));
 	}
 	
 	private void assertLocation() {

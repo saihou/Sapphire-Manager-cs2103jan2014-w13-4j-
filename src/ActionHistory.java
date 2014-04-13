@@ -1,14 +1,11 @@
+//@author A0101252A
 import java.util.ArrayDeque;
-
-/**
- * @author Si Rui
- *	This class stores the history of the last user action, a pointer to the last task 
- *	that was added, edited or deleted, and a copy of the details of that last task. 
- *	This class will be referred to by the undo function in the CommandExecutor class.
- *
- *	Possible requests: set and get lastAction, pointerToLastTask and copyOfLastTask
- *
+ 
+/*
+ *	This class stores the history of the last user action in a stack.
+ *	It will be referred to by the undo function in the CommandExecutor class.
  */
+
 public class ActionHistory<E> {
 	
 	private ArrayDeque<E> historyOfCommands;
@@ -32,6 +29,8 @@ public class ActionHistory<E> {
 	public boolean isEmpty() {
 		return historyOfCommands.isEmpty();
 	}
+	
+	//@author A0101252A-unused
 	/*
 	private static ActionHistory instance = null;
 	

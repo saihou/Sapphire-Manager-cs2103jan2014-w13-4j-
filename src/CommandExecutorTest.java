@@ -1,13 +1,11 @@
-/**
- * @author Si Rui 
- * @author Sai Hou
- *
+//@author A0101252A 
+
+/*
  *	This class contains the jUnit tests for CommandExecutor and ActionHistory Class. It checks if:
  *	1. The Add (all Types of Tasks), Display, Edit, Delete, Undo and Clear are working correctly.
  *	2. The action history has been updated correctly after each action (if applicable).
  * 	
  */
-
 import static org.junit.Assert.*;
 
 import java.text.SimpleDateFormat;
@@ -18,15 +16,19 @@ import java.util.Queue;
 import org.junit.Test;
 
 public class CommandExecutorTest {
-
+	private static final String HEADING_MEMOS = "Memos:\n";
+	private static final String HEADING_TASKS_OCCURRING_DUE_MORE_THAN_A_WEEK_LATER = "Tasks Occurring/Due More Than A Week Later:\n";
+	private static final String HEADING_TASKS_OCCURRING_DUE_WITHIN_7_DAYS = "Tasks Occurring/Due Within 7 Days:\n";
+	private static final String HEADING_TODAY_S_TASKS = "Today's Tasks:\n";
+	private static final String HEADING_OVERDUE_TASKS = "Overdue Tasks:\n";
+	
 	SimpleDateFormat inputDateFormat = new SimpleDateFormat("ddMMyy");
 	SimpleDateFormat displayDateFormat = new SimpleDateFormat("dd-MMM-yyyy <EEE>");
 	
-	private String FEEDBACK_CLEAR_ALL = "Successfully cleared all tasks.";
+	private static String FEEDBACK_CLEAR_ALL = "Successfully cleared all tasks.";
 	
-	
-	private final static String TASK_NUMBER_SPACING = "   ";
-	private final static String DETAILS_SPACING = "      ";
+	private static final String TASK_NUMBER_SPACING = "   ";
+	private static final String DETAILS_SPACING = "      ";
 	
 	@Test
 	public void test() {
@@ -67,7 +69,7 @@ public class CommandExecutorTest {
 		int indexJ = 0;
 		String feedback = "Successfully added \"An overdue task\".";
 		ArrayDeque<String> headings = new ArrayDeque<String>(); 
-		headings.offer("Overdue Tasks:\n");
+		headings.offer(HEADING_OVERDUE_TASKS);
 		
 		Queue<String> bodySegment = new ArrayDeque<String>();
 		bodySegment.offer(TASK_NUMBER_SPACING + "1. An overdue task\n" + 
@@ -90,7 +92,7 @@ public class CommandExecutorTest {
 		int indexJ = 0;
 		String feedback = "Successfully made changes to \"An overdue task\".";
 		ArrayDeque<String> headings = new ArrayDeque<String>(); 
-		headings.offer("Overdue Tasks:\n");
+		headings.offer(HEADING_OVERDUE_TASKS);
 		
 		Queue<String> bodySegment = new ArrayDeque<String>();
 		bodySegment.offer(TASK_NUMBER_SPACING + "1. An overdue task\n" + 
@@ -125,7 +127,7 @@ public class CommandExecutorTest {
 		int indexJ = 0;
 		String feedback = "Undo previous deletion: Successfully added \"An overdue task\".";
 		ArrayDeque<String> headings = new ArrayDeque<String>(); 
-		headings.offer("Overdue Tasks:\n");
+		headings.offer(HEADING_OVERDUE_TASKS);
 		
 		Queue<String> bodySegment = new ArrayDeque<String>();
 		bodySegment.offer(TASK_NUMBER_SPACING + "1. An overdue task\n" + 
@@ -145,7 +147,7 @@ public class CommandExecutorTest {
 		int indexJ = 0;
 		String feedback = "Undo previous update: Successfully reverted \"An overdue task\".";
 		ArrayDeque<String> headings = new ArrayDeque<String>(); 
-		headings.offer("Overdue Tasks:\n");
+		headings.offer(HEADING_OVERDUE_TASKS);
 		
 		Queue<String> bodySegment = new ArrayDeque<String>();
 		bodySegment.offer(TASK_NUMBER_SPACING + "1. An overdue task\n" + 
@@ -178,7 +180,7 @@ public class CommandExecutorTest {
 		int indexJ = -1;
 		String feedback = "Displaying uncompleted tasks.";
 		ArrayDeque<String> headings = new ArrayDeque<String>(); 
-		headings.offer("Overdue Tasks:\n");
+		headings.offer(HEADING_OVERDUE_TASKS);
 		
 		Queue<String> bodySegment = new ArrayDeque<String>();
 		bodySegment.offer(TASK_NUMBER_SPACING + "1. An overdue task\n" + 
@@ -247,8 +249,8 @@ public class CommandExecutorTest {
 		String feedback = "Successfully added \"A task for today\".";
 		
 		ArrayDeque<String> headings = new ArrayDeque<String>(); 
-		headings.offer("Overdue Tasks:\n");
-		headings.offer("Today's Tasks:\n");
+		headings.offer(HEADING_OVERDUE_TASKS);
+		headings.offer(HEADING_TODAY_S_TASKS);
 		
 		ArrayDeque<Queue<String>> bodyAll = new ArrayDeque<Queue<String>>();
 		addOverdueBodySegment(bodyAll);
@@ -267,9 +269,9 @@ public class CommandExecutorTest {
 		String feedback = "Successfully added \"A task for the week\".";
 		
 		ArrayDeque<String> headings = new ArrayDeque<String>(); 
-		headings.offer("Overdue Tasks:\n");
-		headings.offer("Today's Tasks:\n");
-		headings.offer("Tasks Occurring/Due Within 7 Days:\n");
+		headings.offer(HEADING_OVERDUE_TASKS);
+		headings.offer(HEADING_TODAY_S_TASKS);
+		headings.offer(HEADING_TASKS_OCCURRING_DUE_WITHIN_7_DAYS);
 		
 		ArrayDeque<Queue<String>> bodyAll = new ArrayDeque<Queue<String>>();
 		addOverdueBodySegment(bodyAll);
@@ -291,10 +293,10 @@ public class CommandExecutorTest {
 		String feedback = "Successfully added \"A task for the next week\".";
 		
 		ArrayDeque<String> headings = new ArrayDeque<String>(); 
-		headings.offer("Overdue Tasks:\n");
-		headings.offer("Today's Tasks:\n");
-		headings.offer("Tasks Occurring/Due Within 7 Days:\n");
-		headings.offer("Tasks Occurring/Due More Than A Week Later:\n");
+		headings.offer(HEADING_OVERDUE_TASKS);
+		headings.offer(HEADING_TODAY_S_TASKS);
+		headings.offer(HEADING_TASKS_OCCURRING_DUE_WITHIN_7_DAYS);
+		headings.offer(HEADING_TASKS_OCCURRING_DUE_MORE_THAN_A_WEEK_LATER);
 		
 		ArrayDeque<Queue<String>> bodyAll = new ArrayDeque<Queue<String>>();
 		addOverdueBodySegment(bodyAll);
@@ -317,11 +319,11 @@ public class CommandExecutorTest {
 		String feedback = "Successfully added \"A second memo\".";
 		
 		ArrayDeque<String> headings = new ArrayDeque<String>(); 
-		headings.offer("Overdue Tasks:\n");
-		headings.offer("Today's Tasks:\n");
-		headings.offer("Tasks Occurring/Due Within 7 Days:\n");
-		headings.offer("Tasks Occurring/Due More Than A Week Later:\n");
-		headings.offer("Memos:\n");
+		headings.offer(HEADING_OVERDUE_TASKS);
+		headings.offer(HEADING_TODAY_S_TASKS);
+		headings.offer(HEADING_TASKS_OCCURRING_DUE_WITHIN_7_DAYS);
+		headings.offer(HEADING_TASKS_OCCURRING_DUE_MORE_THAN_A_WEEK_LATER);
+		headings.offer(HEADING_MEMOS);
 		
 		ArrayDeque<Queue<String>> bodyAll = new ArrayDeque<Queue<String>>();
 		addOverdueBodySegment(bodyAll);
