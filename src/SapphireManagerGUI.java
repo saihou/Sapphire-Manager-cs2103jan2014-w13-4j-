@@ -32,9 +32,6 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-
-
 //JAVAX-SWING LIBRARIES
 import javax.swing.BoxLayout;
 import javax.swing.event.CaretListener;
@@ -54,10 +51,6 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 //import javax.swing.Timer;
-
-
-
-
 import java.awt.FlowLayout;
 import java.io.File;
 
@@ -390,44 +383,7 @@ public class SapphireManagerGUI {
 		inputBox.addKeyListener(new KeyAdapter() {			
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-					if(!inputBox.getText().trim().equals("")) {
-						String userCommand = readCommandFromUser();
-						Result result = myExecutor.doUserOperation(userCommand);
-						printResults(result);
-
-						if(helpo.getText().trim().equals("")) {
-							displayToHelpo(MESSAGE_HELP);
-						}
-						setDisplayToTop();
-						inputBox.setText("");
-					}
-				} else if(e.getKeyCode() == KeyEvent.VK_F1) {
-					clearDisplayBox();
-					displayHelp();
-					displayToHelpo("Displaying Help List");
-					setDisplayToTop();
-				} else if(e.getKeyCode() == KeyEvent.VK_F5) {
-					clearDisplayBox();
-					displayToHelpo("Screen cleared");
-				} else if(e.getKeyCode() == KeyEvent.VK_F2) {
-					guiFrame.setState(Frame.ICONIFIED);
-				} else if(e.getKeyCode() == KeyEvent.VK_F3) {
-					printResults(myExecutor.doUserOperation("display today"));
-					setDisplayToTop();
-				} else if(e.getKeyCode() == KeyEvent.VK_F10) {
-					openTextFile();
-				} else if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-					System.exit(0);
-				} else if(e.getKeyCode() == KeyEvent.VK_PAGE_UP || e.getKeyCode() == KeyEvent.VK_UP) {
-					scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getValue()-25);
-				} else if(e.getKeyCode() == KeyEvent.VK_PAGE_DOWN || e.getKeyCode() == KeyEvent.VK_DOWN) {
-					scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getValue()+25);
-				} else if(e.getKeyCode() == KeyEvent.VK_HOME) {
-					scrollPane.getVerticalScrollBar().setValue(0);
-				} else if(e.getKeyCode() == KeyEvent.VK_END) {
-					scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
-				} 
+				keyboardExecution(e); 
 			}
 
 			@Override
@@ -439,6 +395,55 @@ public class SapphireManagerGUI {
 				}
 			}
 		});
+	}
+	
+	//@author A0097706U
+	//Keyboard execution
+	private void keyboardExecution(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+			inputExecution();
+		} else if(e.getKeyCode() == KeyEvent.VK_F1) {
+			clearDisplayBox();
+			displayHelp();
+			displayToHelpo("Displaying Help List");
+			setDisplayToTop();
+		} else if(e.getKeyCode() == KeyEvent.VK_F5) {
+			clearDisplayBox();
+			displayToHelpo("Screen cleared");
+		} else if(e.getKeyCode() == KeyEvent.VK_F2) {
+			guiFrame.setState(Frame.ICONIFIED);
+		} else if(e.getKeyCode() == KeyEvent.VK_F3) {
+			printResults(myExecutor.doUserOperation("display today"));
+			setDisplayToTop();
+		} else if(e.getKeyCode() == KeyEvent.VK_F10) {
+			openTextFile();
+		} else if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			System.exit(0);
+		} else if(e.getKeyCode() == KeyEvent.VK_PAGE_UP || e.getKeyCode() == KeyEvent.VK_UP) {
+			scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getValue()-25);
+		} else if(e.getKeyCode() == KeyEvent.VK_PAGE_DOWN || e.getKeyCode() == KeyEvent.VK_DOWN) {
+			scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getValue()+25);
+		} else if(e.getKeyCode() == KeyEvent.VK_HOME) {
+			scrollPane.getVerticalScrollBar().setValue(0);
+		} else if(e.getKeyCode() == KeyEvent.VK_END) {
+			scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+		}
+	}
+	
+	//@author A0097706U
+	//Executes user's input
+	private void inputExecution() {
+		if(!inputBox.getText().trim().equals("")) {
+			String userCommand = readCommandFromUser();
+			Result result = myExecutor.doUserOperation(userCommand);
+			printResults(result);
+
+			if(helpo.getText().trim().equals("")) {
+				displayToHelpo(MESSAGE_HELP);
+			}
+			setDisplayToTop();
+			inputBox.setText("");
+		}
 	}
 
 	//@author A0097706U
@@ -947,56 +952,64 @@ public class SapphireManagerGUI {
 			if(m.find() && m.group(1).trim().equals("") && action.equals("add")) {
 				return "Please enter a task name";
 			} else {
-				Pattern pOn = Pattern.compile("(/on)( )([0-9]{6})");
-				Matcher mOn = pOn.matcher(userInput);
-
-				Pattern pLoc = Pattern.compile("(/loc)( )(\\w{0,15})");
-				Matcher mLoc = pLoc.matcher(userInput);
-
-				Pattern pFrom = Pattern.compile("(/from)( )([0-9]{4})");
-				Matcher mFrom = pFrom.matcher(userInput);
-
-				Pattern pTo = Pattern.compile("(to)([0-9]{4})");
-				Matcher mTo = pTo.matcher(userInput);
-
-				Pattern pAt = Pattern.compile("(/at)( )([0-9]{0,4})");
-				Matcher mAt = pAt.matcher(userInput);
-
-				Pattern pBy = Pattern.compile("(/by)( )([0-9]{0,4})");
-				Matcher mBy = pBy.matcher(userInput);
-
-				Pattern pMark = Pattern.compile("(/mark)( )([a-zA-Z]{0,6})");
-				Matcher mMark = pMark.matcher(userInput);
-
-				Pattern pRemove = Pattern.compile("(/rm)( )([a-zA-Z]{0,4})");
-				Matcher mRemove = pRemove.matcher(userInput);
-
-				if(userInput.endsWith("/")) {
-					String options = HELPO_OPTIONS_ON+" "+HELPO_OPTIONS_FROM+" OR "+HELPO_OPTIONS_AT_BY+" "+HELPO_OPTIONS_LOC;					
-					if(action.equalsIgnoreCase("edit") || action.equalsIgnoreCase("update")) {
-						options += " "+HELPO_OPTIONS_MARK+" "+HELPO_OPTIONS_REMOVE;
-					}
-					return options; 
-				} else if(userInput.endsWith("/o") || userInput.endsWith("/on") && !mOn.find()) {
-					return HELPO_OPTIONS_ON+" "+" "+HELPO_FORMAT_ON+" "+HELPO_FORMAT_DATE;
-				} else if(userInput.endsWith("/l") || userInput.endsWith("/lo") || userInput.endsWith("/loc") && !mLoc.find()) {
-					return HELPO_OPTIONS_LOC+" "+HELPO_FORMAT_LOC;
-				} else if(userInput.endsWith("/f") || userInput.endsWith("/fr") || userInput.endsWith("/fro") || userInput.endsWith("/from") && !mFrom.find()) {
-					return HELPO_OPTIONS_FROM+" "+HELPO_FORMAT_FROM_TO+" "+HELPO_FORMAT_TIME;
-				} else if(userInput.endsWith("to") && !mTo.find()) {
-					return HELPO_OPTIONS_FROM+" "+HELPO_FORMAT_FROM_TO+" "+HELPO_FORMAT_TIME;
-				} else if(userInput.endsWith("/a") || userInput.endsWith("/at") && !mAt.find()) {
-					return HELPO_OPTIONS_AT+" "+HELPO_FORMAT_AT_BY+" "+HELPO_FORMAT_TIME;
-				} else if(userInput.endsWith("/b") || userInput.endsWith("/by") && !mBy.find()) {
-					return HELPO_OPTIONS_BY+" "+HELPO_FORMAT_AT_BY+" "+HELPO_FORMAT_TIME;
-				} else if((action.equalsIgnoreCase("edit") || action.equalsIgnoreCase("update")) && (userInput.endsWith("/m") || userInput.endsWith("/ma") || userInput.endsWith("/mar") || userInput.endsWith("/mark") && !mMark.find())) {
-					return HELPO_OPTIONS_MARK+" "+HELPO_FORMAT_MARK;
-				} else if((action.equalsIgnoreCase("edit") || action.equalsIgnoreCase("update")) && ((userInput.endsWith("/r") || userInput.endsWith("/rm") && !mRemove.find()) && action.equals("edit"))) {
-					return HELPO_OPTIONS_REMOVE+" "+HELPO_FORMAT_REMOVE;
-				}
+				return addEditOptions(action, userInput);
 			}
 		} 
 		return helpo.getText();
+	}
+	
+	//@author A0097706U
+	//Options for Add and Edit
+	private String addEditOptions(String action, String userInput) {
+		Pattern pOn = Pattern.compile("(/on)( )([0-9]{6})");
+		Matcher mOn = pOn.matcher(userInput);
+
+		Pattern pLoc = Pattern.compile("(/loc)( )(\\w{0,15})");
+		Matcher mLoc = pLoc.matcher(userInput);
+
+		Pattern pFrom = Pattern.compile("(/from)( )([0-9]{4})");
+		Matcher mFrom = pFrom.matcher(userInput);
+
+		Pattern pTo = Pattern.compile("(to)([0-9]{4})");
+		Matcher mTo = pTo.matcher(userInput);
+
+		Pattern pAt = Pattern.compile("(/at)( )([0-9]{0,4})");
+		Matcher mAt = pAt.matcher(userInput);
+
+		Pattern pBy = Pattern.compile("(/by)( )([0-9]{0,4})");
+		Matcher mBy = pBy.matcher(userInput);
+
+		Pattern pMark = Pattern.compile("(/mark)( )([a-zA-Z]{0,6})");
+		Matcher mMark = pMark.matcher(userInput);
+
+		Pattern pRemove = Pattern.compile("(/rm)( )([a-zA-Z]{0,4})");
+		Matcher mRemove = pRemove.matcher(userInput);
+
+		if(userInput.endsWith("/")) {
+			String options = HELPO_OPTIONS_ON+" "+HELPO_OPTIONS_FROM+" OR "+HELPO_OPTIONS_AT_BY+" "+HELPO_OPTIONS_LOC;					
+			if(action.equalsIgnoreCase("edit") || action.equalsIgnoreCase("update")) {
+				options += " "+HELPO_OPTIONS_MARK+" "+HELPO_OPTIONS_REMOVE;
+			}
+			return options; 
+		} else if(userInput.endsWith("/o") || userInput.endsWith("/on") && !mOn.find()) {
+			return HELPO_OPTIONS_ON+" "+" "+HELPO_FORMAT_ON+" "+HELPO_FORMAT_DATE;
+		} else if(userInput.endsWith("/l") || userInput.endsWith("/lo") || userInput.endsWith("/loc") && !mLoc.find()) {
+			return HELPO_OPTIONS_LOC+" "+HELPO_FORMAT_LOC;
+		} else if(userInput.endsWith("/f") || userInput.endsWith("/fr") || userInput.endsWith("/fro") || userInput.endsWith("/from") && !mFrom.find()) {
+			return HELPO_OPTIONS_FROM+" "+HELPO_FORMAT_FROM_TO+" "+HELPO_FORMAT_TIME;
+		} else if(userInput.endsWith("to") && !mTo.find()) {
+			return HELPO_OPTIONS_FROM+" "+HELPO_FORMAT_FROM_TO+" "+HELPO_FORMAT_TIME;
+		} else if(userInput.endsWith("/a") || userInput.endsWith("/at") && !mAt.find()) {
+			return HELPO_OPTIONS_AT+" "+HELPO_FORMAT_AT_BY+" "+HELPO_FORMAT_TIME;
+		} else if(userInput.endsWith("/b") || userInput.endsWith("/by") && !mBy.find()) {
+			return HELPO_OPTIONS_BY+" "+HELPO_FORMAT_AT_BY+" "+HELPO_FORMAT_TIME;
+		} else if((action.equalsIgnoreCase("edit") || action.equalsIgnoreCase("update")) && (userInput.endsWith("/m") || userInput.endsWith("/ma") || userInput.endsWith("/mar") || userInput.endsWith("/mark") && !mMark.find())) {
+			return HELPO_OPTIONS_MARK+" "+HELPO_FORMAT_MARK;
+		} else if((action.equalsIgnoreCase("edit") || action.equalsIgnoreCase("update")) && ((userInput.endsWith("/r") || userInput.endsWith("/rm") && !mRemove.find()) && action.equals("edit"))) {
+			return HELPO_OPTIONS_REMOVE+" "+HELPO_FORMAT_REMOVE;
+		} else {
+			return MESSAGE_INVALID_COMMAND;
+		}
 	}
 
 	//@author A0097706U
