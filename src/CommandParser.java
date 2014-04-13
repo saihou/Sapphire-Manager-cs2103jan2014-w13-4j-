@@ -1,4 +1,4 @@
-//@author Cai Di
+//@author A0085159W
 /*
  * Command pattern: This is one of the "Receiver" classes.
  * 
@@ -209,7 +209,7 @@ public class CommandParser {
 		}
 	}
 
-	//@author Cai Di
+	//@author  A0085159W
 	protected String invalidFeedBack;
 	protected String[] taskDetails;
 
@@ -346,6 +346,9 @@ public class CommandParser {
 		}
 		
 	}
+	/* 
+	 * @author  A0085159W
+	 */
 	/*
 	 * input with a "/" but no command keyword is not valid
 	 * input with multiple "/" e.g. "///" is not allowed
