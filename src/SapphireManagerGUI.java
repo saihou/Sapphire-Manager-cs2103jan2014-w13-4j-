@@ -194,7 +194,7 @@ public class SapphireManagerGUI {
 		guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		guiFrame.setResizable(false);
 		guiFrame.setTitle("Sapphire Manager");	
-		
+
 		//sets favicon to program
 		ImageIcon icon = new ImageIcon(getClass().getResource("img/logoIcon.png"));
 		guiFrame.setIconImage(icon.getImage());
@@ -390,7 +390,7 @@ public class SapphireManagerGUI {
 			}
 		});
 	}
-	
+
 	//@author A0097706U
 	//Keyboard execution
 	private void keyboardExecution(KeyEvent e) {
@@ -423,7 +423,7 @@ public class SapphireManagerGUI {
 			scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
 		}
 	}
-	
+
 	//@author A0097706U
 	//Executes user's input
 	private void inputExecution() {
@@ -541,7 +541,7 @@ public class SapphireManagerGUI {
 	private String readCommandFromUser() {
 		return readUserInput();
 	}
-	
+
 	//author A0097706U
 	//opens the text document
 	private void openTextFile() {
@@ -555,7 +555,7 @@ public class SapphireManagerGUI {
 		}
 		System.out.println(System.getProperty("user.dir"));
 	}
-	
+
 	//@author A0097706U
 	//display pop up message for errors
 	private void displayPopUpMsg(String msg) {
@@ -946,32 +946,32 @@ public class SapphireManagerGUI {
 		} 
 		return helpo.getText();
 	}
-	
+
 	//@author A0097706U
 	//Options for Add and Edit
 	private String addEditOptions(String action, String userInput) {
 		Pattern pOn = Pattern.compile("(/on)( )([0-9]{6})");
 		Matcher mOn = pOn.matcher(userInput);
 
-		Pattern pLoc = Pattern.compile("(/loc)( )(\\w{0,15})");
+		Pattern pLoc = Pattern.compile("(/loc)( )(\\w{0,30})");
 		Matcher mLoc = pLoc.matcher(userInput);
 
-		Pattern pFrom = Pattern.compile("(/from)( )([0-9]{4})");
+		Pattern pFrom = Pattern.compile("(/from)( )([0-9]{10})");
 		Matcher mFrom = pFrom.matcher(userInput);
 
-		Pattern pTo = Pattern.compile("(to)([0-9]{4})");
+		Pattern pTo = Pattern.compile("(to)([0-9]{8})");
 		Matcher mTo = pTo.matcher(userInput);
 
-		Pattern pAt = Pattern.compile("(/at)( )([0-9]{0,4})");
+		Pattern pAt = Pattern.compile("(/at)( )([0-9]{0,10})");
 		Matcher mAt = pAt.matcher(userInput);
 
-		Pattern pBy = Pattern.compile("(/by)( )([0-9]{0,4})");
+		Pattern pBy = Pattern.compile("(/by)( )([0-9]{0,10})");
 		Matcher mBy = pBy.matcher(userInput);
 
 		Pattern pMark = Pattern.compile("(/mark)( )([a-zA-Z]{0,6})");
 		Matcher mMark = pMark.matcher(userInput);
 
-		Pattern pRemove = Pattern.compile("(/rm)( )([a-zA-Z]{0,4})");
+		Pattern pRemove = Pattern.compile("(/rm)( )([a-zA-Z]{0,5})");
 		Matcher mRemove = pRemove.matcher(userInput);
 
 		if(userInput.endsWith("/")) {
@@ -997,7 +997,66 @@ public class SapphireManagerGUI {
 		} else if((action.equalsIgnoreCase("edit") || action.equalsIgnoreCase("update")) && ((userInput.endsWith("/r") || userInput.endsWith("/rm") && !mRemove.find()) && action.equals("edit"))) {
 			return HELPO_OPTIONS_REMOVE+" "+HELPO_FORMAT_REMOVE;
 		} else {
-			return MESSAGE_INVALID_COMMAND;
+			switch(locateLastOption(userInput)) {
+			case "/on": 
+				return HELPO_OPTIONS_ON+" "+" "+HELPO_FORMAT_ON+" "+HELPO_FORMAT_DATE;
+			case "/loc": 
+				return HELPO_OPTIONS_LOC+" "+HELPO_FORMAT_LOC;
+			case "/from": 
+				return HELPO_OPTIONS_FROM+" "+HELPO_FORMAT_FROM_TO+" "+HELPO_FORMAT_TIME;
+			case "to": 
+				return HELPO_OPTIONS_FROM+" "+HELPO_FORMAT_FROM_TO+" "+HELPO_FORMAT_TIME;
+			case "/at": 
+				return HELPO_OPTIONS_FROM+" "+HELPO_FORMAT_FROM_TO+" "+HELPO_FORMAT_TIME;
+			case "/by": 
+				return HELPO_OPTIONS_BY+" "+HELPO_FORMAT_AT_BY+" "+HELPO_FORMAT_TIME;
+			case "/mark": 
+				if(action.equalsIgnoreCase("edit") || action.equalsIgnoreCase("update")) {
+					return HELPO_OPTIONS_MARK+" "+HELPO_FORMAT_MARK;
+				}
+			case "/rm": 
+				if(action.equalsIgnoreCase("edit") || action.equalsIgnoreCase("update")) {
+					return HELPO_OPTIONS_REMOVE+" "+HELPO_FORMAT_REMOVE;
+				}
+			default: 
+				return MESSAGE_INVALID_COMMAND;
+			}
+		}
+	}
+	
+	//@author A0097706U
+	//check for last input option
+	private String locateLastOption(String userInput) {
+		int[] optionLastIndex = new int[9];
+		int lastInput = 8;
+
+		optionLastIndex[0] = userInput.indexOf("/on");
+		optionLastIndex[1] = userInput.indexOf("/loc");
+		optionLastIndex[2] = userInput.indexOf("/from");
+		optionLastIndex[3] = userInput.indexOf("/to");
+		optionLastIndex[4] = userInput.indexOf("/at");
+		optionLastIndex[5] = userInput.indexOf("/by");
+		optionLastIndex[6] = userInput.indexOf("/mark");
+		optionLastIndex[7] = userInput.indexOf("/rm");
+
+
+		for(int i=0; i<optionLastIndex.length; i++) {
+			if(optionLastIndex[lastInput] < optionLastIndex[i]) {
+				lastInput = i;
+			}
+		}
+		
+		System.out.println(lastInput);
+		switch(lastInput) {
+		case 0: lastInput = 8; return "/on"; 
+		case 1: lastInput = 8; return "/loc"; 
+		case 2: lastInput = 8; return "/from"; 
+		case 3: lastInput = 8; return "/to"; 
+		case 4: lastInput = 8; return "/at"; 
+		case 5: lastInput = 8; return "/by"; 
+		case 6: lastInput = 8; return "/mark"; 
+		case 7: lastInput = 8; return "/rm"; 
+		default: return "";
 		}
 	}
 
@@ -1050,17 +1109,17 @@ public class SapphireManagerGUI {
 		if(result.getSystemFeedback().equals("Displaying tasks for today.")) {
 			displayToHelpo(helpo.getText()+" "+MESSAGE_HELP);
 		}
-		
+
 		if(!result.getSystemFeedback().contains("ERROR")) {
 			clearDisplayBox();
 			if(result.getSystemFeedback().startsWith("You have no")) {
 				displayHighlightMessage(result.getSystemFeedback()+"\nPress F1 for help or F3 to display today's tasks.");
 			}
-			
+
 			printResults(headings, body, highlightIndexI, highlightIndexJ);
 		}
-		
-		
+
+
 	}
 
 	//@author A0097706U
@@ -1225,7 +1284,7 @@ public class SapphireManagerGUI {
 			bodyOfThisHeading.offer(task);
 		}
 	}
-	
+
 	//@author A0097706U
 	//any other kind of tasks will be printed here - unlikely to be activated
 	private static void printOtherTask(Queue<String> headings, Queue<Queue<String>> body, int highlightIndexI, int highlightIndexJ, int i, String heading) {
