@@ -1,18 +1,21 @@
+//@author A0097706U
+//This class is the storage that that deals with the reading of file and writing to file
+
+//JAVA-UTIL LIBRARIES
 import java.util.ArrayList;
+
+//JAVA-IO LIBRARIES
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
+//JAVAX-SWING LIBRARIES
 import javax.swing.JOptionPane;
 
-/**
- * @author A0097706U
- * This class is the storage that that deals with the reading of file and writing to file
- */
-
 public class Storage {
+	//@author A0097706U
 	//default file name - cannot change
 	private final static String FILE_NAME = "mytextfile.txt";
 	private final static String FILE_ERROR_BACKUP_NAME = "mytextfileWithError.txt";
@@ -43,6 +46,7 @@ public class Storage {
 	//instance - Singleton
 	private static Storage instance = null;
 
+	//@author A0097706U
 	//constructor to initialize arraylist and file
 	private Storage() {
 		taskList = new ArrayList<Task>();
@@ -50,6 +54,7 @@ public class Storage {
 		readFile();
 	}
 
+	//@author A0097706U
 	//return instance of Storage <Singleton>
 	public static Storage getInstance() {
 		if (instance == null) {
@@ -61,11 +66,13 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
 	//gets tasklist
 	public ArrayList<Task> getTaskList() {
 		return taskList;
 	}
 
+	//@author A0097706U
 	//add task to list
 	public boolean setTaskList(Task task) {
 		if(task != null) {
@@ -77,6 +84,7 @@ public class Storage {
 		return false;
 	}
 
+	//@author A0097706U
 	//writes String to file
 	private boolean writeHeader(String header, boolean toAppend) {
 		try {
@@ -92,6 +100,7 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
 	//write a task to file
 	//toAppend: true - append to existing file; false - rewrite the file
 	public boolean writeATaskToFile(Task task, boolean toAppend) {
@@ -113,6 +122,7 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
 	//write multiple task to file
 	public boolean writeTaskListToFile() {
 		if(taskList.size() > 0) {
@@ -124,6 +134,7 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
 	//clear all file
 	public boolean clear() {
 		if(!clearFile()) {
@@ -138,6 +149,7 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
 	//read file
 	private boolean readFile() {		
 		try {
@@ -154,6 +166,7 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
 	//initialize file
 	private boolean initializeFile() {
 		try {
@@ -169,6 +182,7 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
 	//read file line by line
 	private boolean readFileLine() {
 		try {
@@ -198,6 +212,7 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
 	//copy the contents of invalid file under a separate file name
 	//reinitializes the original file
 	private boolean settleInvalidFile() {
@@ -229,6 +244,7 @@ public class Storage {
 		return false;
 	}
 
+	//@author A0097706U
 	//clear and re-initialize file
 	private boolean clearFile() {
 		try {
@@ -243,7 +259,8 @@ public class Storage {
 		}
 	}
 
-	//clear and initialize ArrayList
+	//@author A0097706U
+	//clear ArrayList
 	private boolean clearTaskList() {
 		try {
 			taskList.clear();
@@ -257,6 +274,7 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
 	//write file line by line
 	private boolean writeFile() {
 		initializeFile();
@@ -271,6 +289,7 @@ public class Storage {
 		return true;
 	}
 
+	//@author A0097706U
 	//converts String to Task
 	public Task convertStringToTask(String[] splitedTaskInfo) {
 		task = new Task();	
@@ -324,6 +343,7 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
 	//converts Task to String
 	public String convertTaskToString(Task task) {
 		String convertedTask = "";
@@ -388,6 +408,8 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
+	//checks Task's entries to ensure they are valid
 	private boolean checkTaskEntries(Task task) {
 		boolean isValid = true;
 
@@ -426,6 +448,8 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
+	//checks String's entries are valid before placing them in Task
 	private boolean checkStringTaskEntries(String[] splitedTaskInfo) {
 		boolean isValid = true;
 
@@ -464,11 +488,13 @@ public class Storage {
 		}
 	}
 	
+	//@author A0097706U
 	//display pop up message for errors
 	private void displayPopUpMsg(String msg) {
 		JOptionPane.showMessageDialog(null, msg);
 	}
 
+	//@author A0097706U
 	//BACK UP PURPOSES - Save a copy of backup list from original list
 	private void updateBackUpTaskList() {
 		backUpTaskList.clear();
@@ -477,6 +503,7 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
 	//BACK UP PURPOSES - Re-add tasks to original list from backup list
 	private void reAddTaskListFromBackUp() {
 		taskList.clear();
@@ -485,6 +512,7 @@ public class Storage {
 		}
 	}
 
+	//@author A0097706U
 	//BACK UP PURPOSES - Re-write file from backup list
 	private boolean writeBackUpFile() {
 		for(int i=0; i<backUpTaskList.size(); i++) {
