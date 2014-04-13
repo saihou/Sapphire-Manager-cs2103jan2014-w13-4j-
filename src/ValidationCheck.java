@@ -1,13 +1,13 @@
+//@author A0097812X
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 import java.text.ParseException;
 
-/**
- * ValidationCheck
- * This static class will check for errors from user input
+/*
+ * Description: This static class will check for errors from user input 
+ * and return an appropriate boolean, depending on whether
+ * it is valid or not. It is part of the Utility component.
  */
-
-//@author Sai Hou
 public class ValidationCheck {
 	
 	public static boolean isValidDate(String input) {
@@ -59,7 +59,7 @@ public class ValidationCheck {
 		}
 	}
 	
-	//@author Sai Hou
+	//@author A0097812X
 	private static boolean validateChoice(String input, int sizeOfList) {
 		try {
 			int choiceEntered = Integer.parseInt(input);
@@ -161,13 +161,14 @@ public class ValidationCheck {
 		return isValid;
 	}
 	
-	//author A0097706U
+	//@author A0097706U
 	private static boolean validateType(String type) {		
 		switch(type.trim()) {
 			case "setDuration"  :
 			case "noSetTiming"  :
 			case "targetedTime" : 
 			case "fullDay" 		:
+				//all valid types should fall through to return true
 				return true;
 			default: 
 				return false;

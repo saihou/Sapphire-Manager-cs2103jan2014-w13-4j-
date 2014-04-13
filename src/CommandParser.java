@@ -1,35 +1,60 @@
-/**
- * @author Cai Di
+//@author Cai Di
+/*
+ * Command pattern: This is one of the "Receiver" classes.
+ * 
  * This class is created to analyze user input string.  
  * It extracts task details and information from user input string.
  */
 
 public class CommandParser {
-	// constructor
+	private static final String ERROR_NO_TASK_NAME = "ERROR: No task name.";
+	private static final String ERROR_COMMAND_FROM_AND_AT_ARE_MUTUALLY_EXCLUSIVE = "ERROR: Command /from and /at are mutually exclusive.";
+	private static final String ERROR_INPUT_COMMAND_IS_NOT_VALID = "ERROR: Input Command is not valid.";
+	private static final String ERROR_MORE_THAN_ONE_COMMAND_RM_IS_DETECTED = "ERROR: More than one command /rm is detected.";
+	private static final String ERROR_MORE_THAN_ONE_COMMAND_LOC_IS_DETECTED = "ERROR: More than one command /loc is detected.";
+	private static final String ERROR_MORE_THAN_ONE_COMMAND_MARK_IS_DETECTED = "ERROR: More than one command /mark is detected.";
+	private static final String ERROR_MORE_THAN_ONE_COMMAND_ON_IS_DETECTED = "ERROR: More than one command /on is detected.";
+	private static final String ERROR_MORE_THAN_ONE_COMMAND_AT_IS_DETECTED = "ERROR: More than one command /at is detected.";
+	private static final String ERROR_MORE_THAN_ONE_COMMAND_FROM_IS_DETECTED = "ERROR: More than one command /from is detected.";
+	private static final String ERROR_COMMAND_KEYWORD_IS_MISSING = "ERROR: Command keyword is missing.";
+	private static final String ERROR_LOCATION_MUST_START_WITH_A_LETTER = "ERROR: Location must start with a letter.";
+	private static final String ERROR_EMPTY_INPUT = "ERROR: Empty input!";
+	private static final String ERROR_INVALID_NUMBER_OF_KEYWORDS = "ERROR: Invalid number of keywords!!";
+	private static final String ERROR_INVALID_KEYWORDS_ENTERED = "ERROR: Invalid keyword(s) entered!";
+
+	private static final int INDICATOR_INVALID = 0;
+	private static final int INDICATOR_LOCATION = 1;
+	private static final int INDICATOR_TIME = 2;
+	private static final int INDICATOR_DATE = 3;
+	private static final int INDICATOR_MAX = 4;
+	
+	private static final String OVERDUE = "overdue";
+	private static final String MEMOS = "memos";
+	private static final String ALL = "all";
+	private static final String DONE = "done";
+	private static final String UNDONE = "undone";
+	private static final String TODAY = "today";
+	
+	//null constructor
 	public CommandParser(){
 	}
     
-	// returns the first word of String userInput 
-	public String getFirstWord(String userInput) {
-		return userInput.trim().split("\\s+")[0];
-	}
-	
-	//@author Sai Hou
+	//@author A0097812X
 	/**
 	 * @param userCommand
-	 * @return displayType, "all", "undone", "done" or "today"
+	 * @return displayType, "all", "overdue", "memos", "undone", "done" or "today" or error msg
 	 */
 	public String parseDisplayType(String userCommand) {
 		String displayType = "";
 		
 		userCommand = prepareUserCommandForParsing(userCommand);
 		
-		boolean isAllKeywordPresent = userCommand.equals("all");
-		boolean isUndoneKeywordPresent = userCommand.equals("undone") || userCommand.equals("");
-		boolean isDoneKeywordPresent = userCommand.equals("done");
-		boolean isTodayKeywordPresent = userCommand.equals("today");
-		boolean isOverdueKeywordPresent = userCommand.equals("overdue");
-		boolean isMemosKeywordPresent = userCommand.equals("memos");
+		boolean isAllKeywordPresent = userCommand.equals(ALL);
+		boolean isUndoneKeywordPresent = userCommand.equals(UNDONE) || userCommand.equals("");
+		boolean isDoneKeywordPresent = userCommand.equals(DONE);
+		boolean isTodayKeywordPresent = userCommand.equals(TODAY);
+		boolean isOverdueKeywordPresent = userCommand.equals(OVERDUE);
+		boolean isMemosKeywordPresent = userCommand.equals(MEMOS);
 		
 		displayType = determineDisplayType(isUndoneKeywordPresent,
 				isDoneKeywordPresent, isTodayKeywordPresent, isAllKeywordPresent,
@@ -39,14 +64,8 @@ public class CommandParser {
 	}
 
 	/**
-	 * @param isUndoneKeywordPresent
-	 * @param isDoneKeywordPresent
-	 * @param isTodayKeywordPresent
-	 * @param isAllKeywordPresent
-	 * @param isOverdueKeywordPresent
-	 * @param isMemoesKeywordPresent
 	 * @return error message if number of keywords > 1,
-	 * 		"future" if number of keywords == 0,
+	 * 		"undone" if number of keywords == 0,
 	 * 		the respective display type otherwise.
 	 */
 	private String determineDisplayType(boolean isUndoneKeywordPresent,
@@ -61,28 +80,28 @@ public class CommandParser {
 		assert numberOfKeywordsPresent >= 0;
 		
 		if (numberOfKeywordsPresent > 1 ) {
-			displayType = "ERROR: Invalid number of keywords!!";
+			displayType = ERROR_INVALID_NUMBER_OF_KEYWORDS;
 			return displayType;
 		}
 		
 		if (numberOfKeywordsPresent < 1) {
-			displayType = "ERROR: Invalid keyword(s) entered!";
+			displayType = ERROR_INVALID_KEYWORDS_ENTERED;
 			return displayType;
 		}
 		
 		if (isAllKeywordPresent) {
-			displayType = "all";
+			displayType = ALL;
 		} else if (isDoneKeywordPresent) {
-			displayType = "done";
+			displayType = DONE;
 		} else if (isTodayKeywordPresent) {
-			displayType = "today";
+			displayType = TODAY;
 		} else if (isOverdueKeywordPresent) {
-			displayType = "overdue";
+			displayType = OVERDUE;
 		} else if (isMemosKeywordPresent) {
-			displayType = "memos";
+			displayType = MEMOS;
 		} else { 
 			//default
-			displayType = "undone";
+			displayType = UNDONE;
 		}
 		return displayType;
 	}
@@ -98,30 +117,36 @@ public class CommandParser {
 				(isOverdueKeywordPresent ? 1:0) +
 				(isMemosKeywordPresent ? 1:0);
 	}
-
+	/**
+	 * @param userCommand
+	 * @return displayType, "all" or "done" or error msg
+	 */
 	public String parseClearType(String userCommand) {
 		String clearType = "";
 		
 		userCommand = prepareUserCommandForParsing(userCommand);
 		
-		boolean isAllKeywordPresent = userCommand.equals("all");
-		boolean isDoneKeywordPresent = userCommand.equals("done") || userCommand.equals("");
+		boolean isAllKeywordPresent = userCommand.equals(ALL);
+		boolean isDoneKeywordPresent = userCommand.equals(DONE) || userCommand.equals("");
 		
 		clearType = determineClearType(isAllKeywordPresent, isDoneKeywordPresent); 
 		
 		return clearType;
 	}
 	
+	/**
+	 * @return error message if keyword is invalid,
+	 * 		the respective display type otherwise.
+	 */
 	private String determineClearType(boolean isAllKeywordPresent, boolean isDoneKeywordPresent) {
 		String clearType = "";
 		
 		if (isAllKeywordPresent) {
-			clearType = "all";
+			clearType = ALL;
 		} else if (isDoneKeywordPresent) {
-			//default
-			clearType = "done";
+			clearType = DONE;
 		} else {
-			clearType = "ERROR: Invalid keyword(s) entered!";
+			clearType = ERROR_INVALID_KEYWORDS_ENTERED;
 		}
 		return clearType;
 	}
@@ -140,7 +165,7 @@ public class CommandParser {
 	 * fieldsToRemove[0] = true | indicates parsing failed, i.e. user typed nonsense
 	 */
 	public boolean [] extractFieldsToRemove(String userCommand) {
-		boolean [] fieldsToRemove = new boolean[4];
+		boolean [] fieldsToRemove = new boolean[INDICATOR_MAX];
 		int countInvalidKeywords = 0;
 		
 		String[] arrayOfKeywords = prepareArrayOfKeywords(userCommand);
@@ -148,13 +173,13 @@ public class CommandParser {
 		for (String keyword : arrayOfKeywords) {
 			switch (keyword) {
 			case "loc" : 
-				fieldsToRemove[1] = true;
+				fieldsToRemove[INDICATOR_LOCATION] = true;
 				break;
 			case "time" :
-				fieldsToRemove[2] = true;
+				fieldsToRemove[INDICATOR_TIME] = true;
 				break;
 			case "date" :
-				fieldsToRemove[3] = true;
+				fieldsToRemove[INDICATOR_DATE] = true;
 				break;
 			default :
 				countInvalidKeywords++;
@@ -164,7 +189,7 @@ public class CommandParser {
 		}
 		
 		if (countInvalidKeywords > 0) {
-			fieldsToRemove[0] = true;
+			fieldsToRemove[INDICATOR_INVALID] = true;
 		}
 		
 		return fieldsToRemove;
@@ -185,7 +210,6 @@ public class CommandParser {
 	}
 
 	//@author Cai Di
-	 
 	protected String invalidFeedBack;
 	protected String[] taskDetails;
 
@@ -224,7 +248,7 @@ public class CommandParser {
 		String[] temp = input.split("/");
 		
 		if(temp.length == 0){
-			invalidFeedBack = "ERROR: Command keyword is missing.";
+			invalidFeedBack = ERROR_COMMAND_KEYWORD_IS_MISSING;
 			return;
 		}
 		
@@ -251,7 +275,7 @@ public class CommandParser {
 					numOfFrom++;
 					// more than one command /from is detected
 					if(numOfFrom > 1){
-						invalidFeedBack = "ERROR: More than one command /from is detected.";
+						invalidFeedBack = ERROR_MORE_THAN_ONE_COMMAND_FROM_IS_DETECTED;
 						return;
 					}
 					extractDuration(temp[i]);
@@ -264,7 +288,7 @@ public class CommandParser {
 					numOfAt++;
 					// more than one command /at is detected
 					if(numOfAt > 1){
-						invalidFeedBack = "ERROR: More than one command /at is detected.";
+						invalidFeedBack = ERROR_MORE_THAN_ONE_COMMAND_AT_IS_DETECTED;
 						return;
 					}
 					extractDeadline(temp[i]);
@@ -274,7 +298,7 @@ public class CommandParser {
 					numOfOn++;
 					// more than one command /on is detected
 					if(numOfOn > 1){
-						invalidFeedBack = "ERROR: More than one command /on is detected.";
+						invalidFeedBack = ERROR_MORE_THAN_ONE_COMMAND_ON_IS_DETECTED;
 						return;
 					}
 					extractDate(temp[i]);
@@ -284,7 +308,7 @@ public class CommandParser {
 					numOfMark++;
 					// more than one command /mark is detected
 					if(numOfMark > 1){
-						invalidFeedBack = "ERROR: More than one command /mark is detected.";
+						invalidFeedBack = ERROR_MORE_THAN_ONE_COMMAND_MARK_IS_DETECTED;
 						return;
 					}
 					extractStatus(temp[i]);
@@ -294,7 +318,7 @@ public class CommandParser {
 					numOfLoc++;
 					// more than one command /loc is detected
 					if(numOfLoc > 1){
-						invalidFeedBack = "ERROR: More than one command /loc is detected.";
+						invalidFeedBack = ERROR_MORE_THAN_ONE_COMMAND_LOC_IS_DETECTED;
 						return;
 					}
 					extractLocation(temp[i]);
@@ -304,20 +328,20 @@ public class CommandParser {
 					numOfRm++;
 					// more than one command /rm is detected
 					if(numOfRm > 1){
-						invalidFeedBack = "ERROR: More than one command /rm is detected.";
+						invalidFeedBack = ERROR_MORE_THAN_ONE_COMMAND_RM_IS_DETECTED;
 						return;
 					}
 					isCommand = true;
 				}
 			
 			if(isCommand == false) {
-				invalidFeedBack = "ERROR: Input Command is not valid.";
+				invalidFeedBack = ERROR_INPUT_COMMAND_IS_NOT_VALID;
 				return;
 			}
 		}
 		
 		if(fromExist == true && atExist == true){
-			invalidFeedBack = "ERROR: Command /from and /at are mutually exclusive.";
+			invalidFeedBack = ERROR_COMMAND_FROM_AND_AT_ARE_MUTUALLY_EXCLUSIVE;
 			return;
 		}
 		
@@ -347,7 +371,7 @@ public class CommandParser {
 		
 		// if there is no task name, input is not valid
 		if(taskDetails[0] == null) {
-			invalidFeedBack = "ERROR: No task name.";
+			invalidFeedBack = ERROR_NO_TASK_NAME;
 			return;
 		}
 		
@@ -360,7 +384,7 @@ public class CommandParser {
 		
 		// if input string is "////" input command is not valid
 		if(temp.length == 0){
-			invalidFeedBack = "ERROR: Command keyword is missing.";
+			invalidFeedBack = ERROR_COMMAND_KEYWORD_IS_MISSING;
 			return;
 		}
 		
@@ -386,7 +410,7 @@ public class CommandParser {
 					numOfFrom++;
 					extractDuration(temp[i]);
 					if(numOfFrom > 1){
-						invalidFeedBack = "ERROR: More than one command /from is detected.";
+						invalidFeedBack = ERROR_MORE_THAN_ONE_COMMAND_FROM_IS_DETECTED;
 						return;
 					}
 					break;
@@ -398,7 +422,7 @@ public class CommandParser {
 					numOfAt++;
 					extractDeadline(temp[i]);
 					if(numOfAt > 1){
-						invalidFeedBack = "ERROR: More than one command /at is detected.";
+						invalidFeedBack = ERROR_MORE_THAN_ONE_COMMAND_AT_IS_DETECTED;
 						return;
 					}
 					break;
@@ -407,7 +431,7 @@ public class CommandParser {
 					numOfOn++;
 					extractDate(temp[i]);
 					if(numOfOn > 1){
-						invalidFeedBack = "ERROR: More than one command /on is detected.";
+						invalidFeedBack = ERROR_MORE_THAN_ONE_COMMAND_ON_IS_DETECTED;
 						return;
 					}
 					break;
@@ -416,7 +440,7 @@ public class CommandParser {
 					numOfMark++;
 					extractStatus(temp[i]);
 					if(numOfMark > 1){
-						invalidFeedBack = "ERROR: More than one command /mark is detected.";
+						invalidFeedBack = ERROR_MORE_THAN_ONE_COMMAND_MARK_IS_DETECTED;
 						return;
 					}
 					break;
@@ -425,7 +449,7 @@ public class CommandParser {
 					numOfLoc++;
 					extractLocation(temp[i]);
 					if(numOfLoc > 1){
-						invalidFeedBack = "ERROR: More than one command /loc is detected.";
+						invalidFeedBack = ERROR_MORE_THAN_ONE_COMMAND_LOC_IS_DETECTED;
 						return;
 					}
 					break;
@@ -433,14 +457,14 @@ public class CommandParser {
 			
 			// if any segment is not start with a command isCommand == false
 			if(isCommand == false){
-				invalidFeedBack = "ERROR: Input Command is not valid.";
+				invalidFeedBack = ERROR_INPUT_COMMAND_IS_NOT_VALID;
 				return;
 			}
 		}
 		
 		// if command /from and /at was keyed in at the same time 
 		if(fromExist == true && atExist == true){
-			invalidFeedBack = "ERROR: Command /from and /at are mutually exclusive.";
+			invalidFeedBack = ERROR_COMMAND_FROM_AND_AT_ARE_MUTUALLY_EXCLUSIVE;
 			return;
 		}
 	}
@@ -470,7 +494,6 @@ public class CommandParser {
 	}
 	
 	// extract task duration
-	
 	private void extractDuration(String inputFragment) {
 		taskDetails[1] = getFirstWord(inputFragment.substring(4));
 		//if (!ValidationCheck.isValidTime(taskDetails[1]))
@@ -489,7 +512,6 @@ public class CommandParser {
 	}
 	
 	// extract task deadline
-
 	private void extractDeadline(String inputFragment) {
 		taskDetails[1] = getFirstWord(inputFragment.substring(2));
 		if (!ValidationCheck.isValidTime(taskDetails[1])) {
@@ -502,7 +524,6 @@ public class CommandParser {
 	}
 	
 	// extract task date
-
 	private void extractDate(String inputFragment) {
 		taskDetails[3] = getFirstWord(inputFragment.substring(2));
 		if (!ValidationCheck.isValidDate(taskDetails[3])) {
@@ -515,7 +536,6 @@ public class CommandParser {
 	}
 	
 	// extract task status 
-
 	private void extractStatus(String inputFragment) {
 		taskDetails[4] = getFirstWord(inputFragment.substring(4));
 		if (!ValidationCheck.isValidStatus(taskDetails[4])) {
@@ -524,22 +544,25 @@ public class CommandParser {
 	}
 	
 	// extract task location
-
 	private void extractLocation(String inputFragment) {
 		inputFragment = inputFragment.substring(3).trim();
 		
 		if (ValidationCheck.isValidLocation(inputFragment)) {
 			taskDetails[5] = inputFragment;
 		} else {
-			invalidFeedBack = "ERROR: Location must start with a letter.";
+			invalidFeedBack = ERROR_LOCATION_MUST_START_WITH_A_LETTER;
 		}
 	}
 	
+	// returns the first word of String userInput 
+	public String getFirstWord(String userInput) {
+		return userInput.trim().split("\\s+")[0];
+	}
 	
-	//@author Sai Hou
+	//@author A0097812X
 	private boolean isSuppliedInputEmpty(String input) {
 		if (input.trim().equals("")) {
-			invalidFeedBack = "ERROR: Empty input!";
+			invalidFeedBack = ERROR_EMPTY_INPUT;
 			return true;
 		}
 		return false;
