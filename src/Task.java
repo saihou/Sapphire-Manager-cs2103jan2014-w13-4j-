@@ -1,4 +1,12 @@
+//@author Cai Di
+
+/*
+ * Command pattern: This is one of the "Receiver" classes.
+ */
 class Task implements Comparable<Task> {
+	private static final String TASK_TYPE_FULL_DAY = "fullDay";
+	private static final String TASK_TYPE_NO_SET_TIMING = "noSetTiming";
+	
 	private String type, name, date, startTime, endTime, location;
 	private DateTimeConfiguration dateTimeConfig;
 	boolean isDone;
@@ -58,9 +66,8 @@ class Task implements Comparable<Task> {
 		}
 		this.location = location;
 	}
-	/**
-	 * @author Teck Sheng (Dex)
-	 */
+	
+	//@author A0097706U
 	public void setIsDone(boolean isDone) {
 		this.isDone = isDone;
 	}
@@ -88,26 +95,24 @@ class Task implements Comparable<Task> {
 	public String getLocation() {
 		return location;
 	}
-	/**
-	 * @author Teck Sheng (Dex)
-	 */
+	
 	public boolean getIsDone() {
 		return isDone;
 	}
 	
-	/**
-	 * @author Si Rui
+	//@author A0101252A
+	/*
 	 * Returns a String that contains all task details in order for display Command :
 	 * Task name which all tasks must have, followed by time and then optional details.
 	 */
 		private String getTaskDetails(boolean haveDate) {
 		String taskDetails = this.name + '\n';
+		
 		assert taskDetails != null;
 		
-		if (haveDate && !this.type.equals("noSetTiming")) {
+		if (haveDate && !this.type.equals(TASK_TYPE_NO_SET_TIMING)) {
 			taskDetails += SPACING + dateTimeConfig.getDateForDisplay(this.date) + '\n';
 		}
-		
 		if (this.type.equals("setDuration")) {
 			taskDetails += SPACING + "From " + dateTimeConfig.getTimeForDisplay(this.startTime) +
 							" to " + dateTimeConfig.getTimeForDisplay(this.endTime) + '\n';
@@ -115,11 +120,9 @@ class Task implements Comparable<Task> {
 			taskDetails += SPACING + "At/By " + 
 							dateTimeConfig.getTimeForDisplay(this.startTime) + '\n';
 		}
-		
 		if (getLocation() != null) {
 			taskDetails += SPACING + this.location + '\n';
 		}
-		
 		return taskDetails;
 	}
 	
@@ -131,67 +134,75 @@ class Task implements Comparable<Task> {
 		return getTaskDetails(true);
 	}
 
-	/* 
-	 * @author Si Rui
+	/**
 	 * This function allows Collections objects that store Task to sort it according to these rules:
 	 *  
 	 * 1. Tasks with timing sorted by date. Under each date:
-	 * 		2.1 Full day tasks should appear at the top under each date
-	 * 		2.2 Tasks with timings should follow chronologically 
+	 * 		1.1 Full day tasks should appear at the top under each date
+	 * 		1.2 Tasks with timings should follow chronologically 
 	 * 2. Tasks with no set timing appear at the bottom of entire displayed list alphabetically
 	 *
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
-	public int compareTo(Task t) {	//NOTE : HAVE NOT REFACTORED YET.
-		
-		String tType = t.getType();
+	public int compareTo(Task t) {
 		// Compare tasks with date/timing vs tasks with no set timing
-		if (this.type.equals("noSetTiming") && tType.equals("noSetTiming")) {
+		String taskType = t.getType();
+		
+		if (this.type.equals(TASK_TYPE_NO_SET_TIMING) && taskType.equals(TASK_TYPE_NO_SET_TIMING)) {
 			// If both are noSetTiming Tasks, list alphabetically by name
-			String tName = t.getName();
-			return this.name.compareTo(tName);
+			return compareAlphabetically(t);
+		} else if (this.type.equals(TASK_TYPE_NO_SET_TIMING)){
 			// else if either is noSetTiming task, return that task is larger
-		} else if (this.type.equals("noSetTiming")){
-				return 1;
-		} else if (tType.equals("noSetTiming")) {
+			return 1;
+		} else if (taskType.equals(TASK_TYPE_NO_SET_TIMING)) {
 			return -1;
 		} else {
-			// Compare by date and within each, compare by type again
-			String thisDate = dateTimeConfig.reverseDate(this.date);
-			String tDate = dateTimeConfig.reverseDate(t.getDate());
-			
-			if (thisDate.equals(tDate)){
-				// They have the same date, so compare type
-				if (this.type.compareTo("fullDay") == 0) {
-					return -1;
-				} else if (tType.compareTo("fullDay") == 0) {
-					return 1;
-				} else {
-					// Compare Time
-					String thisTime = this.startTime;
-					String tTime = t.getStartTime();
-					return thisTime.compareTo(tTime);
-				}
-			} else {
-				return thisDate.compareTo(tDate);
-			}
+			// both not noSetTiming tasks i.e. both have dates, then compare by date
+			return compareByDate(t, taskType);
 		}
+	}
+
+	private int compareByDate(Task t, String taskType) {
+		// Compare by date and within each, compare by type again
+		String thisDate = dateTimeConfig.reverseDate(this.date);
+		String tDate = dateTimeConfig.reverseDate(t.getDate());
+		
+		if (thisDate.equals(tDate)) {
+			// They have the same date, so compare type
+			return compareType(t, taskType);
+		} else {
+			return thisDate.compareTo(tDate);
+		}
+	}
+
+	private int compareType(Task t, String taskType) {
+		if (this.type.compareTo(TASK_TYPE_FULL_DAY) == 0) {
+			return -1;
+		} else if (taskType.compareTo(TASK_TYPE_FULL_DAY) == 0) {
+			return 1;
+		} else {
+			//both not fullDay tasks, so compare time
+			return compareTime(t);
+		}
+	}
+
+	private int compareTime(Task t) {
+		String thisTime = this.startTime;
+		String tTime = t.getStartTime();
+		return thisTime.compareTo(tTime);
+	}
+
+	private int compareAlphabetically(Task t) {
+		String tName = t.getName();
+		return this.name.compareTo(tName);
 	}
 	
 	private String capitalizeString(String name) {
 		return (Character.toUpperCase(name.charAt(0)) + name.substring(1));
 	}
 	
-	/*
-	/*private void println(String line){
-		System.out.println(line);
-	}*/
-	
-	
-	/**
-	 * @author Teck Sheng (Dex)
-	 */
+	//@author A0097706U
 	public boolean equals(Task newTask) {
 		if(!getType().equals(newTask.getType())) {
 			return false;

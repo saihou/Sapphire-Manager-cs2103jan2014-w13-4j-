@@ -1,22 +1,27 @@
+//@author A0097812X
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Queue;
 
+/*
+* Command pattern: This is one of the "Receiver" classes.
+* 
+* Description: This class serves as a user-defined data structure that
+* will store the result of every Command. It will be returned to GUI,
+* where it will use the Get methods to retrieve the results.
+*/
 
 public class Result {
-	int highlightIndexI;
-	int highlightIndexJ;
-
 	//stores system feedback messages 
-	//eg. "successfully added XXX", "invalid task number!", etc.
-	String systemFeedback;
+	//eg. "Successfully added XX", "invalid task number!", etc.
+	private String systemFeedback;
+	private int highlightIndexI;
+	private int highlightIndexJ;
+	private boolean success;
 	
-	//each header has a body, each body has tasks
-	Queue<String> headings;
-	Queue<Queue<String>> body;
-	Queue<String> currentHeading;
-	
-	boolean success;
+	private Queue<String> headings;
+	private Queue<Queue<String>> body;
+	private Queue<String> currentHeading;
 	
 	public Result() {
 		headings = new ArrayDeque<String>();
@@ -44,6 +49,7 @@ public class Result {
 		systemFeedback = sysFeedback;
 	}
 	
+	//@author A0101252A
 	@Override
 	public boolean equals(Object object) {
 		if (!(object instanceof Result)) {
@@ -95,6 +101,7 @@ public class Result {
 		}
 	}
 	
+	//@author A0097812X
 	public void pushNewHeadingText(String heading) {
 		headings.offer(heading);
 	}

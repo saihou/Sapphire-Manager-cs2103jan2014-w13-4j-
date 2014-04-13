@@ -1,8 +1,15 @@
+//@author Cai Di
 import java.util.ArrayList;
 import java.util.Collections;
 
-
+/*
+* Command pattern: This is one of the concrete commands.
+* 
+* Description: This class will handle the search operation.
+*/
 public class SearchCommand extends DisplayCommand {
+	
+	private static final String FEEDBACK_SEARCH_RESULTS = "Search results:";
 	
 	private final static String MESSAGE_NO_SEARCH_RESULTS = "ERROR: No records found!";
 	
@@ -16,9 +23,6 @@ public class SearchCommand extends DisplayCommand {
 		super();
 	}
 	
-	/**
-	 * @author Cai Di
-	 */
 	@Override
 	public void execute(String taskName) {
 		Search seeker = new Search(allTasks);
@@ -49,7 +53,7 @@ public class SearchCommand extends DisplayCommand {
 
 		if (currentTaskList.size() > 0) {
 			formDisplayText(result);
-			systemFeedback = "Search results:";
+			systemFeedback = FEEDBACK_SEARCH_RESULTS;
 		}
 		else {
 			systemFeedback = MESSAGE_NO_SEARCH_RESULTS;

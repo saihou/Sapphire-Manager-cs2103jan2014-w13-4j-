@@ -1,12 +1,7 @@
+//@author A0101252A
 import static org.junit.Assert.*;
-
 import org.junit.Test;
 
-
-/**
- * @author Si Rui
- *
- */
 public class DateTimeConfigurationTest {
 
 	@Test

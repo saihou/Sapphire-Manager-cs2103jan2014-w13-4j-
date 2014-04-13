@@ -1,10 +1,14 @@
+//@author A0101252A
 import java.util.ArrayList;
 import java.util.Collections;
 
-
+/*
+* Command pattern: This is one of the concrete commands.
+* 
+* Description: This class will handle the display operation.
+*/
 public class DisplayCommand extends Command {
 
-	
 	protected CommandParser parser;
 	protected DateTimeConfiguration dateTimeConfig;
 	
@@ -35,6 +39,13 @@ public class DisplayCommand extends Command {
 
 	private final static String TASK_NUMBER_SPACING = "   ";
 	
+	private final static String OVERDUE = "overdue";
+	private final static String MEMOS = "memos";
+	private final static String ALL = "all";
+	private final static String DONE = "done";
+	private final static String UNDONE = "undone";
+	private final static String TODAY = "today";
+	
 	public DisplayCommand() {
 		super();
 		dateTimeConfig = new DateTimeConfiguration();
@@ -47,9 +58,6 @@ public class DisplayCommand extends Command {
 		result.setSystemFeedback(systemFeedback);
 	}
 	
-	/**
-	 * @author Si Rui
-	 */
 	public void executeDisplayCommand(String userCommand) {
 		systemFeedback = "";
 		if (allTasks.isEmpty()) {
@@ -84,24 +92,24 @@ public class DisplayCommand extends Command {
 		currentTaskList = getTasksBasedOnCompletion(allTasks, isDone);
 
 		switch (displayType) {
-			case "all" : 
+			case ALL : 
 				//Append completed tasks at the end of list
 				isDone = true;
 				ArrayList<Task> completedTasks = getTasksBasedOnCompletion(allTasks, isDone);
 				currentTaskList.addAll(completedTasks);
 				break;
-			case "overdue" :
+			case OVERDUE :
 				currentTaskList = getOverdue(currentTaskList);
 				break;
-			case "memos" :
+			case MEMOS :
 				currentTaskList = getMemos(currentTaskList);
 				break;
-			case "today" :
+			case TODAY :
 				currentTaskList = getTodaysTasks();
 				break;
-			case "undone" :
+			case UNDONE :
 				break;
-			case "done" :
+			case DONE :
 				isDone = true;
 				currentTaskList = getTasksBasedOnCompletion(allTasks, isDone);
 				break;
@@ -147,17 +155,17 @@ public class DisplayCommand extends Command {
 	
 	private String getFeedbackIfHaveTasks(String displayType) {
 		String feedback = "";
-		if (displayType.equals("done")) {
+		if (displayType.equals(DONE)) {
 			feedback = FEEDBACK_DISPLAY_DONE;
-		} else if (displayType.equals("today")) {
+		} else if (displayType.equals(TODAY)) {
 			feedback = FEEDBACK_DISPLAY_TODAY;
-		} else if (displayType.equals("undone")) {
+		} else if (displayType.equals(UNDONE)) {
 			feedback = FEEDBACK_DISPLAY_UNDONE;
-		}  else if (displayType.equals("all")) {
+		}  else if (displayType.equals(ALL)) {
 			feedback = FEEDBACK_DISPLAY_ALL;
-		} else if (displayType.equals("memos")) {
+		} else if (displayType.equals(MEMOS)) {
 			feedback = FEEDBACK_DISPLAY_MEMOS;
-		} else if (displayType.equals("overdue")) {
+		} else if (displayType.equals(OVERDUE)) {
 			feedback = FEEDBACK_DISPLAY_OVERDUE;
 		}
 		
@@ -166,22 +174,18 @@ public class DisplayCommand extends Command {
 	
 	private String getFeedbackIfHaveNoTasks(String displayType) {
 		String feedback = "";
-		if (displayType.equals("overdue")) {
+		if (displayType.equals(OVERDUE)) {
 			feedback = FEEDBACK_NO_OVERDUE;
-		} else if (displayType.equals("memos")) {
+		} else if (displayType.equals(MEMOS)) {
 			feedback = FEEDBACK_NO_MEMOS;
-		} else if (displayType.equals("done")) {
+		} else if (displayType.equals(DONE)) {
 			feedback = FEEDBACK_NO_DONE;
-		} else if (displayType.equals("today")) {
+		} else if (displayType.equals(TODAY)) {
 			feedback = FEEDBACK_NO_TODAY;
-		} else if (displayType.equals("undone")) {
+		} else if (displayType.equals(UNDONE)) {
 			feedback = FEEDBACK_NO_UNDONE;
-		}  else if (displayType.equals("all")) {
+		}  else if (displayType.equals(ALL)) {
 			feedback = "You have no tasks.";
-		} else if (displayType.equals("memos")) {
-			feedback = "You have no memos.";
-		} else if (displayType.equals("overdue")) {
-			feedback = "You have no overdue tasks.";
 		}
 		
 		return feedback;
@@ -201,8 +205,6 @@ public class DisplayCommand extends Command {
 		if (!completedTasks.isEmpty()) {
 			displayText += formDisplayTextCompletedTasks(completedTasks, numberOfUncompletedTasks, result);
 		}
-		
-		//result.printResult();
 		
 		return displayText;
 	}
@@ -256,8 +258,6 @@ public class DisplayCommand extends Command {
 				result.savePreviousHeading();
 				result.pushNewHeadingText(HEADING_AFTER_A_WEEK);
 			}
-			
-			
 			
 			displayText += formDisplayTextOfOneTask(count, t);
 			result.pushTaskToCurrentHeading(formDisplayTextOfOneTask(count, t));
@@ -337,6 +337,7 @@ public class DisplayCommand extends Command {
 
 		return matchedTasks;
 	}
+	
 	public void setTaskToHighlight(Task task) {
 		taskToHighlight = task;
 	}
