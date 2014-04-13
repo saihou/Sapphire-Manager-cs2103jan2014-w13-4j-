@@ -50,7 +50,7 @@ public class ValidationCheck {
 		return validateType(type);
 	}
 
-	//@author Cai Di
+	//@author A0085159W
 	private static boolean validateStatus(String status) {
 		if (status.compareTo("done") == 0 || status.compareTo("undone") == 0) {
 			return true;
