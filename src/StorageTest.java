@@ -1,7 +1,9 @@
+//@author A0097706U
+//to test the conversion of String to Task and vice versa in order to save them to ArrayList and Text Document respectively
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-//@author A0097706U
 public class StorageTest {
 	Storage testStorage = Storage.getInstance();
 
