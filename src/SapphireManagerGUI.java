@@ -1,10 +1,7 @@
 //@author A0097706U
+//This GUI class handles the input and output to and from user and system
 
-/**
- * This GUI class handles the input and output to and from user and system
- */
-
-//JAVA-AWT libraries
+//JAVA-AWT LIBRARIES
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
@@ -337,23 +334,21 @@ public class SapphireManagerGUI {
 	//@author A0097706U-unused
 	//reasons for not using: buggy and insufficient time to fix
 	//initializes the timer
-	/*
-	private static void startTimer() {
-		//timer 
-		if(!timer.isRunning()) {
-			System.out.println("Start timer");
-			timer.start();
-		} else {
-			System.out.println("Restart timer");
-			timer.restart();
-		}
-		System.out.println("4) Timer is running?" +timer.isRunning());
-	}
-	 */
+	//private static void startTimer() {
+	//	timer 
+	//	if(!timer.isRunning()) {
+	//		System.out.println("Start timer");
+	//		timer.start();
+	//	} else {
+	//		System.out.println("Restart timer");
+	//		timer.restart();
+	//	}
+	//	System.out.println("4) Timer is running?" +timer.isRunning());
+	//}
 
 	//@author A0097706U
 	//sets up the frame in Box Layout with components in the following order
-	//***ordering is important!
+	//ordering is important!
 	private void contentPaneDisplay() {
 		guiFrame.getContentPane().setLayout(new BoxLayout(guiFrame.getContentPane(), BoxLayout.Y_AXIS));		
 		guiFrame.getContentPane().add(logoPanel, Component.CENTER_ALIGNMENT);
@@ -370,12 +365,11 @@ public class SapphireManagerGUI {
 	}
 
 	//@author A0097706U-unused
-	/* not used because there are no cases that requires it
+	//not used because there are no cases that requires it
 	//set display to the bottom
-	private void setDisplayToBottom() {
-		displayBox.setCaretPosition(displayBox.getDocument().getLength());
-	}
-	 */
+	//private void setDisplayToBottom() {
+	//	displayBox.setCaretPosition(displayBox.getDocument().getLength());
+	//}
 
 	//@author A0097706U
 	//Listener for input box
@@ -477,22 +471,20 @@ public class SapphireManagerGUI {
 
 	//@author A0097706U-unused
 	//reasons for not using: buggy and insufficient time to fix
-	/*
-	private void timerListener() {
-		timeListener = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("1) Timer is running? "+timer.isRunning());
-				timer.stop();
-				System.out.println("2) Timer is running? "+timer.isRunning());
-				if(!timer.isRunning()) {
-					System.out.println("3) Timer is running? "+timer.isRunning());
-					displayToHelpo(MESSAGE_HELP);
-					displayWelcomeMessage();
-				}
-			}
-		};
-	}
-	 */
+	//private void timerListener() {
+	//	timeListener = new ActionListener() {
+	//		public void actionPerformed(ActionEvent e) {
+	//			System.out.println("1) Timer is running? "+timer.isRunning());
+	//			timer.stop();
+	//			System.out.println("2) Timer is running? "+timer.isRunning());
+	//			if(!timer.isRunning()) {
+	//				System.out.println("3) Timer is running? "+timer.isRunning());
+	//				displayToHelpo(MESSAGE_HELP);
+	//				displayWelcomeMessage();
+	//			}
+	//		}
+	//	};
+	//}
 
 	//@author A0097706U
 	//Listener for Helpo
@@ -655,9 +647,6 @@ public class SapphireManagerGUI {
 		aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
 		aset = sc.addAttribute(aset, StyleConstants.Bold, isBold);
 
-		//int length = displayBox.getDocument().getLength();
-		//System.out.println("Length: "+length);
-		//displayBox.setCaretPosition(0);
 		displayBox.setCharacterAttributes(aset, false);
 		displayBox.replaceSelection(message);
 	}
