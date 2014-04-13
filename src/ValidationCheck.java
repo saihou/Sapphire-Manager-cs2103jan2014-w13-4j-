@@ -44,6 +44,11 @@ public class ValidationCheck {
 		boolean isValid = validateLocation(loc);
 		return isValid;
 	}
+	
+	//@author A0097706U
+	public static boolean isValidType(String type) {
+		return validateType(type);
+	}
 
 	//@author Cai Di
 	private static boolean validateStatus(String status) {
@@ -154,5 +159,18 @@ public class ValidationCheck {
 			isValid = false;
 		}
 		return isValid;
+	}
+	
+	//author A0097706U
+	private static boolean validateType(String type) {		
+		switch(type.trim()) {
+			case "setDuration"  :
+			case "noSetTiming"  :
+			case "targetedTime" : 
+			case "fullDay" 		:
+				return true;
+			default: 
+				return false;
+		}
 	}
 }
