@@ -1050,16 +1050,17 @@ public class SapphireManagerGUI {
 		if(result.getSystemFeedback().equals("Displaying tasks for today.")) {
 			displayToHelpo(helpo.getText()+" "+MESSAGE_HELP);
 		}
-
+		
 		if(!result.getSystemFeedback().contains("ERROR")) {
 			clearDisplayBox();
+			if(result.getSystemFeedback().startsWith("You have no")) {
+				displayHighlightMessage(result.getSystemFeedback()+"\nPress F1 for help or F3 to display today's tasks.");
+			}
+			
+			printResults(headings, body, highlightIndexI, highlightIndexJ);
 		}
 		
-		if(result.getSystemFeedback().startsWith("You have no")) {
-			displayHighlightMessage(result.getSystemFeedback()+"\nPress F1 for help or F3 to display today's tasks.");
-		}
 		
-		printResults(headings, body, highlightIndexI, highlightIndexJ);
 	}
 
 	//@author A0097706U
