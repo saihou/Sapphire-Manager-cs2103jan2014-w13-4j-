@@ -18,10 +18,10 @@ public class Storage {
 	private final static String FILE_ERROR_BACKUP_NAME = "mytextfileWithError.txt";
 
 	//error messages
-	private final static String FILE_CLEARING_ERROR = "Error clearing file! Please re-start program.";
-	private final static String FILE_INITIALIZING_ERROR = "Error initializing file! Please re-start program.";
-	private final static String FILE_READING_ERROR = "Error reading file! Please re-start program.";
-	private final static String FILE_SAVING_ERROR = "Error saving file! Please re-start program.";
+	private final static String FILE_CLEARING_ERROR = "Error clearing file!";
+	private final static String FILE_INITIALIZING_ERROR = "Error initializing file!";
+	private final static String FILE_READING_ERROR = "Error reading file!";
+	private final static String FILE_SAVING_ERROR = "Error saving file!";
 
 	//file header
 	private final static String FILE_HEADER = String.format("%-6s", "Date").replace(' ', ' ')+"|"+
@@ -86,7 +86,8 @@ public class Storage {
 			bufferedWriter.close();
 			return true;
 		} catch(Exception ex) {
-			displayPopUpMsg(FILE_SAVING_ERROR);
+			//displayPopUpMsg(FILE_SAVING_ERROR);
+			System.out.println(FILE_SAVING_ERROR);
 			return false;
 		}
 	}
@@ -106,7 +107,8 @@ public class Storage {
 			updateBackUpTaskList();
 			return true;
 		} catch(Exception ex) {
-			displayPopUpMsg(FILE_SAVING_ERROR);
+			//displayPopUpMsg(FILE_SAVING_ERROR);
+			System.out.println(FILE_SAVING_ERROR);
 			return false;
 		}
 	}
@@ -146,7 +148,8 @@ public class Storage {
 				return initializeFile();
 			}
 		} catch(Exception ex) { 
-			displayPopUpMsg(FILE_READING_ERROR);
+			//displayPopUpMsg(FILE_READING_ERROR);
+			System.out.println(FILE_READING_ERROR);
 			return false;
 		}
 	}
@@ -160,7 +163,8 @@ public class Storage {
 			bufferedWriter.close();
 			return true;
 		} catch (Exception ex) {
-			displayPopUpMsg(FILE_INITIALIZING_ERROR);
+			//displayPopUpMsg(FILE_INITIALIZING_ERROR);
+			System.out.println(FILE_INITIALIZING_ERROR);
 			return false;
 		}
 	}
@@ -188,11 +192,12 @@ public class Storage {
 			bufferedReader.close();
 			return true;
 		} catch (Exception ex) {
-			displayPopUpMsg(FILE_READING_ERROR);
+			//displayPopUpMsg(FILE_READING_ERROR);
+			System.out.println(FILE_READING_ERROR);
 			return false;
 		}
 	}
-	
+
 	//copy the contents of invalid file under a separate file name
 	//reinitializes the original file
 	private boolean settleInvalidFile() {
@@ -232,7 +237,8 @@ public class Storage {
 			initializeFile();
 			return true;
 		} catch (Exception ex) {
-			displayPopUpMsg(FILE_CLEARING_ERROR);
+			//displayPopUpMsg(FILE_CLEARING_ERROR);
+			System.out.println(FILE_CLEARING_ERROR);
 			return false;
 		}
 	}
@@ -244,7 +250,8 @@ public class Storage {
 			backUpTaskList.clear();
 			return true;
 		} catch (Exception ex) {
-			displayPopUpMsg(FILE_CLEARING_ERROR);
+			//displayPopUpMsg(FILE_CLEARING_ERROR);
+			System.out.println(FILE_CLEARING_ERROR);
 			reAddTaskListFromBackUp();
 			return false;
 		}
@@ -267,143 +274,197 @@ public class Storage {
 	//converts String to Task
 	public Task convertStringToTask(String[] splitedTaskInfo) {
 		task = new Task();	
-		boolean isConversionOkay = true;		
 
-		if(!splitedTaskInfo[0].trim().equals("-")) { //date
-			if(ValidationCheck.isValidDate(splitedTaskInfo[0].trim())) {
+		if(checkStringTaskEntries(splitedTaskInfo)) {
+			if(!splitedTaskInfo[0].trim().equals("-")) { //date
 				task.setDate(splitedTaskInfo[0].trim());
 			} else {
-				isConversionOkay = false;
+				task.setDate(null);
 			}
-		} else {
-			task.setDate(null);
-		}
 
-		if(!splitedTaskInfo[1].trim().equals("-")) { //start time
-			if(ValidationCheck.isValidTime(splitedTaskInfo[1].trim())) {
+			if(!splitedTaskInfo[1].trim().equals("-")) { //start time
 				task.setStartTime(splitedTaskInfo[1].trim());
 			} else {
-				isConversionOkay = false;
+				task.setStartTime(null);
 			}
-		} else {
-			task.setStartTime(null);
-		}
 
-		if(!splitedTaskInfo[2].trim().equals("-")) { //end time
-			if(ValidationCheck.isValidTime(splitedTaskInfo[2].trim())) {
+			if(!splitedTaskInfo[2].trim().equals("-")) { //end time
 				task.setEndTime(splitedTaskInfo[2].trim());
 			} else {
-				isConversionOkay = false;
+				task.setEndTime(null);
 			}
-		} else {
-			task.setEndTime(null);
-		}
 
-		if(task.getStartTime() != null && task.getEndTime() != null) {
-			if(!ValidationCheck.isValidDuration(task.getStartTime(), task.getEndTime())) {
-				isConversionOkay = false;
+			if(!splitedTaskInfo[3].trim().equals("-")) { //task name
+				task.setName(splitedTaskInfo[3].trim());
+			} else {
+				task.setName(splitedTaskInfo[3].trim());
 			}
-		}
 
-		if(!splitedTaskInfo[3].trim().equals("-")) { //task name
-			task.setName(splitedTaskInfo[3].trim());
-		} else {
-			task.setName(splitedTaskInfo[3].trim());
-		}
+			if(!splitedTaskInfo[4].trim().equals("-")) { //location
+				task.setLocation(splitedTaskInfo[4].trim());
+			} else {
+				task.setLocation(null);
+			}
 
-		if(!splitedTaskInfo[4].trim().equals("-")) { //location
-			task.setLocation(splitedTaskInfo[4].trim());
-		} else {
-			task.setLocation(null);
-		}
+			if(!splitedTaskInfo[5].trim().equals("-")) { //type
+				task.setType(splitedTaskInfo[5].trim());
+			} else {
+				task.setType(null);
+			}
 
-		if(!splitedTaskInfo[5].trim().equals("-")) { //type
-			task.setType(splitedTaskInfo[5].trim());
-		} else {
-			task.setType(null);
-		}
-
-		if(splitedTaskInfo[6].trim().equals("done")) { //isDone
-			if(ValidationCheck.isValidStatus(splitedTaskInfo[6].trim())) {
+			if(splitedTaskInfo[6].trim().equals("done")) { //isDone
 				task.setIsDone(true);
 			} else {
-				isConversionOkay = false;
+				task.setIsDone(false);
 			}
-		} else {
-			task.setIsDone(false);
-		}
 
-		//assert task != null;
-		//assert false;
-
-		if(isConversionOkay) {
 			return task;
-		} 
-
-		return null;
+		} else {
+			return null;
+		}
 	}
 
 	//converts Task to String
 	public String convertTaskToString(Task task) {
 		String convertedTask = "";
+		if(checkTaskEntries(task)) {
+			if(task.getDate() == null) { //date
+				convertedTask += String.format("%-6s", "-").replace(' ', ' ');
+			} else {
+				convertedTask += String.format("%-6s", task.getDate()).replace(' ', ' ');
+			}
 
-		if(task.getDate() == null) { //date
-			convertedTask += String.format("%-6s", "-").replace(' ', ' ');
+			convertedTask += "|";
+
+			if(task.getStartTime() == null) { //start time
+				convertedTask += String.format("%-10s", "-").replace(' ', ' ');
+			} else {
+				convertedTask += String.format("%-10s", task.getStartTime()).replace(' ', ' ');
+			}
+
+			convertedTask += "|";
+
+			if(task.getEndTime() == null) { //end time
+				convertedTask += String.format("%-8s", "-").replace(' ', ' ');
+			} else {
+				convertedTask += String.format("%-8s", task.getEndTime()).replace(' ', ' ');
+			}
+
+			convertedTask += "|";
+
+			if(task.getName() == null) { //name
+				convertedTask += String.format("%-60s", "-").replace(' ', ' ');
+			} else {
+				convertedTask += String.format("%-60s", task.getName()).replace(' ', ' ');
+			}
+
+			convertedTask += "|";
+
+			if(task.getLocation() == null) { //location
+				convertedTask += String.format("%-30s", "-").replace(' ', ' ');
+			} else {
+				convertedTask += String.format("%-30s", task.getLocation()).replace(' ', ' ');
+			}
+
+			convertedTask += "|";
+
+			if(task.getType() == null) { //type
+				convertedTask += String.format("%-12s", "-").replace(' ', ' ');
+			} else {
+				convertedTask += String.format("%-12s", task.getType()).replace(' ', ' ');
+			}
+
+			convertedTask += "|";
+
+			if(task.getIsDone() == false) { //isDone
+				convertedTask += "undone";
+			} else {
+				convertedTask += "done";
+			}
+
+			return convertedTask;
 		} else {
-			convertedTask += String.format("%-6s", task.getDate()).replace(' ', ' ');
+			return null;
+		}
+	}
+
+	private boolean checkTaskEntries(Task task) {
+		boolean isValid = true;
+
+		if(task.getName() == null || task.getType() == null) {
+			isValid = false;
 		}
 
-		convertedTask += "|";
-
-		if(task.getStartTime() == null) { //start time
-			convertedTask += String.format("%-10s", "-").replace(' ', ' ');
-		} else {
-			convertedTask += String.format("%-10s", task.getStartTime()).replace(' ', ' ');
+		if(task.getDate() != null && !ValidationCheck.isValidDate(task.getDate())) {
+			isValid = false;
 		}
 
-		convertedTask += "|";
-
-		if(task.getEndTime() == null) { //end time
-			convertedTask += String.format("%-8s", "-").replace(' ', ' ');
-		} else {
-			convertedTask += String.format("%-8s", task.getEndTime()).replace(' ', ' ');
+		if(task.getStartTime() != null && !ValidationCheck.isValidTime(task.getStartTime())) {
+			isValid = false;
 		}
 
-		convertedTask += "|";
-
-		if(task.getName() == null) { //name
-			convertedTask += String.format("%-60s", "-").replace(' ', ' ');
-		} else {
-			convertedTask += String.format("%-60s", task.getName()).replace(' ', ' ');
+		if(task.getEndTime() != null && !ValidationCheck.isValidTime(task.getEndTime())) {
+			isValid = false;
 		}
 
-		convertedTask += "|";
-
-		if(task.getLocation() == null) { //location
-			convertedTask += String.format("%-30s", "-").replace(' ', ' ');
-		} else {
-			convertedTask += String.format("%-30s", task.getLocation()).replace(' ', ' ');
+		if((task.getStartTime() != null && task.getEndTime() != null) && !ValidationCheck.isValidDuration(task.getStartTime(), task.getEndTime())) {
+			isValid = false;
 		}
 
-		convertedTask += "|";
-
-		if(task.getType() == null) { //type
-			convertedTask += String.format("%-12s", "-").replace(' ', ' ');
-		} else {
-			convertedTask += String.format("%-12s", task.getType()).replace(' ', ' ');
+		if(task.getLocation() != null && !ValidationCheck.isValidLocation(task.getLocation())) {
+			isValid = false;
 		}
 
-		convertedTask += "|";
-
-		if(task.getIsDone() == false) { //isDone
-			convertedTask += "undone";
-		} else {
-			convertedTask += "done";
+		if(task.getType() != null && !ValidationCheck.isValidType(task.getType())) {
+			isValid = false;
 		}
 
-		return convertedTask;
+		if(isValid) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private boolean checkStringTaskEntries(String[] splitedTaskInfo) {
+		boolean isValid = true;
+
+		if(!splitedTaskInfo[0].trim().equals("-") && !ValidationCheck.isValidDate(splitedTaskInfo[0].trim())) {
+			isValid = false;
+		}
+
+		if(!splitedTaskInfo[1].trim().equals("-") && !ValidationCheck.isValidTime(splitedTaskInfo[1].trim())) {
+			isValid = false;
+		}
+
+		if(!splitedTaskInfo[2].trim().equals("-") && !ValidationCheck.isValidTime(splitedTaskInfo[2].trim())) {
+			isValid = false;
+		}
+		
+		if((!splitedTaskInfo[1].trim().equals("-") && !splitedTaskInfo[2].trim().equals("-")) && !ValidationCheck.isValidDuration(splitedTaskInfo[1].trim(), splitedTaskInfo[2].trim())) {
+			isValid = false;
+		}
+
+		if(!splitedTaskInfo[4].trim().equals("-") && !ValidationCheck.isValidLocation(splitedTaskInfo[4].trim())) {
+			isValid = false;
+		}
+
+		if(!splitedTaskInfo[5].trim().equals("-") && !ValidationCheck.isValidType(splitedTaskInfo[5].trim())) {
+			isValid = false;
+		}
+
+		if(!splitedTaskInfo[6].trim().equals("-") && !ValidationCheck.isValidStatus(splitedTaskInfo[6].trim())) {
+			isValid = false;
+		}
+
+		if(isValid) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
+	//display pop up message for errors
 	private void displayPopUpMsg(String msg) {
 		JOptionPane.showMessageDialog(null, msg);
 	}
