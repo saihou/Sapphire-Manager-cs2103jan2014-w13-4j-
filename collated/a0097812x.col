@@ -1,0 +1,2421 @@
+//@author: a0097812x
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\AddCommand.java
+	 */
+
+
+/*
+ * Command pattern: This is one of the concrete commands.
+ * 
+ * Description: This class will handle the add operation.
+ */
+public class AddCommand extends Command {
+	
+	private static final int INDICATOR_TASK_NAME = 0;
+	private static final int INDICATOR_START_TIME = 1;
+	private static final int INDICATOR_END_TIME = 2;
+	private static final int INDICATOR_DATE = 3;
+	private static final int INDICATOR_STATUS = 4;
+	private static final int INDICATOR_LOCATION = 5;
+	
+	private static final String TASK_TYPE_NO_SET_TIMING = "noSetTiming";
+	private static final String TASK_TYPE_FULL_DAY = "fullDay";
+	private static final String TASK_TYPE_TARGETED_TIME = "targetedTime";
+	private static final String TASK_TYPE_SET_DURATION = "setDuration";
+	
+	private static final String ERROR_CANNOT_UNDO = "ERROR: Cannot undo!";
+	private static final String ERROR_ENTERING_TIMESTAMP_WITHOUT_DATE = "ERROR: Entering a timestamp without a date doesn't make sense!";
+	private static final String ERROR_UNABLE_TO_ADD = "ERROR: Unable to add \"%s\".";
+	
+	private static final String SUCCESS_ADD = "Successfully added \"%s\".";
+	private static final String SUCCESS_UNDO = "Undo previous addition: Successfully deleted \"%s\".";
+	
+	private static final String PLACEHOLDER_PARSE_SUCCESS = "parsing success";
+	
+	private static final String ADD = "add";
+	
+	public CommandParser parser = null;
+	
+	public AddCommand() {
+		super();
+		parser = new CommandParser();
+	}
+	
+	@Override
+	public void execute(String userCommand) {
+		userCommand = userCommand.trim();
+		currentTask = new Task();
+		
+		systemFeedback = parseAndModifyTask(userCommand, currentTask, ADD);
+		
+		//if parsing is successful
+		if (systemFeedback.equals(PLACEHOLDER_PARSE_SUCCESS)) {
+			add();
+		} else {
+			//do nothing; parsing error message is already contained in systemFeedback
+		}
+		
+		result.setSystemFeedback(systemFeedback);
+	}
+
+	private void add() {
+		boolean isAdditionOfNewTaskSuccessful = addThisTask(currentTask);
+		if (isAdditionOfNewTaskSuccessful) {
+			result.setSuccess(true);
+			systemFeedback = formatString(SUCCESS_ADD, currentTask.getName());
+		}
+		else {
+			systemFeedback = formatString(ERROR_UNABLE_TO_ADD, currentTask.getName());
+		}
+	}
+	
+	protected String parseAndModifyTask(String userCommand, Task taskToBeModified, String caller) {
+		String systemFeedback;
+		boolean isParsable = true;
+		String [] taskDetails;
+		
+		taskDetails = parseUserCommand(userCommand, caller);
+		isParsable = checkParsability(isParsable);
+		
+		if (!isParsable) {
+			systemFeedback = parser.invalidFeedBack;
+		} else {
+			systemFeedback = proceedToTaskModification(taskToBeModified, taskDetails);
+		}
+		
+		return systemFeedback;
+	}
+
+	private String proceedToTaskModification(Task taskToBeModified,
+			String[] taskDetails) {
+		String systemFeedback;
+		boolean isModificationSuccessful;
+		isModificationSuccessful = modifyTask(taskToBeModified, taskDetails);
+		
+		if (!isModificationSuccessful) {
+			systemFeedback = ERROR_ENTERING_TIMESTAMP_WITHOUT_DATE;
+		}
+		else {
+			systemFeedback = PLACEHOLDER_PARSE_SUCCESS;
+		}
+		return systemFeedback;
+	}
+
+	private boolean modifyTask(Task taskToBeModified, String[] taskDetails) {
+		boolean isSettingTaskTypeSuccessful;
+		setTaskDetails(taskToBeModified, taskDetails);
+		isSettingTaskTypeSuccessful = setTaskType(taskToBeModified);
+		return isSettingTaskTypeSuccessful;
+	}
+
+	private boolean checkParsability(boolean isParsable) {
+		if (parser.invalidFeedBack != null) {
+			isParsable = false;
+		}
+		return isParsable;
+	}
+
+	private String[] parseUserCommand(String userCommand, String caller) {
+		String[] taskDetails;
+		
+		if (caller.equals(ADD)) {
+			parser.extractTaskDetailsForAdd(userCommand);
+		} else {
+			parser.extractTaskDetailsForEdit(userCommand);
+		}
+		
+		taskDetails = parser.taskDetails;
+		return taskDetails;
+	}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\AddCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\AddCommand.java
+	 */
+
+	protected boolean setTaskType(Task task) {
+		if (task.getDate() == null && task.getStartTime() == null && task.getEndTime() == null) {
+			task.setType(TASK_TYPE_NO_SET_TIMING);
+			return true;
+		} else if (task.getDate() != null && task.getStartTime() == null && task.getEndTime() == null) {
+			task.setType(TASK_TYPE_FULL_DAY);
+			return true;
+		} else if (task.getDate() != null && task.getStartTime() != null && task.getEndTime() == null) {
+			task.setType(TASK_TYPE_TARGETED_TIME);
+			return true;
+		} else if (task.getDate() != null && task.getStartTime() != null && task.getEndTime() != null) {
+			task.setType(TASK_TYPE_SET_DURATION);
+			return true;
+		} else {
+			//the rest of the cases, e.g. entered deadline/duration
+			//but never enter date
+			return false;
+		}
+	}
+
+	protected boolean addThisTask(Task taskToBeAdded) {
+		allTasks.add(taskToBeAdded);
+		
+		boolean isFileWritingSuccessful = taskStorage.writeATaskToFile(taskToBeAdded, true);
+		return isFileWritingSuccessful;
+	}
+	
+	@Override
+	public void undo() {
+		allTasks.remove(currentTask);
+		
+		if (taskStorage.writeTaskListToFile()) {
+			systemFeedback = formatString(SUCCESS_UNDO, currentTask.getName());
+		}
+		else {
+			systemFeedback = ERROR_CANNOT_UNDO;
+		}
+		result.setSystemFeedback(systemFeedback);
+	}
+	
+	private String formatString(String message, String arg) {
+		return String.format(message, arg);
+	}
+}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\AddCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\ClearCommand.java
+	 */
+
+import java.util.ArrayList;
+
+/*
+ * Command pattern: This is one of the concrete commands.
+ * 
+ * Description: This class will handle the clear operation.
+ */
+public class ClearCommand extends Command {
+	private static final String SUCCESSFULLY_CLEARED_ALL = "Successfully cleared all tasks.";
+	private static final String SUCCESSFULLY_CLEARED_DONE = "Successfully cleared all done tasks.";
+	private static final String ERROR_COULDN_T_CLEAR_TASKS = "ERROR: Couldn't clear tasks.";
+	
+	private static final String DONE = "done";
+	private static final String ALL = "all";
+	
+	public CommandParser parser = null;
+	
+	@Override
+	public void execute(String userCommand) {
+		parser = new CommandParser();
+		
+		userCommand = userCommand.trim();
+		
+		String clearType = parser.parseClearType(userCommand);
+
+		if (clearType.equals(ALL)) {
+			clearAll();
+		} else if (clearType.equals(DONE)){
+			clearDone();
+		} else {
+			//if parsing fails, error message will be stored in clearType
+			systemFeedback = clearType;
+		}
+		result.setSystemFeedback(systemFeedback);
+	}
+	
+	private void clearDone() {
+		Search seeker = new Search(allTasks);
+		
+		ArrayList<Task> tasksToClear = seeker.searchByStatus(true);
+		boolean isSuccessful = true;
+		
+		for (Task t : tasksToClear) {
+			boolean isRemoved = allTasks.remove(t);
+			if (!isRemoved) {
+				isSuccessful = false;
+			}
+		}
+		
+		if (isSuccessful) {
+			taskStorage.writeTaskListToFile();
+			systemFeedback = SUCCESSFULLY_CLEARED_DONE;
+		} else {
+			systemFeedback = ERROR_COULDN_T_CLEAR_TASKS;
+		}
+		
+	}
+	
+	private void clearAll() {
+		boolean isSuccessful = taskStorage.clear();
+		
+		if (isSuccessful) {
+			systemFeedback = SUCCESSFULLY_CLEARED_ALL;
+		} else {
+			systemFeedback = ERROR_COULDN_T_CLEAR_TASKS;
+		}
+	}
+	
+	
+}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\ClearCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\Command.java
+	 */
+
+import java.util.ArrayList;
+
+/*
+ * Command pattern: assumes role of "Command interface", except that
+ * it is not an interface, but an abstract class. This is because we
+ * realized instead of just specifying an interface, there are a LOT
+ * more common attributes and methods between the concrete commands,
+ * such as systemFeedback, and currentTask and their respective Get
+ * methods.
+ */
+public abstract class Command {
+	
+	protected String systemFeedback;
+	protected Task currentTask;
+	protected ArrayList<Task> currentTaskList;
+	protected ArrayList<Task> allTasks;
+	protected Storage taskStorage;
+	protected Result result;
+	
+	public Command() {
+		systemFeedback = "";
+		taskStorage = Storage.getInstance();
+		allTasks = taskStorage.getTaskList();
+		currentTaskList = allTasks;
+		currentTask = null;
+		result = new Result();
+	}
+	
+	public Command(ArrayList<Task> current) {
+		this();
+		currentTaskList = current;
+	}
+	
+	//to be implemented by all subclasses
+	public abstract void execute(String s);
+	
+	//undo-able commands = add, edit and delete
+	//undo-able commands should override this method
+	public void undo() {
+		return;
+	}
+	
+	//edit command should override this method
+	public Task getEditedTask() {
+		return new Task();
+	}
+	
+	public String getSystemFeedback() {
+		return systemFeedback;
+	}
+	
+	public Result getResult() {
+		return result;
+	}
+	
+	public ArrayList<Task> getCurrentTaskList() {
+		return currentTaskList;
+	}
+	
+	public Task getCurrentTask() {
+		return currentTask;
+	}
+}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\Command.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\CommandExecutor.java
+	 */
+
+import java.util.ArrayList;
+
+/*
+ * Façade pattern: From the perspective of the GUI, it throws whatever
+ * the user enters to this class, and waits for a result. The GUI does 
+ * not know about any back-end logic. Thus, this class acts as a 
+ * façade and hides the logic from the GUI.
+ * 
+ * Command pattern: This class is the "invoker" class. It will create 
+ * Commands and then execute them. After executing, it will then store
+ * them in a history (if the command is undo-able). When user wants
+ * to undo, it will retrieve from the history and execute its 
+ * undo method.
+ * 
+ * Description: This class is the only class that the GUI interacts with.
+ * It will take in the user input and decide which Command to execute.
+ */
+
+public class CommandExecutor {
+	private static final String ERROR_NOTHING_TO_UNDO = "ERROR: Nothing to undo!";
+	private static final String ERROR_INVALID_COMMAND = "ERROR: No such command! Press F1 for help.";
+	
+	private static final String CREATE = "create";
+	private static final String NEW = "new";
+	private static final String ADD = "add";
+	private static final String SHOW = "show";
+	private static final String DISPLAY = "display";
+	private static final String UPDATE = "update";
+	private static final String EDIT = "edit";
+	private static final String DEL = "del";
+	private static final String REMOVE = "remove";
+	private static final String DELETE = "delete";
+	private static final String CLEAR = "clear";
+	private static final String FIND = "find";
+	private static final String SEARCH = "search";
+	private static final String UNDO = "undo";
+	private static final String EXIT = "exit";
+	private static final String QUIT = "quit";
+	
+	private static final String UNDONE = "undone";
+	
+	protected ArrayList<Task> currentTaskList;
+	protected ActionHistory<Command> history;
+	
+	public CommandExecutor() {
+		currentTaskList = null;
+		history = new ActionHistory<Command>();
+	}
+	
+	public Result doUserOperation(String userCommand) {
+		Result result = null;
+		String operation = "";
+		
+		operation = getOperation(userCommand);
+
+		boolean isValidOperation = ValidationCheck.isValidOperation(operation);
+		if (!isValidOperation) {
+			return new Result(ERROR_INVALID_COMMAND);
+		}
+
+		if(isExit(operation)) {
+			System.exit(0);
+		}
+		
+		result = executeOperation(operation, userCommand);
+		assert result != null;
+		return result;
+	}
+
+	private Result executeOperation(String operation, String userCommand) {
+		Result result = null;
+		
+		userCommand = getSecondWordOnwards(userCommand);
+		
+		switch (operation) {
+			case CREATE :
+			case NEW :
+				//same operations fall through
+			case ADD :
+				result = executeAddOperation(userCommand);
+				break;
+			case SHOW :
+				//same operations fall through
+			case DISPLAY :
+				result = executeDisplayOperation(userCommand);
+				break;
+			case UPDATE :
+				//same operations fall through
+			case EDIT :
+				result = executeEditOperation(userCommand);
+				break;
+	        case DEL :
+			case REMOVE :
+				//same operations fall through
+			case DELETE :
+				result = executeDeleteOperation(userCommand);
+				break;
+			case CLEAR :
+				result = executeClearOperation(userCommand);
+				break;
+			case FIND :
+				//same operations fall through
+			case SEARCH :
+				result = executeSearchOperation(userCommand);
+				break;
+			case UNDO :
+				result = executeUndoOperation();
+				break;
+			default : 
+				//assert false here
+				//if program reaches here, it should fail because
+				//previously, already checked for valid operation
+				assert false;
+				break;
+			}
+		return result;
+	}
+
+	private Result executeUndoOperation() {
+		String systemFeedback;
+		Result result;
+		if (!history.isEmpty()) {
+			Command lastCommand = history.pop();
+			lastCommand.undo();
+			result = lastCommand.getResult();
+			systemFeedback = result.getSystemFeedback();
+			result = displayTaskListWithHighlightAfterUndoCommand(systemFeedback, lastCommand);
+		} else {
+			result = displayTaskListAfterCommand(ERROR_NOTHING_TO_UNDO);
+		}
+		return result;
+	}
+
+	private Result executeSearchOperation(String userCommand) {
+		Result result;
+		Command search = new SearchCommand(currentTaskList);
+		search.execute(userCommand);
+		result = search.getResult();
+		currentTaskList = search.getCurrentTaskList();
+		return result;
+	}
+
+	private Result executeClearOperation(String userCommand) {
+		String systemFeedback;
+		Result result;
+		Command clear = new ClearCommand();
+		clear.execute(userCommand);
+		result = clear.getResult();
+		systemFeedback = clear.getSystemFeedback();
+		
+		result = displayTaskListAfterCommand(systemFeedback);
+		return result;
+	}
+
+	private Result executeDeleteOperation(String userCommand) {
+		String systemFeedback;
+		Result result;
+		Command delete = new DeleteCommand(currentTaskList);
+		delete.execute(userCommand);
+		result = delete.getResult();
+		systemFeedback = delete.getSystemFeedback();
+		System.out.println("DELETE SYSTEM FEEDBACK: " + systemFeedback);
+		boolean success = result.isSuccessful();
+		if (success) {
+			history.push(delete);
+		}
+		
+		result = displayTaskListAfterCommand(systemFeedback);
+		return result;
+	}
+
+	private Result executeEditOperation(String userCommand) {
+		String systemFeedback;
+		Result result;
+		Command edit = new EditCommand(currentTaskList);
+		edit.execute(userCommand);
+		systemFeedback = edit.getSystemFeedback();
+		System.out.println("EDIT SYSTEM FEEDBACK: " + systemFeedback);
+		result = edit.getResult();
+		boolean success = result.isSuccessful();
+		if (success) {
+			history.push(edit);
+		}
+		
+		result = displayTaskListWithHighlightAfterEditCommand(systemFeedback, edit);
+		return result;
+	}
+
+	private Result executeDisplayOperation(String userCommand) {
+		Result result;
+		Command display = new DisplayCommand();
+		display.execute(userCommand);
+		result = display.getResult();
+		currentTaskList = display.getCurrentTaskList();
+		return result;
+	}
+
+	private Result executeAddOperation(String userCommand) {
+		String systemFeedback;
+		Result result;
+		Command add = new AddCommand();
+		add.execute(userCommand);
+		systemFeedback = add.getSystemFeedback();
+		result = add.getResult();
+		boolean success = result.isSuccessful();
+		if (success) {
+			history.push(add);
+		}
+		result = displayTaskListWithHighlightAfterAddCommand(systemFeedback, add);
+		return result;
+	}
+
+	private Result displayTaskListAfterCommand(String systemFeedback) {
+		Result result;
+		DisplayCommand disp = new DisplayCommand();
+		disp.execute(UNDONE);
+		result = disp.getResult();
+		result.setSystemFeedback(systemFeedback);
+		currentTaskList = disp.getCurrentTaskList();
+		return result;
+	}
+	
+	private Result displayTaskListWithHighlightAfterUndoCommand(
+			String systemFeedback, Command undo) {
+		Result result;
+		DisplayCommand disp = new DisplayCommand();
+		disp.setTaskToHighlight(undo.getCurrentTask());
+		disp.execute(UNDONE);
+		result = disp.getResult();
+		result.setSystemFeedback(systemFeedback);
+		currentTaskList = disp.getCurrentTaskList();
+		return result;
+	}
+	
+	private Result displayTaskListWithHighlightAfterEditCommand(
+			String systemFeedback, Command edit) {
+		Result result;
+		DisplayCommand disp = new DisplayCommand();
+		disp.setTaskToHighlight(edit.getEditedTask());
+		disp.execute(UNDONE);
+		result = disp.getResult();
+		result.setSystemFeedback(systemFeedback);
+		currentTaskList = disp.getCurrentTaskList();
+		return result;
+	}
+
+	private Result displayTaskListWithHighlightAfterAddCommand(String systemFeedback,
+			Command add) {
+		Result result;
+		DisplayCommand disp = new DisplayCommand();
+		disp.setTaskToHighlight(add.getCurrentTask());
+		disp.execute(UNDONE);
+		result = disp.getResult();
+		result.setSystemFeedback(systemFeedback);
+		currentTaskList = disp.getCurrentTaskList();
+		return result;
+	}
+	
+	private boolean isExit(String operation) {
+		return operation.equalsIgnoreCase(EXIT) || operation.equalsIgnoreCase(QUIT);
+	}
+	
+	private String getOperation(String userCommand) {
+		return getFirstWord(userCommand).toLowerCase();
+	}
+	
+	private String getFirstWord(String str) {
+		return str.trim().split("\\s+")[0];
+	}
+	
+	private String getSecondWordOnwards(String str) {
+		String [] individualWordsInArray = str.split(" ");
+		StringBuilder sb = new StringBuilder();
+		boolean isFirstWord = true;
+		
+		for (String word: individualWordsInArray) {
+			if (isFirstWord) {
+				isFirstWord = false;
+				continue;
+			}
+			sb.append(word + " ");
+		}
+		return sb.toString().trim();
+	}
+}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\CommandExecutor.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\CommandParser.java
+	 */
+
+	/**
+	 * @param userCommand
+	 * @return displayType, "all", "overdue", "memos", "undone", "done" or "today" or error msg
+	 */
+	public String parseDisplayType(String userCommand) {
+		String displayType = "";
+		
+		userCommand = prepareUserCommandForParsing(userCommand);
+		
+		boolean isAllKeywordPresent = userCommand.equals(ALL);
+		boolean isUndoneKeywordPresent = userCommand.equals(UNDONE) || userCommand.equals("");
+		boolean isDoneKeywordPresent = userCommand.equals(DONE);
+		boolean isTodayKeywordPresent = userCommand.equals(TODAY);
+		boolean isOverdueKeywordPresent = userCommand.equals(OVERDUE);
+		boolean isMemosKeywordPresent = userCommand.equals(MEMOS);
+		
+		displayType = determineDisplayType(isUndoneKeywordPresent,
+				isDoneKeywordPresent, isTodayKeywordPresent, isAllKeywordPresent,
+				isOverdueKeywordPresent, isMemosKeywordPresent); 
+		
+		return displayType;
+	}
+
+	/*
+	 * @return error message if number of keywords > 1,
+	 * 		"undone" if number of keywords == 0,
+	 * 		the respective display type otherwise.
+	 */
+	private String determineDisplayType(boolean isUndoneKeywordPresent,
+			boolean isDoneKeywordPresent, boolean isTodayKeywordPresent,
+			boolean isAllKeywordPresent, boolean isOverdueKeywordPresent,
+			boolean isMemosKeywordPresent) {
+		String displayType = "";
+		
+		int numberOfKeywordsPresent = getNumberOfKeywordsPresent(isAllKeywordPresent, isUndoneKeywordPresent,
+				isDoneKeywordPresent, isTodayKeywordPresent, isOverdueKeywordPresent, isMemosKeywordPresent);
+		
+		assert numberOfKeywordsPresent >= 0;
+		
+		if (numberOfKeywordsPresent > 1 ) {
+			displayType = ERROR_INVALID_NUMBER_OF_KEYWORDS;
+			return displayType;
+		}
+		
+		if (numberOfKeywordsPresent < 1) {
+			displayType = ERROR_INVALID_KEYWORDS_ENTERED;
+			return displayType;
+		}
+		
+		if (isAllKeywordPresent) {
+			displayType = ALL;
+		} else if (isDoneKeywordPresent) {
+			displayType = DONE;
+		} else if (isTodayKeywordPresent) {
+			displayType = TODAY;
+		} else if (isOverdueKeywordPresent) {
+			displayType = OVERDUE;
+		} else if (isMemosKeywordPresent) {
+			displayType = MEMOS;
+		} else { 
+			//default
+			displayType = UNDONE;
+		}
+		return displayType;
+	}
+
+	private int getNumberOfKeywordsPresent(boolean isAllKeywordPresent,
+			boolean isUndoneKeywordPresent, boolean isDoneKeywordPresent,
+			boolean isTodayKeywordPresent, boolean isOverdueKeywordPresent,
+			boolean isMemosKeywordPresent) {
+		return (isAllKeywordPresent ? 1:0) + 
+				(isUndoneKeywordPresent ? 1:0) +
+				(isDoneKeywordPresent ? 1:0) + 
+				(isTodayKeywordPresent ? 1:0) +
+				(isOverdueKeywordPresent ? 1:0) +
+				(isMemosKeywordPresent ? 1:0);
+	}
+	
+	/*
+	 * @param userCommand
+	 * @return displayType, "all" or "done" or error msg
+	 */
+	public String parseClearType(String userCommand) {
+		String clearType = "";
+		
+		userCommand = prepareUserCommandForParsing(userCommand);
+		
+		boolean isAllKeywordPresent = userCommand.equals(ALL);
+		boolean isDoneKeywordPresent = userCommand.equals(DONE) || userCommand.equals("");
+		
+		clearType = determineClearType(isAllKeywordPresent, isDoneKeywordPresent); 
+		
+		return clearType;
+	}
+	
+	/*
+	 * @return error message if keyword is invalid,
+	 * 		the respective display type otherwise.
+	 */
+	private String determineClearType(boolean isAllKeywordPresent, boolean isDoneKeywordPresent) {
+		String clearType = "";
+		
+		if (isAllKeywordPresent) {
+			clearType = ALL;
+		} else if (isDoneKeywordPresent) {
+			clearType = DONE;
+		} else {
+			clearType = ERROR_INVALID_KEYWORDS_ENTERED;
+		}
+		return clearType;
+	}
+	
+	private String prepareUserCommandForParsing(String userCommand) {
+		return userCommand.trim().toLowerCase();
+	}
+	
+	/*
+	 * 
+	 * @param userCommand
+	 * @return boolean array
+	 * fieldsToRemove[1] = true | indicates removal of location
+	 * fieldsToRemove[2] = true | indicates removal of time
+	 * fieldsToRemove[3] = true | indicates removal of date
+	 * fieldsToRemove[0] = true | indicates parsing failed, i.e. user typed nonsense
+	 */
+	public boolean [] extractFieldsToRemove(String userCommand) {
+		boolean [] fieldsToRemove = new boolean[INDICATOR_MAX];
+		int countInvalidKeywords = 0;
+		
+		String[] arrayOfKeywords = prepareArrayOfKeywords(userCommand);
+
+		for (String keyword : arrayOfKeywords) {
+			switch (keyword) {
+			case "loc" : 
+				fieldsToRemove[INDICATOR_LOCATION] = true;
+				break;
+			case "time" :
+				fieldsToRemove[INDICATOR_TIME] = true;
+				break;
+			case "date" :
+				fieldsToRemove[INDICATOR_DATE] = true;
+				break;
+			default :
+				countInvalidKeywords++;
+				//not a removal keyword
+				break;
+			}
+		}
+		
+		if (countInvalidKeywords > 0) {
+			fieldsToRemove[INDICATOR_INVALID] = true;
+		}
+		
+		return fieldsToRemove;
+	}
+
+	private String [] prepareArrayOfKeywords(String userCommand) {
+		userCommand = userCommand.trim();
+		String [] splitUserCommand = userCommand.split("/rm");
+		if (splitUserCommand.length > 1) {
+			String stringOfKeywords = userCommand.split("/rm")[1];
+			if (stringOfKeywords != "") {
+				stringOfKeywords = stringOfKeywords.toLowerCase().trim();
+			}
+			return stringOfKeywords.split("\\s+");
+		} else {
+			return new String[0];
+		}
+	}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\CommandParser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\CommandParser.java
+	 */
+
+	private boolean isSuppliedInputEmpty(String input) {
+		if (input.trim().equals("")) {
+			invalidFeedBack = ERROR_EMPTY_INPUT;
+			return true;
+		}
+		return false;
+	}
+}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\CommandParser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\CommandTest.java
+	 */
+
+
+import static org.junit.Assert.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import org.junit.Test;
+
+/*
+ * Description: Integration tests for each of the Concrete Commands (6 in total)
+ */
+
+public class CommandTest {
+	
+	private static final String ERROR_NO_RECORDS_FOUND = "ERROR: No records found!";
+	private static final String ERROR_ENTERING_A_TIMESTAMP_WO_A_DATE = "ERROR: Entering a timestamp without a date doesn't make sense!";
+	private static final String ERROR_LOCATION_MUST_START_WITH_A_LETTER = "ERROR: Location must start with a letter.";
+	private static final String ERROR_INVALID_KEYWORDS = "ERROR: Invalid keyword(s)!";
+	private static final String ERROR_NOTHING_TO_REMOVE = "ERROR: Nothing to remove!";
+	private static final String ERROR_CANNOT_REMOVE_DATE_WITHOUT_REMOVING_TIME = "ERROR: Cannot remove date without removing time!";
+	private static final String ERROR_CANNOT_REMOVE_SOMETHING_NOT_PRESENT = "ERROR: Cannot remove something not present!";
+	private static final String ERROR_COMMAND_FROM_AND_AT_ARE_MUTUALLY_EXCLUSIVE = "ERROR: Command /from and /at are mutually exclusive.";
+	private static final String ERROR_INPUT_ENDING_TIME_WITHOUT_STARTING_TIME = "ERROR: Input ending time without starting time.";
+	private static final String ERROR_INPUT_STARTING_TIME_WITHOUT_ENDING_TIME = "ERROR: Input starting time without ending time.";
+	private static final String ERROR_INPUT_DURATION_IS_NOT_VALID = "ERROR: Input duration is not valid.";
+	private static final String ERROR_INPUT_DEADLINE_TIME_IS_NOT_VALID = "ERROR: Input deadline time is not valid.";
+	private static final String ERROR_INPUT_DATE_IS_NOT_VALID = "ERROR: Input date is not valid.";
+	private static final String ERROR_INPUT_COMMAND_IS_NOT_VALID = "ERROR: Input Command is not valid.";
+	private static final String ERROR_COMMAND_KEYWORD_MISSING = "ERROR: Command keyword is missing.";
+	private static final String ERROR_EMPTY_INPUT = "ERROR: Empty input!";
+	private static final String ERROR_INVALID_COMMAND = "ERROR: Invalid command entered. Please try again.";
+	private static final String ERROR_INVALID_TASK_NUMBER = "ERROR: Invalid task number!";
+	private static final String ERROR_INVALID_KEYWORDS_ENTERED = "ERROR: Invalid keyword(s) entered!";
+	
+	private static final String FEEDBACK_CLEAR_ALL_SUCCESS = "Successfully cleared all tasks.";
+	private static final String FEEDBACK_CLEAR_DONE_SUCCESS = "Successfully cleared all done tasks.";
+	private static final String FEEDBACK_EDIT_SUCCESS = "Successfully made changes to \"%s\".";
+	private static final String FEEDBACK_DEL_SUCCESS = "Successfully deleted 2. %s.";
+	
+	@Test
+	public void test() {
+		testClearCommand();
+		testAddCommand();
+		testEditCommand();
+		testDeleteCommand();
+		testDisplayCommand();
+		testSearchCommand();
+	}
+	
+	private void testClearCommand() {
+		assertClearAll();
+		assertClearDone();
+		assertClearInvalid();
+	}
+	
+	private void testAddCommand() {
+		assertAddMemo();
+		assertAddFullday();
+		assertAddDeadline();
+		assertAddDuration();
+		assertAddInvalid();
+	}
+	
+	private void testEditCommand() {
+		assertEditName();
+		assertEditLoc();
+		assertEditDate();
+		assertEditDeadline();
+		assertEditDuration();
+		assertEditMark();
+		assertEditRemoveTime();
+		assertEditRemoveLoc();
+		assertEditRemoveDate();
+		assertEditCombination();
+		assertEditInvalid();
+	}
+	
+	private void testDeleteCommand() {
+		assertDelete();
+		assertDeleteInvalid();
+	}
+	
+	private void testDisplayCommand() {
+		initDisplay();
+		
+		assertDisplay();
+		assertDisplayUndone();
+		assertDisplayDone();
+		assertDisplayAll();
+		assertDisplayOverdue();
+		assertDisplayMemos();
+		assertDisplayToday();
+		assertDisplayInvalid();
+	}
+	
+	private void testSearchCommand() {
+		assertSearchName();
+		assertSearchDate();
+		assertSearchNoResults();
+	}
+	
+	private void assertSearchName() {
+		Command search = new SearchCommand();
+		search.execute("AB");
+		Result r = search.getResult();
+		assertEquals("Completed Tasks:\n" +
+				"   1. ABC\n" +
+				"      10-Oct-2010 <Sun>\n" +
+				"      At/By 00:55\n", r.getResult());
+	}
+	
+	private void assertSearchDate() {
+		Command search = new SearchCommand();
+		search.execute("101010");
+		Result r = search.getResult();
+		assertEquals("Completed Tasks:\n" +
+				"   1. ABC\n" +
+				"      10-Oct-2010 <Sun>\n" +
+				"      At/By 00:55\n", r.getResult());
+	}
+	
+	private void assertSearchNoResults() {
+		Command search = new SearchCommand();
+		search.execute("1010101010");
+		Result r = search.getResult();
+		assertEquals("", r.getResult());
+		assertEquals(ERROR_NO_RECORDS_FOUND, r.getSystemFeedback());
+	}
+	
+	private void initDisplay() {
+		clearAll();
+		
+		Command add = new AddCommand();
+		add.execute("Overdue task /on 010113 /loc somewhere");
+		add.execute("Within 1 week /on 190414 /from 1000 to 2000 /loc over the");
+		add.execute("Memo /loc rainbow");
+		add.execute("ABC /on 101010 /by 0055");
+		
+		Command edit = new EditCommand();
+		edit.execute("4 /mark done");
+	}
+	
+	private void assertDisplay() {
+		Command disp = new DisplayCommand();
+		disp.execute("    ");
+		Result r = disp.getResult();
+		assertEquals("Overdue Tasks:\n" +
+				"   1. Overdue task\n" +
+				"      01-Jan-2013 <Tue>\n" +
+				"      Somewhere\n" +
+				"Tasks Occurring/Due Within 7 Days:\n" +
+				"   2. Within 1 week\n" +
+				"      19-Apr-2014 <Sat>\n" +
+				"      From 10:00 to 20:00\n" +
+				"      Over the\n" +
+				"Memos:\n" +
+				"   3. Memo\n" +
+				"      Rainbow\n", r.getResult());
+	}
+	
+	private void assertDisplayUndone() {
+		Command disp = new DisplayCommand();
+		disp.execute("undone");
+		Result r = disp.getResult();
+		assertEquals("Overdue Tasks:\n" +
+				"   1. Overdue task\n" +
+				"      01-Jan-2013 <Tue>\n" +
+				"      Somewhere\n" +
+				"Tasks Occurring/Due Within 7 Days:\n" +
+				"   2. Within 1 week\n" +
+				"      19-Apr-2014 <Sat>\n" +
+				"      From 10:00 to 20:00\n" +
+				"      Over the\n" +
+				"Memos:\n" +
+				"   3. Memo\n" +
+				"      Rainbow\n", r.getResult());
+	}
+	
+	private void assertDisplayDone() {
+		Command disp = new DisplayCommand();
+		disp.execute("done");
+		Result r = disp.getResult();
+		assertEquals("Completed Tasks:\n" +
+				"   1. ABC\n" +
+				"      10-Oct-2010 <Sun>\n" +
+				"      At/By 00:55\n", r.getResult());
+	}
+	
+	private void assertDisplayAll() {
+		Command disp = new DisplayCommand();
+		disp.execute("all");
+		Result r = disp.getResult();
+		assertEquals("Overdue Tasks:\n" +
+				"   1. Overdue task\n" +
+				"      01-Jan-2013 <Tue>\n" +
+				"      Somewhere\n" +
+				"Tasks Occurring/Due Within 7 Days:\n" +
+				"   2. Within 1 week\n" +
+				"      19-Apr-2014 <Sat>\n" +
+				"      From 10:00 to 20:00\n" +
+				"      Over the\n" +
+				"Memos:\n" +
+				"   3. Memo\n" +
+				"      Rainbow\n" + 
+				"Completed Tasks:\n" +
+				"   4. ABC\n" +
+				"      10-Oct-2010 <Sun>\n" +
+				"      At/By 00:55\n", r.getResult());
+	}
+	
+	private void assertDisplayOverdue() {
+		Command disp = new DisplayCommand();
+		disp.execute("overdue");
+		Result r = disp.getResult();
+		assertEquals("Overdue Tasks:\n" +
+				"   1. Overdue task\n" +
+				"      01-Jan-2013 <Tue>\n" +
+				"      Somewhere\n", r.getResult());
+	}
+	
+	private void assertDisplayMemos() {
+		Command disp = new DisplayCommand();
+		disp.execute("memos");
+		Result r = disp.getResult();
+		assertEquals("Memos:\n" +
+				"   1. Memo\n" +
+				"      Rainbow\n", r.getResult());
+	}
+	
+	private void assertDisplayToday() {
+		addATaskToday();
+		String displayDate = getFormattedDateToCompare();
+		
+		Command disp = new DisplayCommand();
+		disp.execute("today");
+		Result r = disp.getResult();
+		assertEquals("Overdue Tasks:\n" +
+				"   1. Overdue task\n" +
+				"      01-Jan-2013 <Tue>\n" +
+				"      Somewhere\n" + 
+				"Today's Tasks:\n" +
+				"   2. TaskToday\n" +
+				"      " + displayDate + "\n", r.getResult());
+	}
+	
+	private void addATaskToday() {
+		SimpleDateFormat systemDateFormat = new SimpleDateFormat("ddMMyy");
+		Calendar date = Calendar.getInstance();
+		String formattedDate = systemDateFormat.format(date.getTime());
+		String executeString = "TaskToday /on " + formattedDate;
+		
+		Command add = new AddCommand();
+		add.execute(executeString);
+	}
+
+	private String getFormattedDateToCompare() {
+		SimpleDateFormat displayDateFormat = new SimpleDateFormat("dd-MMM-yyyy <EEE>");
+		Calendar date = Calendar.getInstance();
+		String displayDate = displayDateFormat.format(date.getTime());
+		return displayDate;
+	}
+	
+	private void assertDisplayInvalid() {
+		Command disp = new DisplayCommand();
+		Result r;
+		
+		//1 correct keyword 1 wrong keyword
+		disp.execute("all abc");
+		r = disp.getResult();
+		assertEquals(ERROR_INVALID_COMMAND, r.getSystemFeedback());
+		
+		//0 correct keyword
+		disp.execute("rubbish");
+		r = disp.getResult();
+		assertEquals(ERROR_INVALID_COMMAND, r.getSystemFeedback());
+		
+		//2 correct keyword
+		disp.execute("all done");
+		r = disp.getResult();
+		assertEquals(ERROR_INVALID_COMMAND, r.getSystemFeedback());
+		
+	}
+	
+	private void assertDelete() {
+		Command del = new DeleteCommand();
+		del.execute("2");
+		String taskName = del.getCurrentTask().getName();
+		Result r = del.getResult();
+		assertEquals(formatString(FEEDBACK_DEL_SUCCESS, taskName), r.getSystemFeedback());
+	}
+	
+	private void assertDeleteInvalid() {
+		Command del = new DeleteCommand();
+		Result r;
+		
+		//empty string e.g. "   "
+		del.execute("    ");
+		r = del.getResult();
+		assertEquals(ERROR_INVALID_TASK_NUMBER, r.getSystemFeedback());
+		
+		//invalid choice 0
+		del.execute("0    ");
+		r = del.getResult();
+		assertEquals(ERROR_INVALID_TASK_NUMBER, r.getSystemFeedback());
+		
+		//invalid choice negative
+		del.execute("-100 ");
+		r = del.getResult();
+		assertEquals(ERROR_INVALID_TASK_NUMBER, r.getSystemFeedback());
+		
+		//invalid choice abc
+		del.execute("abc aas");
+		r = del.getResult();
+		assertEquals(ERROR_INVALID_TASK_NUMBER, r.getSystemFeedback());
+	}
+	
+	private void assertEditName() {
+		Command edit = new EditCommand();
+		edit.execute("1 a new name");
+		String taskName = edit.getEditedTask().getName();
+		Result r = edit.getResult();
+		assertEquals(formatString(FEEDBACK_EDIT_SUCCESS, taskName), r.getSystemFeedback());
+	}
+	
+	private void assertEditLoc() {
+		Command edit = new EditCommand();
+		edit.execute("1 /loc new location");
+		String taskName = edit.getEditedTask().getName();
+		Result r = edit.getResult();
+		assertEquals(formatString(FEEDBACK_EDIT_SUCCESS, taskName), r.getSystemFeedback());
+	}
+	
+	private void assertEditDate() {
+		Command edit = new EditCommand();
+		edit.execute("1 /on 100114");
+		String taskName = edit.getEditedTask().getName();
+		Result r = edit.getResult();
+		assertEquals(formatString(FEEDBACK_EDIT_SUCCESS, taskName), r.getSystemFeedback());
+	}
+	
+	private void assertEditDeadline() {
+		Command edit = new EditCommand();
+		edit.execute("1 /on 100114 /at 1000");
+		String taskName = edit.getEditedTask().getName();
+		Result r = edit.getResult();
+		assertEquals(formatString(FEEDBACK_EDIT_SUCCESS, taskName), r.getSystemFeedback());
+	}
+	
+	private void assertEditDuration() {
+		Command edit = new EditCommand();
+		edit.execute("1 /on 100114 /from 1000 to 1001");
+		String taskName = edit.getEditedTask().getName();
+		Result r = edit.getResult();
+		assertEquals(formatString(FEEDBACK_EDIT_SUCCESS, taskName), r.getSystemFeedback());
+	}
+	
+	private void assertEditMark() {
+		Command edit = new EditCommand();
+		edit.execute("3 /mark done");
+		String taskName = edit.getEditedTask().getName();
+		Result r = edit.getResult();
+		assertEquals(formatString(FEEDBACK_EDIT_SUCCESS, taskName), r.getSystemFeedback());
+	
+		edit.execute("5 /mark undone");
+		taskName = edit.getEditedTask().getName();
+		r = edit.getResult();
+		assertEquals(formatString(FEEDBACK_EDIT_SUCCESS, taskName), r.getSystemFeedback());
+	}
+	
+	private void assertEditRemoveTime() {
+		Command edit = new EditCommand();
+		edit.execute("4 Fullday2 /rm time");
+		String taskName = edit.getEditedTask().getName();
+		Result r = edit.getResult();
+		assertEquals(formatString(FEEDBACK_EDIT_SUCCESS, taskName), r.getSystemFeedback());
+	}
+	
+	private void assertEditRemoveLoc() {
+		Command edit = new EditCommand();
+		edit.execute("2 /rm loc");
+		String taskName = edit.getEditedTask().getName();
+		Result r = edit.getResult();
+		assertEquals(formatString(FEEDBACK_EDIT_SUCCESS, taskName), r.getSystemFeedback());
+	}
+	
+	private void assertEditRemoveDate() {
+		Command edit = new EditCommand();
+		edit.execute("5 /rm date");
+		String taskName = edit.getEditedTask().getName();
+		Result r = edit.getResult();
+		assertEquals(formatString(FEEDBACK_EDIT_SUCCESS, taskName), r.getSystemFeedback());
+	}
+	
+	private void assertEditCombination() {
+		Command edit = new EditCommand();
+		
+		//add loc remove date
+		edit.execute("4 /loc new location /rm date");
+		String taskName = edit.getEditedTask().getName();
+		Result r = edit.getResult();
+		assertEquals(formatString(FEEDBACK_EDIT_SUCCESS, taskName), r.getSystemFeedback());
+		
+		//remove loc add everything else
+		edit.execute("5 /on 140414 /from 0000 to 2358 /rm loc");
+		taskName = edit.getEditedTask().getName();
+		r = edit.getResult();
+		assertEquals(formatString(FEEDBACK_EDIT_SUCCESS, taskName), r.getSystemFeedback());
+	}
+	
+	private void assertEditInvalid() {
+		Command edit = new EditCommand();
+		Result r;
+		
+		//empty string e.g. "     "
+		edit.execute("     ");
+		r = edit.getResult();
+		assertEquals(ERROR_INVALID_TASK_NUMBER, r.getSystemFeedback());
+		
+		//got choice but rest is empty string e.g. "   "
+		edit.execute("1     ");
+		r = edit.getResult();
+		assertEquals(ERROR_EMPTY_INPUT, r.getSystemFeedback());
+		
+		//empty keyword
+		edit.execute("1   /  ");
+		r = edit.getResult();
+		assertEquals(ERROR_COMMAND_KEYWORD_MISSING, r.getSystemFeedback());
+		
+		//invalid keyword
+		edit.execute("1   /abc");
+		r = edit.getResult();
+		assertEquals(ERROR_INPUT_COMMAND_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//spam special characters
+		edit.execute("1   //////");
+		r = edit.getResult();
+		assertEquals(ERROR_COMMAND_KEYWORD_MISSING, r.getSystemFeedback());
+		
+		//invalid task number
+		edit.execute("0   ");
+		r = edit.getResult();
+		assertEquals(ERROR_INVALID_TASK_NUMBER, r.getSystemFeedback());
+		
+		//invalid date
+		edit.execute("1   /on abc");
+		r = edit.getResult();
+		assertEquals(ERROR_INPUT_DATE_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//invalid deadline
+		edit.execute("1 /on 101015 /at com1");
+		r = edit.getResult();
+		assertEquals(ERROR_INPUT_DEADLINE_TIME_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//invalid duration
+		edit.execute("1 /on 101015 /from 1000 to 2360");
+		r = edit.getResult();
+		assertEquals(ERROR_INPUT_DURATION_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//got start time but no end time
+		edit.execute("1 /on 101015 /from 1000");
+		r = edit.getResult();
+		assertEquals(ERROR_INPUT_STARTING_TIME_WITHOUT_ENDING_TIME, r.getSystemFeedback());
+		
+		//got end time but no start time
+		edit.execute("1 /on 101015 to 1000");
+		r = edit.getResult();
+		assertEquals(ERROR_INPUT_ENDING_TIME_WITHOUT_STARTING_TIME, r.getSystemFeedback());
+		
+		//same start and end time
+		edit.execute("1 /on 101015 /from 1000 to 1000");
+		r = edit.getResult();
+		assertEquals(ERROR_INPUT_DURATION_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//5 digits for time
+		edit.execute("1 /on 101015 /from 10000 to 00000");
+		r = edit.getResult();
+		assertEquals(ERROR_INPUT_DURATION_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//7 digits for date
+		edit.execute("1 /on 1010151");
+		r = edit.getResult();
+		assertEquals(ERROR_INPUT_DATE_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//both /from and /at
+		edit.execute("1 /from 1010 to 1511 /by 2359");
+		r = edit.getResult();
+		assertEquals(ERROR_COMMAND_FROM_AND_AT_ARE_MUTUALLY_EXCLUSIVE, r.getSystemFeedback());
+	
+		//remove date from a memo
+		edit.execute("1 /rm date");
+		r = edit.getResult();
+		assertEquals(ERROR_CANNOT_REMOVE_SOMETHING_NOT_PRESENT, r.getSystemFeedback());
+		
+		//remove time from a fullday task
+		edit.execute("4 /rm time");
+		r = edit.getResult();
+		assertEquals(ERROR_CANNOT_REMOVE_SOMETHING_NOT_PRESENT, r.getSystemFeedback());
+		
+		//invalid removal keyword
+		edit.execute("4 /rm asde");
+		r = edit.getResult();
+		assertEquals(ERROR_INVALID_KEYWORDS, r.getSystemFeedback());
+		
+		//remove date from a deadline/duration task
+		edit.execute("3 /rm date");
+		r = edit.getResult();
+		assertEquals(ERROR_CANNOT_REMOVE_DATE_WITHOUT_REMOVING_TIME, r.getSystemFeedback());
+		
+		//empty removal keyword
+		edit.execute("3 /rm    ");
+		r = edit.getResult();
+		assertEquals(ERROR_NOTHING_TO_REMOVE, r.getSystemFeedback());
+		
+		//string 2 keywords together
+		edit.execute("4 /loc /rm date");
+		r = edit.getResult();
+		assertEquals(ERROR_LOCATION_MUST_START_WITH_A_LETTER, r.getSystemFeedback());
+		
+		//adding /rm first and then other keywords later
+		edit.execute("4 /rm time /loc haha");
+		r = edit.getResult();
+		assertEquals(ERROR_INVALID_KEYWORDS, r.getSystemFeedback());
+	}
+	
+	private void assertAddMemo() {
+		Command add = new AddCommand();
+		add.execute("memo");
+		Result r = add.getResult();
+		assertEquals("add memo", "Successfully added \"Memo\".", r.getSystemFeedback());
+	}
+	
+	private void assertAddFullday() {
+		Command add = new AddCommand();
+		add.execute("fullday /on 040414");
+		Result r = add.getResult();
+		assertEquals("add fullday", "Successfully added \"Fullday\".", r.getSystemFeedback());
+	}
+	
+	private void assertAddDeadline() {
+		Command add = new AddCommand();
+		Result r;
+		
+		//use "at" keyword
+		add.execute("deadline /on 110414 /at 1000");
+		r = add.getResult();
+		assertEquals("add deadline", "Successfully added \"Deadline\".", r.getSystemFeedback());
+		
+		//use "by" keyword
+		add.execute("deadline2 /on 160414 /by 1300");
+		r = add.getResult();
+		assertEquals("add deadline", "Successfully added \"Deadline2\".", r.getSystemFeedback());
+	}
+	
+	private void assertAddDuration() {
+		Command add = new AddCommand();
+		add.execute("duration /on 040614 /from 1000 to 1200");
+		Result r = add.getResult();
+		assertEquals("add duration", "Successfully added \"Duration\".", r.getSystemFeedback());
+	}
+	
+	private void assertAddInvalid() {
+		Command add = new AddCommand();
+		Result r;
+		
+		//empty string e.g. "     "
+		add.execute("   ");
+		r = add.getResult();
+		assertEquals("user never enter task name", 
+				ERROR_EMPTY_INPUT, r.getSystemFeedback());
+		
+		//empty keyword
+		add.execute("empty keyword /      ");
+		r = add.getResult();
+		assertEquals("user gives empty keyword", ERROR_COMMAND_KEYWORD_MISSING, r.getSystemFeedback());
+		
+		//empty task name
+		add.execute("/");
+		r = add.getResult();
+		assertEquals("user gives empty taskName", "ERROR: No task name.", r.getSystemFeedback());
+		
+		//invalid keyword
+		add.execute("invalid keyword /something");
+		r = add.getResult();
+		assertEquals("user gives invalid keyword", ERROR_INPUT_COMMAND_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//spam special characters
+		add.execute("spam special characters keyword ///////");
+		r = add.getResult();
+		assertEquals("user gives empty keyword", ERROR_COMMAND_KEYWORD_MISSING, r.getSystemFeedback());
+
+		//deadine without date
+		add.execute("time without date /at 0010");
+		r = add.getResult();
+		assertEquals("user enters deadline without date", 
+				ERROR_ENTERING_A_TIMESTAMP_WO_A_DATE, r.getSystemFeedback());
+		
+		//duration without date
+		add.execute("time without date /from 0010 to 0011");
+		r = add.getResult();
+		assertEquals("user enters duration without date", 
+				ERROR_ENTERING_A_TIMESTAMP_WO_A_DATE, r.getSystemFeedback());
+	
+		//invalid duration
+		add.execute("invalid time /on 040414 /from abcd to -7889");
+		r = add.getResult();
+		assertEquals("user enters invalid duration", 
+				ERROR_INPUT_DURATION_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//invalid deadine
+		add.execute("invalid time /on 040414 /at -656");
+		r = add.getResult();
+		assertEquals("user enters invalid deadline", 
+				ERROR_INPUT_DEADLINE_TIME_IS_NOT_VALID, r.getSystemFeedback());
+	
+		//got start time but no end time
+		add.execute("invalid time /on 040414 /from 1009");
+		r = add.getResult();
+		assertEquals("user enters start time but no end time", 
+				ERROR_INPUT_STARTING_TIME_WITHOUT_ENDING_TIME, r.getSystemFeedback());
+		
+		//got end time but no start time
+		add.execute("invalid time /on 040414 to 2359");
+		r = add.getResult();
+		assertEquals("user enters end time but no start time", 
+				ERROR_INPUT_ENDING_TIME_WITHOUT_STARTING_TIME, r.getSystemFeedback());
+		
+		//same start and end time
+		add.execute("invalid time /on 040414 /from 2359 to 2359");
+		r = add.getResult();
+		assertEquals("user enters same start time and end time", 
+				ERROR_INPUT_DURATION_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//5 digits for time
+		add.execute("5 digits time /on 040414 /by 00000");
+		r = add.getResult();
+		assertEquals("user enters 5 digits for time", 
+				ERROR_INPUT_DEADLINE_TIME_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//7 digits for date
+		add.execute("7 digits date /on 0104151 /by 0000");
+		r = add.getResult();
+		assertEquals("user enters 7 digits for date", 
+				ERROR_INPUT_DATE_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//extra spaces between date
+		add.execute("space btw date /on 10 1 1 1 1 /by 0000");
+		r = add.getResult();
+		assertEquals("user enters spaces between date", 
+				ERROR_INPUT_DATE_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//extra spaces between time
+		add.execute("space btw time /on 101111 /by 0 0 0 0");
+		r = add.getResult();
+		assertEquals("user enters spaces between time", 
+				ERROR_INPUT_DEADLINE_TIME_IS_NOT_VALID, r.getSystemFeedback());
+		
+		//both /from and /at
+		add.execute("both from and at /on 101111 /from 1000 to 1100 /at 0000");
+		r = add.getResult();
+		assertEquals("user enters spaces between time", 
+				ERROR_COMMAND_FROM_AND_AT_ARE_MUTUALLY_EXCLUSIVE, r.getSystemFeedback());
+		
+		//string 2 keywords together
+		add.execute("2 keywords together /loc /rm date");
+		r = add.getResult();
+		assertEquals(ERROR_LOCATION_MUST_START_WITH_A_LETTER, r.getSystemFeedback());
+	}
+	
+	private void assertClearAll() {
+		clearAll();
+	}
+
+	private void clearAll() {
+		Command clear = new ClearCommand();
+		clear.execute("all");
+		Result r = clear.getResult();
+		assertEquals(FEEDBACK_CLEAR_ALL_SUCCESS, r.getSystemFeedback());
+	}
+	
+	private void assertClearDone() {
+		Command clear = new ClearCommand();
+		Result r;
+		
+		//clear done by specifying done explicitly
+		clear.execute("done");
+		r = clear.getResult();
+		assertEquals("clear done", 
+				FEEDBACK_CLEAR_DONE_SUCCESS, 
+				r.getSystemFeedback());
+		
+		//clear done by giving empty string
+		clear = new ClearCommand();
+		clear.execute("   ");
+		r = clear.getResult();
+		assertEquals("clear    ", 
+				FEEDBACK_CLEAR_DONE_SUCCESS, 
+				r.getSystemFeedback());
+	}
+	
+	private void assertClearInvalid() {
+		Command clear = new ClearCommand();
+		clear.execute("invalid stuff here");
+		Result r = clear.getResult();
+		assertEquals("user writes rubbish", 
+				ERROR_INVALID_KEYWORDS_ENTERED, 
+				r.getSystemFeedback());
+	}
+	
+	private String formatString(String message, String arg) {
+		return String.format(message, arg);
+	}
+}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\CommandTest.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\DeleteCommand.java
+	 */
+
+import java.util.ArrayList;
+
+/*
+* Command pattern: This is one of the concrete commands.
+* 
+* Description: This class will handle the delete operation.
+*/
+
+public class DeleteCommand extends Command {
+	
+	public CommandParser parser = null;
+	
+	private static final String ERROR_NO_LIST = "ERROR: No list displayed at the moment!";
+	private static final String ERROR_TASK_NUMBER = "ERROR: Invalid task number!";
+	private static final String ERROR_CANNOT_UNDO = "ERROR: Cannot undo!";
+	private static final String ERROR_UNABLE_TO_DEL = "ERROR: Unable to delete.";
+	
+	private static final String SUCCESS_UNDO = "Undo previous deletion: Successfully added \"%s\".";
+	private static final String SUCCESS_DEL = "Successfully deleted %s. %s.";
+	
+	//constructor used by junit test for initialisation
+	public DeleteCommand() {
+		super();
+	}
+	
+	public DeleteCommand(ArrayList<Task> current) {
+		super(current);
+	}
+	
+	@Override
+	public void execute(String userChoice) {
+		parser = new CommandParser();
+	    userChoice = userChoice.trim();
+	    
+	    if (currentTaskList != null) {
+		    proceedWithDeleteOnlyIfValidChoice(userChoice);
+	    } else {
+	    	systemFeedback = ERROR_NO_LIST;
+	    }
+	    result.setSystemFeedback(systemFeedback);
+	}
+
+	private void proceedWithDeleteOnlyIfValidChoice(String userChoice) {
+		boolean isValidChoice = ValidationCheck.isValidChoice(userChoice, currentTaskList.size());
+		if (isValidChoice) {
+			delete(userChoice);
+		} else {
+			systemFeedback = ERROR_TASK_NUMBER;
+		}
+	}
+
+	private void delete(String userChoice) {
+		int choice = convertToInteger(userChoice);
+		//retrieve the task to be removed
+		currentTask = currentTaskList.get(choice-1);
+		boolean isDeletionSuccessful = deleteThisTask(currentTask);
+
+		if (isDeletionSuccessful) {
+			result.setSuccess(true);
+			systemFeedback = formatString(SUCCESS_DEL, 
+					Integer.toString(choice), currentTask.getName());
+		} else {
+			systemFeedback = ERROR_UNABLE_TO_DEL;
+		}
+	}
+	
+	protected boolean deleteThisTask(Task taskToBeRemoved) {
+		//delete from array list
+		allTasks.remove(taskToBeRemoved);
+		//delete from text file
+		boolean isFileWritingSuccessful = taskStorage.writeTaskListToFile();
+		return isFileWritingSuccessful;
+	}
+	
+	@Override
+	public void undo() {
+		System.out.println("Add: "+ allTasks.add(currentTask));
+		
+		if (taskStorage.writeTaskListToFile()) {
+			systemFeedback = formatString(SUCCESS_UNDO, currentTask.getName());
+		}
+		else {
+			systemFeedback = ERROR_CANNOT_UNDO;
+		}
+		result.setSystemFeedback(systemFeedback);
+	}
+	
+	private int convertToInteger(String userCommand) {
+		return Integer.parseInt(userCommand);
+	}
+	
+	private String formatString(String message, String arg1, String arg2) {
+		return String.format(message, arg1, arg2);
+	}
+	
+	private String formatString(String message, String arg) {
+		return String.format(message, arg);
+	}
+}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\DeleteCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\EditCommand.java
+	 */
+
+import java.util.ArrayList;
+
+/*
+ *Command pattern: This is one of the Concrete Commands.
+ * 
+ *Description: This class will handle the edit operation.
+ */
+public class EditCommand extends AddCommand {
+	
+	private static final int INDICATOR_INVALID = 0;
+	private static final int INDICATOR_LOCATION = 1;
+	private static final int INDICATOR_TIME = 2;
+	private static final int INDICATOR_DATE = 3;
+	
+	private static final String ERROR_CANNOT_UNDO = "ERROR: Cannot undo!";
+	private static final String ERROR_UNABLE_TO_EDIT = "ERROR: Unable to edit.";
+	private static final String ERROR_KEYWORD = "ERROR: Invalid keyword(s)!";
+	private static final String ERROR_NO_LIST = "ERROR: No list displayed at the moment!";
+	private static final String ERROR_TASK_NUMBER = "ERROR: Invalid task number!";
+	private static final String ERROR_REMOVE_NOT_PRESENT = "ERROR: Cannot remove something not present!";
+	private static final String ERROR_REMOVE_DATE_WO_TIME = "ERROR: Cannot remove date without removing time!";
+	private static final String ERROR_NOTHING_TO_REMOVE = "ERROR: Nothing to remove!";
+	
+	private static final String SUCCESS_UNDO = "Undo previous update: Successfully reverted \"%s\".";
+	private static final String SUCCESS_EDIT = "Successfully made changes to \"%s\".";
+	
+	private static final String PLACEHOLDER_PARSE_SUCCESS = "parsing success";
+	
+	Task editedTask;
+	
+	public EditCommand(ArrayList<Task> current) {
+		super();
+		currentTaskList = current;
+	}
+	
+	//constructor used by junit test for initialisation
+	public EditCommand() {
+		super();
+	}
+	
+	@Override
+	public void execute(String userCommand) {
+		userCommand = userCommand.trim();
+
+		String userChoice = getFirstWord(userCommand);
+		
+		if (currentTaskList != null) {
+			proceedWithEditOnlyIfValidChoice(userCommand, userChoice);
+		} else {
+			systemFeedback = ERROR_NO_LIST;
+		}
+		result.setSystemFeedback(systemFeedback);
+	}
+
+	private void proceedWithEditOnlyIfValidChoice(String userCommand, String userChoice) {
+		boolean isValidChoice = ValidationCheck.isValidChoice(userChoice, currentTaskList.size());
+
+		if (isValidChoice) {
+			proceedWithEdit(userCommand, userChoice);
+		} else {
+			systemFeedback = ERROR_TASK_NUMBER;
+		}
+	}
+
+	private void proceedWithEdit(String userCommand, String userChoice) {
+		String userModifications = prepareUserModifications(userCommand, userChoice);
+		systemFeedback = parseAndModifyTask(userModifications, editedTask, "edit");
+		
+		//if parsing is successful
+		if (systemFeedback.equals(PLACEHOLDER_PARSE_SUCCESS)) {
+			systemFeedback = parseRemovalKeywordsAndModifyTask(userCommand);
+			
+			//if parsing is successful
+			if (systemFeedback.equals(PLACEHOLDER_PARSE_SUCCESS)) {
+				edit();
+			}
+			else {
+				//do nothing; parsing error message is already contained in systemFeedback
+			}
+		} else {
+			//do nothing; parsing error message is already contained in systemFeedback
+		}
+	}
+	
+	private String parseRemovalKeywordsAndModifyTask(String userCommand) {
+		String feedback = "";
+		if (userCommand.contains("/rm")) {
+			int countNumberOfEdits = 0;
+			boolean [] fieldsToRemove = parser.extractFieldsToRemove(userCommand);
+			
+			if (fieldsToRemove[INDICATOR_INVALID]) {
+				feedback = ERROR_KEYWORD;
+				return feedback;
+			}
+			
+			if (isRemovingSomethingAlreadyNull(fieldsToRemove)) {
+				feedback = ERROR_REMOVE_NOT_PRESENT;
+				return feedback;
+			}
+			
+			if (fieldsToRemove[INDICATOR_LOCATION]) {
+				countNumberOfEdits++;
+				editedTask.setLocation(null);
+			}
+			
+			if (fieldsToRemove[INDICATOR_TIME]) {
+				countNumberOfEdits++;
+				editedTask.setStartTime(null);
+				editedTask.setEndTime(null);
+			}
+			
+			if (fieldsToRemove[INDICATOR_DATE]) {
+				countNumberOfEdits++;
+				//can only remove date if there is no time
+				if (editedTask.getStartTime() == null && editedTask.getEndTime() == null) {
+					editedTask.setDate(null);
+				} else {
+					feedback = ERROR_REMOVE_DATE_WO_TIME;
+					return feedback;
+				}
+			}
+			
+			if (countNumberOfEdits == 0) {
+				feedback = ERROR_NOTHING_TO_REMOVE;
+			} else {
+				setTaskType(editedTask);
+				feedback = PLACEHOLDER_PARSE_SUCCESS;
+			}
+		} else {
+			feedback = PLACEHOLDER_PARSE_SUCCESS;
+		}
+		return feedback;
+	}
+	
+	private boolean isRemovingSomethingAlreadyNull(boolean[] fieldsToRemove) {
+		if ( (fieldsToRemove[INDICATOR_LOCATION] && editedTask.getLocation() == null) ||
+			(fieldsToRemove[INDICATOR_TIME] && editedTask.getStartTime() == null) ||
+			(fieldsToRemove[INDICATOR_DATE] && editedTask.getDate() == null) ) {
+			return true;
+		}
+		return false;
+	}
+	
+	private String prepareUserModifications(String userCommand,
+			String userChoice) {
+		int choice = convertToInteger(userChoice);
+		currentTask = currentTaskList.get(choice-1);
+		editedTask = new Task(currentTask);
+
+		String userModifications = userCommand.substring(userChoice.length()).trim();
+		return userModifications;
+	}
+
+	private void edit() {
+		boolean success = addFirstTaskAndDeleteSecondTask(editedTask, currentTask);
+		
+		if (success) {
+			result.setSuccess(true);
+			systemFeedback = formatString(SUCCESS_EDIT, editedTask.getName());
+		} else {
+			systemFeedback = ERROR_UNABLE_TO_EDIT;
+		}
+	}
+	
+	@Override
+	public void undo() {
+		boolean success = addFirstTaskAndDeleteSecondTask(currentTask, editedTask);
+		
+		if (success) {
+			systemFeedback = formatString(SUCCESS_UNDO, currentTask.getName());
+		}
+		else {
+			systemFeedback = ERROR_CANNOT_UNDO;
+		}
+		result.setSystemFeedback(systemFeedback);
+	}
+	
+	private boolean addFirstTaskAndDeleteSecondTask(Task task1, Task task2) {
+		//parent method
+		boolean addSuccess = addThisTask(task1);
+		
+		DeleteCommand del = new DeleteCommand();
+		boolean delSuccess = del.deleteThisTask(task2);
+		
+		if (delSuccess && addSuccess) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	private String getFirstWord(String str) {
+		return str.trim().split("\\s+")[0];
+	}
+	
+	private int convertToInteger(String userCommand) {
+		return Integer.parseInt(userCommand);
+	}
+	
+	public Task getEditedTask() {
+		return editedTask;
+	}
+	
+	private String formatString(String message, String arg) {
+		return String.format(message, arg);
+	}
+}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\EditCommand.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\Result.java
+	 */
+
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Queue;
+
+/*
+* Command pattern: This is one of the "Receiver" classes.
+* 
+* Description: This class serves as a user-defined data structure that
+* will store the result of every Command. It will be returned to GUI,
+* where it will use the Get methods to retrieve the results.
+*/
+
+public class Result {
+	//stores system feedback messages 
+	//eg. "Successfully added XX", "invalid task number!", etc.
+	private String systemFeedback;
+	private int highlightIndexI;
+	private int highlightIndexJ;
+	private boolean success;
+	
+	private Queue<String> headings;
+	private Queue<Queue<String>> body;
+	private Queue<String> currentHeading;
+	
+	public Result() {
+		headings = new ArrayDeque<String>();
+		body = new ArrayDeque<Queue<String>>();
+		currentHeading = new ArrayDeque<String>();
+		highlightIndexI = -1;
+		highlightIndexJ = -1;
+		systemFeedback = "default";
+		success = false;
+	}
+	
+	public Result(int indexI, int indexJ, String feedback, ArrayDeque<String> headings, 
+			ArrayDeque<Queue<String>> body, boolean success) {
+		this.headings = headings;
+		this.body = body;
+		currentHeading = new ArrayDeque<String>();
+		highlightIndexI = indexI;
+		highlightIndexJ = indexJ;
+		systemFeedback = feedback;
+		this.success = success;
+	}
+	
+	public Result(String sysFeedback) {
+		this();
+		systemFeedback = sysFeedback;
+	}
+	
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\Result.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\Result.java
+	 */
+
+	public void pushNewHeadingText(String heading) {
+		headings.offer(heading);
+	}
+	
+	public void pushTaskToCurrentHeading(String details) {
+		currentHeading.offer(details);
+	}
+	
+	public void savePreviousHeading() {
+		if (currentHeading.size() > 0) {
+			body.offer(currentHeading);
+			currentHeading = new ArrayDeque<String>();
+		}
+	}
+	
+	public void saveHighlightIndex() {
+		highlightIndexI = headings.size()-1;
+		highlightIndexJ = currentHeading.size()-1;
+	}
+	
+	public void setSystemFeedback(String s) {
+		systemFeedback = s;
+	}
+	
+	public void setSuccess(boolean s) {
+		success = s;
+	}
+	
+	public Queue<String> getHeadings() {
+		return headings;
+	}
+	
+	public Queue<Queue<String>> getBody() {
+		return body;
+	}
+	
+	public boolean isSuccessful() {
+		return success;
+	}
+	
+	public int getHighlightIndexI() {
+		return highlightIndexI;
+	}
+	
+	public int getHighlightIndexJ() {
+		return highlightIndexJ;
+	}
+	
+	public String getSystemFeedback() {
+		return systemFeedback;
+	}
+	
+	public void printHighlightIndex() {
+		System.out.println("highlightIndexI"+highlightIndexI);
+		System.out.println("highlightIndexJ"+highlightIndexJ);
+	}
+	
+	public void printResult() {
+		int numOfHeadings = headings.size();
+		for (int i = 0; i < numOfHeadings; i++) {
+			String heading = headings.poll();
+			System.out.print(heading);
+			headings.offer(heading);
+			
+			Queue<String> bodyOfThisHeading = body.poll();
+			
+			int numOfTasks = bodyOfThisHeading.size();
+			for (int j = 0; j < numOfTasks ; j++) {
+				
+				if (i == highlightIndexI && j == highlightIndexJ) {
+					System.out.println("-----HIGHLIGHT ME!!!!!!-----");
+				}
+				String task = bodyOfThisHeading.poll();
+				System.out.print(task);
+				bodyOfThisHeading.offer(task);
+			}
+		}
+	}
+	
+	public String getResult() {
+		StringBuilder sb = new StringBuilder();
+		
+		int numOfHeadings = headings.size();
+		for (int i = 0; i < numOfHeadings; i++) {
+			String heading = headings.poll();
+			sb.append(heading);
+			headings.offer(heading);
+			
+			Queue<String> bodyOfThisHeading = body.poll();
+			
+			int numOfTasks = bodyOfThisHeading.size();
+			for (int j = 0; j < numOfTasks ; j++) {
+				
+				if (i == highlightIndexI && j == highlightIndexJ) {
+					sb.append("-HIGHLIGHT ME!-");
+				}
+				String task = bodyOfThisHeading.poll();
+				sb.append(task);
+				bodyOfThisHeading.offer(task);
+			}
+		}
+		return sb.toString();
+	}
+	
+	public void setHighlightIndices(int i, int j) {
+		highlightIndexI = i;
+		highlightIndexJ = j;
+	}
+}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\Result.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\Search.java
+	 */
+
+import java.util.ArrayList;
+
+/*
+* Description: This class provides the searching methods 
+* and will return the results in the form of an ArrayList.
+*/
+public class Search {
+	ArrayList<Task> searchList;
+	
+	public Search(ArrayList<Task> searchList) {
+		this.searchList = searchList;
+	}
+	
+	public ArrayList<Task> searchByName(String name) {
+		name = name.trim();
+		ArrayList<Task> matchedTasks = new ArrayList<Task>();
+
+		for (Task t : searchList) {
+			String taskNameInLowerCase = t.getName().toLowerCase();
+			name = name.toLowerCase();
+
+			if (taskNameInLowerCase.contains(name)) {
+				matchedTasks.add(t);
+			}
+		}
+		return matchedTasks;
+	}
+	
+	public ArrayList<Task> searchByStatus(boolean status) {
+		ArrayList<Task> matchedTasks = new ArrayList<Task>();
+		
+		for (Task t : searchList) {
+			if ( (t.getIsDone() == status) ) {
+				matchedTasks.add(t);
+			}
+		}
+		return matchedTasks;
+	}
+	
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\Search.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\ValidationCheck.java
+	 */
+
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.text.ParseException;
+
+/*
+ * Description: This static class will check for errors from user input 
+ * and return an appropriate boolean, depending on whether
+ * it is valid or not. It is part of the Utility component.
+ */
+public class ValidationCheck {
+	
+	public static boolean isValidDate(String input) {
+		boolean isValid = validateDate(input);
+		return isValid;
+	}
+	
+	public static boolean isValidDuration(String from, String to) {
+		boolean isValid = validateDuration(from, to);
+		return isValid;
+	}
+	
+	public static boolean isValidTime(String input) {
+		boolean isValid = validateTime(input);
+		return isValid;
+	}
+	
+	public static boolean isValidChoice(String input, int sizeOfList) {
+		boolean isValid = validateChoice(input, sizeOfList);
+		return isValid;
+	}
+
+	public static boolean isValidOperation(String operation) {
+		boolean isValid = validateOperation(operation);
+		return isValid;
+	}
+	
+	public static boolean isValidStatus(String status) {
+		boolean isValid = validateStatus(status);
+		return isValid;
+	}
+	
+	public static boolean isValidLocation(String loc) {
+		boolean isValid = validateLocation(loc);
+		return isValid;
+	}
+	
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\ValidationCheck.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\ValidationCheck.java
+	 */
+
+	private static boolean validateChoice(String input, int sizeOfList) {
+		try {
+			int choiceEntered = Integer.parseInt(input);
+			
+			if (choiceEntered > sizeOfList || choiceEntered < 1) {
+				return false;
+			}
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		return true;
+	}
+	
+	private static boolean validateOperation(String operation) {
+		operation = operation.toLowerCase();
+		switch (operation) {
+			case "add" :
+			case "create" :
+			case "new" :
+			case "delete" :
+			case "remove" :
+			case "del" :
+			case "display" :
+			case "show" :
+			case "edit" :
+			case "update" :
+			case "undo" :
+			case "clear" :
+			case "find" :
+			case "search" :
+			case "exit" :
+			case "quit" :
+				//all valid operations should fall through to return true
+				return true;
+			default :
+				return false;
+			}
+	}
+	
+	private static boolean validateDate(String date) {
+		if (date.length() != 6) {
+			return false;
+		}
+		
+		String DATE_FORMAT = "ddMMyy";
+        try {
+            DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+            dateFormat.setLenient(false);
+            dateFormat.parse(date);
+        } catch (ParseException e) {
+            return false;
+        }
+        return true;
+	}
+	
+	private static boolean validateTime(String input) {
+		if (input.length() != 4) {
+			return false;
+		}
+		
+		try {	
+			int time = Integer.parseInt(input);
+			int mins = time % 100;
+			int hours = time / 100;
+			
+			if (mins > 59 || hours > 23 || mins < 0 || hours < 0) {
+				return false;
+			}
+		} catch (NumberFormatException e) {
+			return false;
+		}
+		return true;
+	}
+	
+	private static boolean validateDuration(String from, String to) {
+		try {
+			int start = Integer.parseInt(from);
+			int end = Integer.parseInt(to);
+			
+			return ( ((end - start) > 0) && validateTime(from) && validateTime(to) );
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+	
+	private static boolean validateLocation(String loc) {
+		boolean isValid = false;
+		
+		if (loc.trim().length() == 0) {
+			return isValid;
+		}
+		
+		char firstChar = loc.charAt(0);
+		if (firstChar >= 'A' && firstChar <= 'z') {
+			isValid = true;
+		} else {
+			isValid = false;
+		}
+		return isValid;
+	}
+	
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\ValidationCheck.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\ValidationCheckTest.java
+	 */
+
+import static org.junit.Assert.*;
+import org.junit.Test;
+
+/*
+ * Description: This is a unit test for ValidationCheck.java.
+ */
+
+public class ValidationCheckTest {
+
+	@Test
+	public void test() {
+		assertDate();
+		assertTime();
+		assertChoice();
+		assertOperation();
+		assertDuration();
+		assertStatus();
+		assertLocation();
+		assertType();
+	}
+	
+	private void assertType() {
+		assertTrue("valid", ValidationCheck.isValidType("setDuration"));
+		assertTrue("valid", ValidationCheck.isValidType("noSetTiming"));
+		assertTrue("valid", ValidationCheck.isValidType("fullDay"));
+		assertTrue("valid", ValidationCheck.isValidType("targetedTime"));
+		assertFalse("invalid", ValidationCheck.isValidType("abccc"));
+		assertFalse("invalid", ValidationCheck.isValidType("#$#$^$1211"));
+	}
+	
+	private void assertLocation() {
+		assertTrue("valid location", ValidationCheck.isValidLocation("Holland V"));
+		assertTrue("valid location", ValidationCheck.isValidLocation("Z123"));
+		assertTrue("valid location", ValidationCheck.isValidLocation("a#$#$"));
+		assertFalse("invalid location", ValidationCheck.isValidLocation("/rmma"));
+		assertFalse("invalid location", ValidationCheck.isValidLocation("*#@%"));
+	}
+	
+	private void assertDuration() {
+		assertTrue("random valid duration", ValidationCheck.isValidDuration("1000", "1001"));
+		
+		//boundary cases: duration
+		assertFalse("invalid duration", ValidationCheck.isValidDuration("2300", "2200"));
+		assertFalse("invalid duration", ValidationCheck.isValidDuration("2200", "2200"));
+	}
+	private void assertStatus() {
+		assertTrue("valid status", ValidationCheck.isValidStatus("done"));
+		assertTrue("valid status", ValidationCheck.isValidStatus("undone"));
+		
+		assertFalse("valid status", ValidationCheck.isValidStatus("HELLO"));
+	}
+	private void assertDate() {
+		assertTrue("random date", ValidationCheck.isValidDate("260314"));
+		assertTrue("random date", ValidationCheck.isValidDate("261012"));
+		
+		//boundary cases: leap year
+		assertTrue("non-leap year, feb 28", ValidationCheck.isValidDate("280214"));
+		assertFalse("non-leap year, feb 29", ValidationCheck.isValidDate("290214"));
+		assertTrue("leap year, feb 28", ValidationCheck.isValidDate("280212"));
+		assertTrue("leap year, feb 29", ValidationCheck.isValidDate("290212"));
+		
+		//boundary cases: last day of month
+		assertTrue("check for 31st", ValidationCheck.isValidDate("310113"));
+		assertFalse("check for 31st", ValidationCheck.isValidDate("310213"));
+		assertTrue("check for 31st", ValidationCheck.isValidDate("310313"));
+		assertFalse("check for 31st", ValidationCheck.isValidDate("310413"));
+		assertTrue("check for 31st", ValidationCheck.isValidDate("310513"));
+		assertFalse("check for 31st", ValidationCheck.isValidDate("310613"));
+		assertTrue("check for 31st", ValidationCheck.isValidDate("310713"));
+		assertTrue("check for 31st", ValidationCheck.isValidDate("310813"));
+		assertFalse("check for 31st", ValidationCheck.isValidDate("310913"));
+		assertTrue("check for 31st", ValidationCheck.isValidDate("311013"));
+		assertFalse("check for 31st", ValidationCheck.isValidDate("311113"));
+		assertTrue("check for 31st", ValidationCheck.isValidDate("311213"));
+	}
+	private void assertTime() {
+		assertTrue("random time", ValidationCheck.isValidTime("1234"));
+		
+		//boundary cases: first and last value in "valid" partition
+		assertTrue("max time", ValidationCheck.isValidTime("2359"));
+		assertTrue("min time", ValidationCheck.isValidTime("0000"));
+		
+		//boundary cases: first and last value in "invalid" partition
+		assertFalse("exceed max hours", ValidationCheck.isValidTime("2459"));
+		assertFalse("exceed max min", ValidationCheck.isValidTime("2360"));
+		assertFalse("negative", ValidationCheck.isValidTime("-120"));
+		assertFalse("alphabets", ValidationCheck.isValidTime("abcd"));
+	}
+	private void assertChoice() {
+		assertTrue("random choice", ValidationCheck.isValidChoice("1", 2));
+		
+		assertTrue("max possible value", ValidationCheck.isValidChoice("1", 1));
+		
+		//boundary cases
+		assertFalse("exceed max possible value", ValidationCheck.isValidChoice("2", 1));
+		assertFalse("0", ValidationCheck.isValidChoice("0", 1));
+		assertFalse("negative value", ValidationCheck.isValidChoice("-2", 1));
+	}
+	private void assertOperation() {
+		assertTrue("add", ValidationCheck.isValidOperation("add"));
+		assertTrue("add", ValidationCheck.isValidOperation("new"));
+		assertTrue("add", ValidationCheck.isValidOperation("create"));
+		assertTrue("delete", ValidationCheck.isValidOperation("delete"));
+		assertTrue("delete", ValidationCheck.isValidOperation("remove"));
+		assertTrue("delete", ValidationCheck.isValidOperation("del"));
+		assertTrue("display", ValidationCheck.isValidOperation("display"));
+		assertTrue("delete", ValidationCheck.isValidOperation("show"));
+		assertTrue("edit", ValidationCheck.isValidOperation("edit"));
+		assertTrue("update", ValidationCheck.isValidOperation("update"));
+		assertTrue("undo", ValidationCheck.isValidOperation("undo"));
+		assertTrue("clear", ValidationCheck.isValidOperation("clear"));
+		assertTrue("search", ValidationCheck.isValidOperation("search"));
+		assertTrue("delete", ValidationCheck.isValidOperation("find"));
+		assertTrue("delete", ValidationCheck.isValidOperation("exit"));
+		assertTrue("delete", ValidationCheck.isValidOperation("quit"));
+		
+		assertFalse("invalid", ValidationCheck.isValidOperation("101"));
+		assertFalse("invalid", ValidationCheck.isValidOperation("abc"));
+	}
+}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\ValidationCheckTest.java
+
+
+
+
+
