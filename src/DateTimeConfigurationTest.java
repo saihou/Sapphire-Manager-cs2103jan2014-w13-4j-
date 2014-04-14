@@ -2,6 +2,9 @@
 import static org.junit.Assert.*;
 import org.junit.Test;
 
+/*
+ * This class contains unit tests for DateTimeConfiguration class.
+ */
 public class DateTimeConfigurationTest {
 
 	@Test

@@ -10,7 +10,7 @@ import org.junit.Test;
  */
 
 public class CommandTest {
-	private static final String FEEDBACK_CLEAR_ALL_SUCCESS = "Successfully cleared all tasks.";
+	
 	private static final String ERROR_NO_RECORDS_FOUND = "ERROR: No records found!";
 	private static final String ERROR_ENTERING_A_TIMESTAMP_WO_A_DATE = "ERROR: Entering a timestamp without a date doesn't make sense!";
 	private static final String ERROR_LOCATION_MUST_START_WITH_A_LETTER = "ERROR: Location must start with a letter.";
@@ -31,6 +31,7 @@ public class CommandTest {
 	private static final String ERROR_INVALID_TASK_NUMBER = "ERROR: Invalid task number!";
 	private static final String ERROR_INVALID_KEYWORDS_ENTERED = "ERROR: Invalid keyword(s) entered!";
 	
+	private static final String FEEDBACK_CLEAR_ALL_SUCCESS = "Successfully cleared all tasks.";
 	private static final String FEEDBACK_CLEAR_DONE_SUCCESS = "Successfully cleared all done tasks.";
 	private static final String FEEDBACK_EDIT_SUCCESS = "Successfully made changes to \"%s\".";
 	private static final String FEEDBACK_DEL_SUCCESS = "Successfully deleted 2. %s.";

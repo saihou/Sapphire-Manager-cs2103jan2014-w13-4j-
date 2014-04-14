@@ -31,6 +31,7 @@ public class ActionHistory<E> {
 	}
 	
 	//@author A0101252A-unused
+	//Unused because we changed to use command pattern halfway through.
 	/*
 	private static ActionHistory instance = null;
 	

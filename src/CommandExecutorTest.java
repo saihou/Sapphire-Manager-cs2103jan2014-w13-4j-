@@ -16,17 +16,21 @@ import java.util.Queue;
 import org.junit.Test;
 
 public class CommandExecutorTest {
+	/* Date formatters */
+	private static SimpleDateFormat inputDateFormat = new SimpleDateFormat("ddMMyy");
+	private static SimpleDateFormat displayDateFormat = new SimpleDateFormat("dd-MMM-yyyy <EEE>");
+	
+	/* Display headings */
 	private static final String HEADING_MEMOS = "Memos:\n";
 	private static final String HEADING_TASKS_OCCURRING_DUE_MORE_THAN_A_WEEK_LATER = "Tasks Occurring/Due More Than A Week Later:\n";
 	private static final String HEADING_TASKS_OCCURRING_DUE_WITHIN_7_DAYS = "Tasks Occurring/Due Within 7 Days:\n";
 	private static final String HEADING_TODAY_S_TASKS = "Today's Tasks:\n";
 	private static final String HEADING_OVERDUE_TASKS = "Overdue Tasks:\n";
 	
-	SimpleDateFormat inputDateFormat = new SimpleDateFormat("ddMMyy");
-	SimpleDateFormat displayDateFormat = new SimpleDateFormat("dd-MMM-yyyy <EEE>");
-	
+	/* Static Feedbacks */
 	private static String FEEDBACK_CLEAR_ALL = "Successfully cleared all tasks.";
 	
+	/* Pre-defined spacing for formatting purposes */
 	private static final String TASK_NUMBER_SPACING = "   ";
 	private static final String DETAILS_SPACING = "      ";
 	
@@ -37,7 +41,13 @@ public class CommandExecutorTest {
 		positiveTestForDoUserOperations(exec);
 	}
 	
+	/*
+	 * A series of tests that test the CommandExecutor.doUserOperation method.
+	 * They test the validity of the returned Result in particular.
+	 */
 	private void positiveTestForDoUserOperations(CommandExecutor exec) {
+		//Chain of tests testing basic functions: clear, add, display, 
+		// edit, delete, undo delete, undo edit and undo add
 		assertDoClearOperation(exec);
 		assertDoAddOverdueOperation(exec);
 		assertDoDefaultDisplayOperation(exec);
@@ -47,10 +57,14 @@ public class CommandExecutorTest {
 		assertDoUndoEditOperation(exec);
 		assertDoUndoAddOperation(exec);
 		
+		//Clear any tasks just in case
 		assertDoClearOperation(exec);
+		
+		//Ensure Result is valid when more than 1 task exists, test includes
+		//adding different tasks that fall under all display headings
 		assertDoAddOperationsForAllHeadings(exec);
 	}
-	
+
 	private void assertDoClearOperation(CommandExecutor exec) {
 		int indexI = -1;
 		int indexJ = -1;

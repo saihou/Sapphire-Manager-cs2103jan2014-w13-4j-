@@ -63,7 +63,7 @@ public class CommandParser {
 		return displayType;
 	}
 
-	/**
+	/*
 	 * @return error message if number of keywords > 1,
 	 * 		"undone" if number of keywords == 0,
 	 * 		the respective display type otherwise.
@@ -117,7 +117,8 @@ public class CommandParser {
 				(isOverdueKeywordPresent ? 1:0) +
 				(isMemosKeywordPresent ? 1:0);
 	}
-	/**
+	
+	/*
 	 * @param userCommand
 	 * @return displayType, "all" or "done" or error msg
 	 */
@@ -134,7 +135,7 @@ public class CommandParser {
 		return clearType;
 	}
 	
-	/**
+	/*
 	 * @return error message if keyword is invalid,
 	 * 		the respective display type otherwise.
 	 */
@@ -155,7 +156,7 @@ public class CommandParser {
 		return userCommand.trim().toLowerCase();
 	}
 	
-	/**
+	/*
 	 * 
 	 * @param userCommand
 	 * @return boolean array
