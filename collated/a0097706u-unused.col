@@ -1,0 +1,70 @@
+//@author: a0097706u-unused
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\SapphireManagerGUI.java
+	 */
+
+	//reasons for not using: buggy and insufficient time to fix
+	//initializes the timer
+	//private static void startTimer() {
+	//	timer 
+	//	if(!timer.isRunning()) {
+	//		System.out.println("Start timer");
+	//		timer.start();
+	//	} else {
+	//		System.out.println("Restart timer");
+	//		timer.restart();
+	//	}
+	//	System.out.println("4) Timer is running?" +timer.isRunning());
+	//}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\SapphireManagerGUI.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\SapphireManagerGUI.java
+	 */
+
+	//not used because there are no cases that requires it
+	//set display to the bottom
+	//private void setDisplayToBottom() {
+	//	displayBox.setCaretPosition(displayBox.getDocument().getLength());
+	//}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\SapphireManagerGUI.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\SapphireManagerGUI.java
+	 */
+
+	//reasons for not using: buggy and insufficient time to fix
+	//private void timerListener() {
+	//	timeListener = new ActionListener() {
+	//		public void actionPerformed(ActionEvent e) {
+	//			System.out.println("1) Timer is running? "+timer.isRunning());
+	//			timer.stop();
+	//			System.out.println("2) Timer is running? "+timer.isRunning());
+	//			if(!timer.isRunning()) {
+	//				System.out.println("3) Timer is running? "+timer.isRunning());
+	//				displayToHelpo(MESSAGE_HELP);
+	//				displayWelcomeMessage();
+	//			}
+	//		}
+	//	};
+	//}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\SapphireManagerGUI.java
+
+
+
+
+

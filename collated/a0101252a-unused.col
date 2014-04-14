@@ -1,0 +1,60 @@
+//@author: a0101252a-unused
+
+
+
+	/**
+	 * origin: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\ActionHistory.java
+	 */
+
+	//Unused because we changed to use command pattern halfway through.
+	/*
+	private static ActionHistory instance = null;
+	
+	private String lastAction;
+	private Task referenceToLastTask;
+	private Task copyOfLastTask;
+	
+	private ActionHistory(){
+		this.lastAction = null;
+	}
+	public static ActionHistory getInstance() {
+		if (instance == null) {
+			instance = new ActionHistory();
+			return instance;
+		}
+		else {
+			return instance;
+		}
+	}
+	public void setLastAction(String lastAction){
+		this.lastAction = lastAction;
+	}
+	
+	public void setReferenceToLastTask(Task referenceToLastTask){
+		this.referenceToLastTask = referenceToLastTask;
+	}
+	
+	public void setCopyOfLastTask(Task copyOfLastTask){
+		this.copyOfLastTask = copyOfLastTask;
+	}
+	
+	public String getLastAction(){
+		return this.lastAction;
+	}
+	
+	public Task getReferenceToLastTask(){
+		return this.referenceToLastTask;
+	}
+	
+	public Task getCopyOfLastTask(){
+		return this.copyOfLastTask;
+	}
+	*/
+}
+
+	// End of segment: C:\Users\Sai Hou\Documents\SAIHOU\CS2103T\cs2103jan2014-w13-4j\src\ActionHistory.java
+
+
+
+
+
