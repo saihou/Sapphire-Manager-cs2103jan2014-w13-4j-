@@ -262,7 +262,7 @@ public class DisplayCommand extends Command {
 	}
 
 	/*
-	 * @return	Feedback when there are tasks to be displayed
+	 * @return	Text to be display on screen
 	 */
 	protected String formDisplayText(Result result) {
 		
