@@ -102,10 +102,12 @@ class Task implements Comparable<Task> {
 	
 	//@author A0101252A
 	/*
-	 * Returns a String that contains all task details in order for display Command :
-	 * Task name which all tasks must have, followed by time and then optional details.
+	 * @param	haveDate	Specifies whether date should be printed
+	 * @return	Returns a String that contains all task details in order for display Command :
+	 * 			Task name which all tasks must have, followed by date if required then time 
+	 * 			and then optional details.
 	 */
-		private String getTaskDetails(boolean haveDate) {
+	private String getTaskDetails(boolean haveDate) {
 		String taskDetails = this.name + '\n';
 		
 		assert taskDetails != null;
@@ -134,7 +136,7 @@ class Task implements Comparable<Task> {
 		return getTaskDetails(true);
 	}
 
-	/**
+	/*
 	 * This function allows Collections objects that store Task to sort it according to these rules:
 	 *  
 	 * 1. Tasks with timing sorted by date. Under each date:

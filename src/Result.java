@@ -50,6 +50,12 @@ public class Result {
 	}
 	
 	//@author A0101252A
+	/*
+	 * Compares two Result objects.
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * @return True if both objects contain the same information, false otherwise.
+	 */
 	@Override
 	public boolean equals(Object object) {
 		if (!(object instanceof Result)) {

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 /*
  * Command pattern: assumes role of "Command interface", except that
  * it is not an interface, but an abstract class. This is because we
- * realised instead of just specifying an interface, there are a LOT
+ * realized instead of just specifying an interface, there are a LOT
  * more common attributes and methods between the concrete commands,
  * such as systemFeedback, and currentTask and their respective Get
  * methods.
